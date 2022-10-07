@@ -1,11 +1,65 @@
+#### Barn is in experimental version (BETA)
 # Barn
 # About
-It's a simple programming language written in Go that is compiled to C/Nasm/Fasm (x86_64) and other arch soon.
-Syntax is very easy and complex, Barn can call C and ASM functions and do inline assembler. Barn is very optimilized
-and fast, it was written with idea to be the most fastes as he can.
+It's a simple programming language written in Go that is compiled to C.
+Syntax is very easy and complex, Barn can call C. Barn is very optimilized
+and fast, it was written with idea to be the most fastes as he can and the 
+most easiest to use as he can.
 # Dependeces
 - GoLang compiler
 - Bash/Bash
+- GCC
 # Author
 [Owner (SolindekDev)](https://github.com/solindekdev/)
-# barn
+# Bugs
+If you found a bug immediately call me about it, you can create [Github Issue](), write to me on Discord Solindek#4773 or on my [website contact page](https://solindek.tech/contact.html)
+# Syntax
+## Hello World
+[01-hello-world.ba](./examples/01-hello-world.ba)
+```kotlin
+fun main() {
+   puts("Hello World\n")
+}
+```
+## Variables
+[14-function-arguments-variable.ba](./examples/14-function-arguments-variable.ba)
+```kotlin
+fun example_function(int i1, string str1, bool b1, char c1, float f1) {
+    print(str1)
+    print("\n")
+}
+
+fun main() {
+    let i1: int = 1
+    let str1: string = "str"
+    let b1: bool = true
+    let c1: char = 'A'
+    let f1: float = 1.0
+    example_function(i1, str1, b1, c1, f1)
+}
+```
+## If statements
+[19-if-condition.ba](./examples/19-if-condition.ba)
+```kotlin
+fun main() {
+    let age: int = 13
+    if |age == 13| {
+        print("Age is 13\n")
+    } elif |age == 14| {
+        print("Age is 14\n")    
+    } else {
+        print("Age isn't 13\n")
+    }
+}
+```
+## User input
+```kotlin
+@import "lib/std.ba"
+
+fun main() {
+	print("What's your name: ")
+	let user_name: string = input()
+	print("Welcome ")
+	puts(user_name)
+}
+```

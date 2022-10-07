@@ -65,66 +65,9 @@ char* __barn_input() {
     return str;
 }
 
-#include <GL/glut.h>
 
-__BARN_FUNCTION__ int init_gl(char* window_title, int y_size, int x_size) {
-			/* __code__ ./examples/25-opengl-binding.ba */
-char** argv = (char**)0;
-/* __code__ end */
-/* __code__ ./examples/25-opengl-binding.ba */
-int argc = 1;
-/* __code__ end */
-/* __code__ ./examples/25-opengl-binding.ba */
-glutInit(&argc, argv);
-/* __code__ end */
-/* __code__ ./examples/25-opengl-binding.ba */
-glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-/* __code__ end */
-/* __code__ ./examples/25-opengl-binding.ba */
-glutInitWindowPosition(-1,-1);
-/* __code__ end */
-/* __code__ ./examples/25-opengl-binding.ba */
-glutInitWindowSize(y_size, x_size);
-/* __code__ end */
-/* __code__ ./examples/25-opengl-binding.ba */
-glutCreateWindow(window_title);
-/* __code__ end */
-	return 1;
-}
-
-__BARN_FUNCTION__ void main_loop_gl() {
-/* __code__ ./examples/25-opengl-binding.ba */
-glutMainLoop();
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void register_display_func() {
-/* __code__ ./examples/25-opengl-binding.ba */
-glutDisplayFunc(display_func);
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void swap_buffers_gl() {
-/* __code__ ./examples/25-opengl-binding.ba */
-glutSwapBuffers();
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void clear_default_gl() {
-/* __code__ ./examples/25-opengl-binding.ba */
-glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void display_func() {
-	clear_default_gl();
-	swap_buffers_gl();
-}
-
-__BARN_FUNCTION__ int main() {
-	init_gl("OpenGL Barn Biding", 1024, 512);
-	register_display_func();
-	main_loop_gl();
-	return 0;
+__BARN_FUNCTION__ void main() {
+	float pi = 3.15;
+	float circle = (pi*(20*20));
 }
 

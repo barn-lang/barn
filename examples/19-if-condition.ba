@@ -1,13 +1,10 @@
 fun main() {
     let age: int = 13
     if |age == 13| {
-        printf("Age is 13\n")
-        if |age == 13| {
-            printf("Age is 13\n")
-        } else {
-            printf("Age isn't 13\n")
-        }
+        print("Age is 13\n")
+    } elif |age == 14| {
+        print("Age is 14\n")    
     } else {
-        printf("Age isn't 13\n")
+        print("Age isn't 13\n")
     }
 }
