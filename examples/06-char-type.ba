@@ -1,0 +1,7 @@
+fun _char(char __c) {
+    printf("Yeah getting a char\n")
+}
+
+fun main() {
+    _char('D')
+}

@@ -1,0 +1,25 @@
+{
+  "name": "barn-lang",
+  "displayName": "barn-lang",
+  "description": "Extension for syntax highlighting in Barn Programming Language",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.71.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "barn",
+      "aliases": ["Barn", "barn"],
+      "extensions": [".ba",".barn",".bar",".b"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "barn",
+      "scopeName": "source.barn",
+      "path": "./syntaxes/barn.tmLanguage.json"
+    }]
+  }
+}

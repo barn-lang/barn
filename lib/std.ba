@@ -1,0 +1,46 @@
+/* Official Barn Standard library file */
+/* Copyright Solindek (C) 2022 */
+
+// Function for comparing string
+fun string_compare(string s1, string s2) -> bool {
+	__code__("return __barn_string_compare(s1, s2);")
+}
+
+// Function for getting string length
+fun string_length(string s) -> int {
+	__code__("return __barn_string_length(s);")
+}
+
+// Function for reversing string
+fun string_reverse(string s) {
+	__code__("return __barn_reverse(s);")
+}
+
+// Function for changing number to string
+// -- EXAMPLE USE --
+// let buf: string = ""
+// let num: int = 10
+// iota(10, buf, 10)
+// -----------------
+//
+// num - number to convert
+// buf - string to write output
+// base - 10 (decimal), 16 (hexadecimal), 2 (binary)
+fun iota(int num, string buf, int base) {
+	__code__("return __barn_iota(num, buf, base);")
+}
+
+// C string malloc
+fun string_malloc(int size) -> string {
+	__code__("return ((char*)malloc(size));")
+}
+
+// Function for getting user input from console
+fun input() -> string {
+	__code__("return __barn_input();")
+}
+
+// Function just for printing
+fun print(string s) {
+	__code__("printf(s);")
+}

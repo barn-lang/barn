@@ -1,0 +1,157 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Barn",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#reserved-words"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#block-comments"
+		},
+		{
+			"include": "#types"
+		},
+		{
+			"include": "#chars"
+		}
+	],
+	"repository": {
+		"operators": {
+			"patterns": [
+				{
+					"comment": "Operator",
+					"match": "\\b(+|+=|->|-|-=|++|--|*|*=|/|/=)\\b"
+				}
+			]
+		},
+		"types": {
+			"patterns": [
+				{
+					"comment": "numeric types",
+					"match": "(?<![A-Za-z])(float|int)\\b",
+					"captures": {
+						"1": {
+							"name": "entity.name.type.numeric.barn"
+						}
+					}
+				},
+				{
+					"name": "entity.name.type.primitive.barn",
+					"match": "\\b(bool|char|string)\\b"
+				},
+				{
+					"match": "\\b(trait)\\s+([A-Z][A-Za-z0-9]*)\\b",
+					"captures": {
+						"1": {
+							"name": "storage.type.barn"
+						},
+						"2": {
+							"name": "entity.name.type.trait.barn"
+						}
+					}
+				},
+				{
+					"name": "entity.name.type.barn",
+					"match": "\\b[A-Z][A-Za-z0-9]*\\b"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.barn",
+				"match": "\\b(fun|import_c|import|let|return|if|else|elif)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.barn",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [{
+					"name": "constant.character.escape.barn",
+					"match": "\\\\."
+			}]
+		},
+		"chars": {
+			"name": "string.quoted.double.barn",
+			"begin": "'",
+			"end": "'",
+			"patterns": [{
+					"name": "constant.character.escape.barn",
+					"match": "\\\\."
+			}]
+		},
+		"numbers": {
+			"patterns": [{
+				"name": "keyword.other.unit.suffix.integer.barn",
+				"match": "(^-?[0-9][0-9\\.]+$)"
+			}]
+		},
+		"reserved-words": {
+			"match": "\\b(print|printf|puts|putchar|input|string_length|string_compare|string_reverse|iota|string_malloc)\\b",
+			"name": "entity.name.function.member.tpl"
+		},
+		"comments": {
+			"patterns": [
+				{
+					"comment": "doc comments, internal or external",
+					"name": "comment.line.documentation",
+					"match": "^\\s*//[/!]{1}.*"
+				},
+				{
+					"comment": "regular comments",
+					"name": "comment.line.double-slash",
+					"match": "\\s*//.*"
+				}
+			]
+		},
+		"block-comments": {
+			"patterns": [
+				{
+					"comment": "empty doc comment",
+					"name": "comment.block.documentation.barn",
+					"match": "/\\*[\\*!]{1}\\*/"
+				},
+				{
+					"comment": "empty block comment",
+					"name": "comment.block.barn",
+					"match": "/\\*\\*/"
+				},
+				{
+					"comment": "block doc comment",
+					"name": "comment.block.documentation.barn",
+					"begin": "/\\*[\\*!]{1}",
+					"end": "\\*/",
+					"patterns": [
+						{
+							"include": "#block-comments"
+						}
+					]
+				},
+				{
+					"comment": "block comment",
+					"name": "comment.block.barn",
+					"begin": "/\\*(?!\\*)",
+					"end": "\\*/",
+					"patterns": [
+						{
+							"include": "#block-comments"
+						}
+					]
+				}
+			]
+		}
+	},
+	"scopeName": "source.barn"
+}

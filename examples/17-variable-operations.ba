@@ -1,0 +1,7 @@
+fun main() {
+    let var1: int = 0
+    var1 += 2
+    var1 -= 2
+    var1 *= 2
+    var1 /= 2
+}

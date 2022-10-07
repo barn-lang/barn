@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "barn_header.h": "c",
+        "stdbool.h": "c",
+        "cstdint": "c",
+        "stdint.h": "c",
+        "stdlib.h": "c",
+        "glut.h": "c",
+        "freeglut_std.h": "c",
+        "string.h": "c"
+    }
+}

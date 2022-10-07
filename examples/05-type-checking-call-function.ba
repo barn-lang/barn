@@ -1,0 +1,7 @@
+fun type_check_test(string __string, int __int, float __float, bool __bool) {
+    
+}
+
+fun main() {
+    type_check_test("String", 1, 2.0, 1)
+}

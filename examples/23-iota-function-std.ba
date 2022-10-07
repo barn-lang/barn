@@ -1,0 +1,9 @@
+@import "lib/std.ba"
+
+fun main() -> int {
+    let len: int = string_length("12345")
+    let buf: string = string_malloc(1)
+    iota(len, buf, 10)
+    printf(buf)
+    return 0
+}
