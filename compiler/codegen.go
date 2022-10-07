@@ -186,7 +186,11 @@ func generate_code_c_function_body_nodes(node *NodeAST, codegen *Codegen) {
 		codegen.c_code += gen_tab(codegen.tab)
 		codegen.c_code += fmt.Sprintf("else if (%s) {\n", node.else_if_condition)
 		codegen.tab += 1
-	} else if node.node_kind == END_IF_STATEMENT || node.node_kind == END_ELSE_STATEMENT || node.node_kind == END_ELSE_IF_STATEMENT {
+	} else if node.node_kind == WHILE_STATEMENT {
+		codegen.c_code += gen_tab(codegen.tab)
+		codegen.c_code += fmt.Sprintf("while (%s) {\n", node.while_condition)
+		codegen.tab += 1
+	} else if node.node_kind == END_STATEMENT {
 		codegen.tab -= 1
 		codegen.c_code += gen_tab(codegen.tab)
 		codegen.c_code += "}\n"

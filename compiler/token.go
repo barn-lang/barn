@@ -157,5 +157,5 @@ func create_token(filename_count int, value string, filename string, col int, ro
 }
 
 func print_token(tk Token) {
-	fmt.Printf("{ value: `%s`, row: %d, col: %d, kind: `%s` }\n", tk.value, tk.row, tk.col, kind_to_str(tk.kind))
+	fmt.Printf("{ value: `%s`, row: %d, col: %d, kind: `%s`, filename: `%s` }\n", tk.value, tk.row, tk.col, kind_to_str(tk.kind), tk.filename)
 }

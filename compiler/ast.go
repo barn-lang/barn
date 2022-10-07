@@ -14,22 +14,43 @@ const (
 )
 
 const (
+	/* Function stuff */
 	FUNCTION_DECLARATION = iota
 	FUNCTION_RETURN
 	FUNCTION_CALL
+
+	/* Import C */
 	IMPORT_C
+
+	/* Variable declaration, assignment */
 	VARIABLE_DECLARATION
 	VARIABLE_ASSIGNMENT
+
+	/* Variable stuff */
 	VARIABLE_PLUS_ASSIGNMENT
 	VARIABLE_MINUS_ASSIGNMENT
 	VARIABLE_MUL_ASSIGNMENT
 	VARIABLE_DIV_ASSIGNMENT
+
+	/* If, elif, else statements */
 	IF_STATEMENT
 	ELSE_STATEMENT
 	ELSE_IF_STATEMENT
-	END_IF_STATEMENT
-	END_ELSE_STATEMENT
-	END_ELSE_IF_STATEMENT
+
+	/* While & for statements */
+	WHILE_STATEMENT
+	CONTINUE_STATEMENT
+	BREAK_STATEMENT
+
+	/* End statement */
+	END_STATEMENT
+)
+
+const (
+	IF_STATEMENT_END    int = iota
+	ELSE_STATEMENT_END  int = iota
+	ELIF_STATEMENT_END  int = iota
+	WHILE_STATEMENT_END int = iota
 )
 
 type ArgsFunctionDeclaration struct {
@@ -98,6 +119,12 @@ type NodeAST struct {
 
 	/* Else if statement */
 	else_if_condition string
+
+	/* While statement */
+	while_condition string
+
+	/* End statement */
+	end_statement_kind int
 }
 
 func (n *NodeAST) show() {

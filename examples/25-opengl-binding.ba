@@ -10,6 +10,5 @@ fun main() -> int {
     init_gl("OpenGL Barn Biding", 1024, 512)
     register_display_func()
     main_loop_gl()
-d
     return 0
 }

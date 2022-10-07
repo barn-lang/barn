@@ -11,13 +11,14 @@ type Parser struct {
 	lex        *Lexer
 	index      int
 
-	is_function_opened bool
-	actual_function    *NodeAST
-	functions          []*NodeAST
-	local_variables    []*NodeAST
-	global_variables   []*NodeAST
-	if_statement_open  int
-	if_statement_node  *NodeAST
+	is_function_opened    bool
+	actual_function       *NodeAST
+	functions             []*NodeAST
+	local_variables       []*NodeAST
+	global_variables      []*NodeAST
+	statement_open        int
+	last_statement_opened string
+	if_statement_node     *NodeAST
 }
 
 // func get_next_token(parser *Parser) *Token {
@@ -294,6 +295,8 @@ func is_keyword(value_token string) bool {
 	case "else":
 		return true
 	case "elif":
+		return true
+	case "while":
 		return true
 	}
 
@@ -1862,7 +1865,8 @@ func parse_if(parser *Parser) {
 		append_node_ptr(parser, &if_node)
 		skip_token(parser, 1)
 		if parser.curr_token.kind == OPENBRACE {
-			parser.if_statement_open += 1
+			parser.statement_open += 1
+			parser.last_statement_opened = "If"
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, "Expected `{` to open if body",
@@ -1884,8 +1888,9 @@ func parse_else(parser *Parser) {
 	error_when_we_arent_in_function(parser)
 	function := parser.nodes[len(parser.nodes)-1] // it should be function node
 	if len(function.function_body) != 0 {
-		if function.function_body[len(function.function_body)-1].node_kind == END_IF_STATEMENT ||
-			function.function_body[len(function.function_body)-1].node_kind == END_ELSE_IF_STATEMENT {
+		if function.function_body[len(function.function_body)-1].node_kind == END_STATEMENT &&
+			function.function_body[len(function.function_body)-1].end_statement_kind == IF_STATEMENT_END &&
+			function.function_body[len(function.function_body)-1].end_statement_kind == ELIF_STATEMENT_END {
 			else_node := NodeAST{}
 			else_node.node_kind = ELSE_STATEMENT
 			else_node.node_kind_str = "ElseStatement"
@@ -1893,7 +1898,8 @@ func parse_else(parser *Parser) {
 			append_node_ptr(parser, &else_node)
 			skip_token(parser, 1)
 			if parser.curr_token.kind == OPENBRACE {
-				parser.if_statement_open += 1
+				parser.statement_open += 1
+				parser.last_statement_opened = "Else"
 			} else {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "Expected `{` to open else body",
@@ -1926,8 +1932,8 @@ func parse_elif(parser *Parser) {
 
 		function := parser.nodes[len(parser.nodes)-1] // it should be function node
 		if len(function.function_body) != 0 {
-			if function.function_body[len(function.function_body)-1].node_kind == END_IF_STATEMENT ||
-				function.function_body[len(function.function_body)-1].node_kind == END_ELSE_IF_STATEMENT {
+			if function.function_body[len(function.function_body)-1].node_kind == END_STATEMENT &&
+				function.function_body[len(function.function_body)-1].end_statement_kind != ELSE_STATEMENT_END {
 				else_node := NodeAST{}
 				else_node.node_kind = ELSE_IF_STATEMENT
 				else_node.node_kind_str = "ElseIfStatement"
@@ -1936,7 +1942,8 @@ func parse_elif(parser *Parser) {
 				append_node_ptr(parser, &else_node)
 				skip_token(parser, 1)
 				if parser.curr_token.kind == OPENBRACE {
-					parser.if_statement_open += 1
+					parser.statement_open += 1
+					parser.last_statement_opened = "Elif"
 				} else {
 					barn_error_show_with_line(
 						SYNTAX_ERROR, "Expected `{` to open elif body",
@@ -1971,6 +1978,37 @@ func parse_import(parser *Parser) {
 	skip_token(parser, 1)
 }
 
+// Function that parse while keyword
+func parse_while(parser *Parser) {
+	error_when_we_arent_in_function(parser)
+	skip_token(parser, 1)
+	if parser.curr_token.kind == CONDITIONBLOCK {
+		condition := parse_condition_statements(parser)
+
+		while_node := NodeAST{}
+		while_node.node_kind = WHILE_STATEMENT
+		while_node.node_kind_str = "WhileStatement"
+		while_node.while_condition = condition
+		append_node(parser, while_node)
+
+		skip_token(parser, 1)
+		if parser.curr_token.kind == OPENBRACE {
+			parser.statement_open++
+			parser.last_statement_opened = "While"
+		} else {
+			barn_error_show_with_line(
+				SYNTAX_ERROR, "Expected `{` after while condition", parser.curr_token.filename,
+				parser.curr_token.row, parser.curr_token.col-1, true,
+				parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+		}
+	} else {
+		barn_error_show_with_line(
+			SYNTAX_ERROR, "Expected `|` after while keyword", parser.curr_token.filename,
+			parser.curr_token.row, parser.curr_token.col-1, true,
+			parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+	}
+}
+
 // Function that helps to parse successfully
 // identifier token
 func parse_identifier(parser *Parser) {
@@ -1993,6 +2031,8 @@ func parse_identifier(parser *Parser) {
 			parse_else(parser)
 		case "elif":
 			parse_elif(parser)
+		case "while":
+			parse_while(parser)
 		}
 	} else {
 		if parser.is_function_opened == true {
@@ -2106,13 +2146,32 @@ func parser_start(lex *Lexer) *Parser {
 			break
 		} else if parser.curr_token.kind == CLOSEBRACE {
 			if parser.is_function_opened {
-				if parser.if_statement_open >= 1 {
-					parser.if_statement_open -= 1
+				// if parser.statement_open >= 1 {
+				// 	parser.statement_open -= 1
+				// 	node := NodeAST{}
+				// 	node.node_kind = END_WHILE_STATEMENT
+				// 	node.node_kind_str = "EndWhileStatement"
+
+				// 	append_node(&parser, node)
+				// 	continue
+				// }
+				if parser.statement_open >= 1 {
+					parser.statement_open -= 1
 					node := NodeAST{}
-					node.node_kind = END_IF_STATEMENT
-					node.node_kind_str = "EndIfStatement"
+					node.node_kind = END_STATEMENT
+					node.node_kind_str = "EndStatement"
+					if parser.last_statement_opened == "If" {
+						node.end_statement_kind = IF_STATEMENT_END
+					} else if parser.last_statement_opened == "Else" {
+						node.end_statement_kind = ELSE_STATEMENT_END
+					} else if parser.last_statement_opened == "Elif" {
+						node.end_statement_kind = ELIF_STATEMENT_END
+					} else if parser.last_statement_opened == "While" {
+						node.end_statement_kind = WHILE_STATEMENT_END
+					}
 
 					append_node(&parser, node)
+					continue
 				} else {
 					parser.is_function_opened = false
 					reset_local_variables(&parser)

@@ -71,7 +71,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.barn",
-				"match": "\\b(fun|import_c|import|let|return|if|else|elif)\\b"
+				"match": "\\b(fun|import_c|import|let|return|if|else|elif|while|continue|break)\\b"
 			}]
 		},
 		"strings": {

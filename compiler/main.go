@@ -1,7 +1,8 @@
 package main
 
+// TODO: while
+// TODO: variable decrement & increment
 // TODO: for
-// TODO: math operations function return
 
 import (
 	"errors"

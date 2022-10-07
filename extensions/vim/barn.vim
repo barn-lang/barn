@@ -16,7 +16,7 @@ endif
 set iskeyword=a-z,A-Z,-,_,!,@
 
 " Language keywords
-syntax keyword barnKeywords if else elif fun @import_c @import let return
+syntax keyword barnKeywords if else elif fun @import_c @import let return while break continue
 
 " Comments
 syntax region barnCommentLine start="//" end="$"   contains=barnTodos
