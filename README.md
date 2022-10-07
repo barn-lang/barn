@@ -13,6 +13,11 @@ most easiest to use as he can.
 [Owner (SolindekDev)](https://github.com/solindekdev/)
 # Bugs
 If you found a bug immediately call me about it, you can create [Github Issue](), write to me on Discord Solindek#4773 or on my [website contact page](https://solindek.tech/contact.html)
+# Extensions
+## Visual Studio Code
+[Here!](./extensions/vscode/), copy **barn-lang** folder to $HOME/.vscode/extensions/ for unix or there where you installed visual studio code
+## Vim
+[Here!](./extensions/vim/) Put file barn.vim to .vim/syntax/barn.vim and add in your .vimrc file this `autocmd BufRead,BufNewFile *.barn set filetype=barn`
 # Syntax
 ## Hello World
 [01-hello-world.ba](./examples/01-hello-world.ba)
