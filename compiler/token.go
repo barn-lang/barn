@@ -58,11 +58,12 @@ const (
 )
 
 type Token struct {
-	value    string
-	filename string
-	col      int
-	row      int
-	kind     int
+	value          string
+	filename       string
+	col            int
+	row            int
+	kind           int
+	filename_count int
 }
 
 func kind_to_str(kind int) string {
@@ -144,13 +145,14 @@ func kind_to_str(kind int) string {
 	return "NONE"
 }
 
-func create_token(value string, filename string, col int, row int, kind int) Token {
+func create_token(filename_count int, value string, filename string, col int, row int, kind int) Token {
 	var tk Token
 	tk.value = value
 	tk.filename = filename
 	tk.col = col
 	tk.row = row
 	tk.kind = kind
+	tk.filename_count = filename_count
 	return tk
 }
 

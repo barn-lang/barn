@@ -1,6 +1,5 @@
 package main
 
-// TODO: condition statement string strcmp()
 // TODO: for
 // TODO: math operations function return
 
@@ -34,7 +33,7 @@ func main() {
 			os.Exit(1)
 		} else {
 			file_value := get_file_value(args.filename)
-			file_lines := strings.Split(file_value, "\n")
+			file_lines := [][]string{strings.Split(file_value, "\n")}
 
 			time_compilation, is_time_compilation := register_time_compilation(args)
 			lexer := lexer_start(file_value, file_lines, args.filename)
