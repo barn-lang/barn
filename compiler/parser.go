@@ -11,14 +11,16 @@ type Parser struct {
 	lex        *Lexer
 	index      int
 
-	is_function_opened    bool
-	actual_function       *NodeAST
-	functions             []*NodeAST
-	local_variables       []*NodeAST
-	global_variables      []*NodeAST
-	statement_open        int
-	last_statement_opened string
-	if_statement_node     *NodeAST
+	is_function_opened        bool
+	actual_function           *NodeAST
+	functions                 []*NodeAST
+	local_variables           []*NodeAST
+	global_variables          []*NodeAST
+	statement_open            int
+	last_statement_opened     string
+	if_statement_node         *NodeAST
+	is_while_statement_opened int
+	is_for_statement_opened   int
 }
 
 // func get_next_token(parser *Parser) *Token {
@@ -67,7 +69,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
 					os.Exit(1)
 				}
-			} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV) && expect_symbol == true {
+			} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && expect_symbol == true {
 				to_ret += parser.curr_token.value
 				expect_symbol = false
 				expect_number = true
@@ -132,7 +134,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 		} else {
 			to_ret_2 := parser.curr_token.value
 			skip_token(parser, 1)
-			if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV) && (expected_type == BARN_INTREGER || expected_type == BARN_FLOAT) {
+			if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && (expected_type == BARN_INTREGER || expected_type == BARN_FLOAT) {
 				to_ret += to_ret_2
 				expect_number = false
 				expect_symbol = true
@@ -143,7 +145,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						expect_number = false
 						skip_token(parser, 1)
 						continue
-					} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV) && expect_symbol == true {
+					} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && expect_symbol == true {
 						to_ret += parser.curr_token.value
 						expect_symbol = false
 						expect_number = true
@@ -297,6 +299,12 @@ func is_keyword(value_token string) bool {
 	case "elif":
 		return true
 	case "while":
+		return true
+	case "continue":
+		return true
+	case "break":
+		return true
+	case "for":
 		return true
 	}
 
@@ -885,7 +893,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 						os.Exit(1)
 					}
 				}
-			} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV) && expect_symbol == true {
+			} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && expect_symbol == true {
 				to_ret += parser.curr_token.value
 				expect_symbol = false
 				expect_number = true
@@ -1105,7 +1113,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 
 			// to_ret_2 := parser.curr_token.value
 			// skip_token(parser, 1)
-			// if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV) && (expected_type == BARN_INTREGER || expected_type == BARN_FLOAT) {
+			// if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && (expected_type == BARN_INTREGER || expected_type == BARN_FLOAT) {
 			// 	to_ret += to_ret_2
 			// 	expect_number = false
 			// 	expect_symbol = true
@@ -1116,7 +1124,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			// 			expect_number = false
 			// 			skip_token(parser, 1)
 			// 			continue
-			// 		} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV) && expect_symbol == true {
+			// 		} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && expect_symbol == true {
 			// 			to_ret += parser.curr_token.value
 			// 			expect_symbol = false
 			// 			expect_number = true
@@ -1669,7 +1677,7 @@ func parse_return(parser *Parser) {
 }
 
 // Function that parse condition statements
-func parse_condition_statements(parser *Parser) string {
+func parse_condition_statements(parser *Parser, end_kind int) string {
 	skip_token(parser, 1)
 	var last_type_lhs BarnTypes = BARN_TYPE_NONE
 	var last_symbol int = NONE
@@ -1680,7 +1688,7 @@ func parse_condition_statements(parser *Parser) string {
 	parents := 0
 	to_ret := ""
 	for do_we_continue {
-		if parser.curr_token.kind == CONDITIONBLOCK {
+		if parser.curr_token.kind == end_kind {
 			if to_ret == "" {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "Expected condition statement between `|`", parser.curr_token.filename,
@@ -1855,7 +1863,7 @@ func parse_if(parser *Parser) {
 	error_when_we_arent_in_function(parser)
 	skip_token(parser, 1)
 	if parser.curr_token.kind == CONDITIONBLOCK {
-		condition_statement := parse_condition_statements(parser)
+		condition_statement := parse_condition_statements(parser, CONDITIONBLOCK)
 
 		if_node := NodeAST{}
 		if_node.node_kind = IF_STATEMENT
@@ -1889,8 +1897,8 @@ func parse_else(parser *Parser) {
 	function := parser.nodes[len(parser.nodes)-1] // it should be function node
 	if len(function.function_body) != 0 {
 		if function.function_body[len(function.function_body)-1].node_kind == END_STATEMENT &&
-			function.function_body[len(function.function_body)-1].end_statement_kind == IF_STATEMENT_END &&
-			function.function_body[len(function.function_body)-1].end_statement_kind == ELIF_STATEMENT_END {
+			(function.function_body[len(function.function_body)-1].end_statement_kind == IF_STATEMENT_END ||
+				function.function_body[len(function.function_body)-1].end_statement_kind == ELIF_STATEMENT_END) {
 			else_node := NodeAST{}
 			else_node.node_kind = ELSE_STATEMENT
 			else_node.node_kind_str = "ElseStatement"
@@ -1928,12 +1936,13 @@ func parse_elif(parser *Parser) {
 	error_when_we_arent_in_function(parser)
 	skip_token(parser, 1)
 	if parser.curr_token.kind == CONDITIONBLOCK {
-		condition_statement := parse_condition_statements(parser)
+		condition_statement := parse_condition_statements(parser, CONDITIONBLOCK)
 
 		function := parser.nodes[len(parser.nodes)-1] // it should be function node
 		if len(function.function_body) != 0 {
 			if function.function_body[len(function.function_body)-1].node_kind == END_STATEMENT &&
-				function.function_body[len(function.function_body)-1].end_statement_kind != ELSE_STATEMENT_END {
+				(function.function_body[len(function.function_body)-1].end_statement_kind == IF_STATEMENT_END ||
+					function.function_body[len(function.function_body)-1].end_statement_kind == ELIF_STATEMENT_END) {
 				else_node := NodeAST{}
 				else_node.node_kind = ELSE_IF_STATEMENT
 				else_node.node_kind_str = "ElseIfStatement"
@@ -1983,7 +1992,7 @@ func parse_while(parser *Parser) {
 	error_when_we_arent_in_function(parser)
 	skip_token(parser, 1)
 	if parser.curr_token.kind == CONDITIONBLOCK {
-		condition := parse_condition_statements(parser)
+		condition := parse_condition_statements(parser, CONDITIONBLOCK)
 
 		while_node := NodeAST{}
 		while_node.node_kind = WHILE_STATEMENT
@@ -1994,6 +2003,7 @@ func parse_while(parser *Parser) {
 		skip_token(parser, 1)
 		if parser.curr_token.kind == OPENBRACE {
 			parser.statement_open++
+			parser.is_while_statement_opened++
 			parser.last_statement_opened = "While"
 		} else {
 			barn_error_show_with_line(
@@ -2006,6 +2016,144 @@ func parse_while(parser *Parser) {
 			SYNTAX_ERROR, "Expected `|` after while keyword", parser.curr_token.filename,
 			parser.curr_token.row, parser.curr_token.col-1, true,
 			parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+	}
+}
+
+func parse_continue(parser *Parser) {
+	error_when_we_arent_in_function(parser)
+	if parser.is_while_statement_opened >= 1 {
+		continue_node := NodeAST{}
+		continue_node.node_kind = CONTINUE_STATEMENT
+		continue_node.node_kind_str = "ContinueStatement"
+		append_node(parser, continue_node)
+	} else {
+		barn_error_show_with_line(
+			SYNTAX_ERROR, "Continue statement can be only used in while statement", parser.curr_token.filename,
+			parser.curr_token.row, parser.curr_token.col-1, true,
+			parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+		os.Exit(1)
+	}
+}
+
+func parse_break(parser *Parser) {
+	error_when_we_arent_in_function(parser)
+	if parser.is_while_statement_opened >= 1 {
+		break_node := NodeAST{}
+		break_node.node_kind = BREAK_STATEMENT
+		break_node.node_kind_str = "BreakStatement"
+		append_node(parser, break_node)
+	} else {
+		barn_error_show_with_line(
+			SYNTAX_ERROR, "Break statement can be only used in while statement", parser.curr_token.filename,
+			parser.curr_token.row, parser.curr_token.col-1, true,
+			parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+		os.Exit(1)
+	}
+}
+
+func parse_for(parser *Parser) {
+	error_when_we_arent_in_function(parser)
+	skip_token(parser, 1)
+
+	if parser.curr_token.kind == IDENTIFIER && parser.curr_token.value == "let" {
+		parse_let(parser)
+		actual_function := parser.nodes[len(parser.nodes)-1]
+		variable_declaration_node := actual_function.function_body[len(actual_function.function_body)-1]
+		actual_function.function_body = actual_function.function_body[:len(actual_function.function_body)-1]
+
+		skip_token(parser, 1)
+		if parser.curr_token.kind == SEMICOL {
+			condition := parse_condition_statements(parser, SEMICOL)
+
+			if parser.curr_token.kind == SEMICOL {
+				skip_token(parser, 1)
+				if parser.curr_token.value == variable_declaration_node.variable_name {
+					parse_identifier(parser)
+					actual_function := parser.nodes[len(parser.nodes)-1]
+					variable_modification_node := actual_function.function_body[len(actual_function.function_body)-1]
+					actual_function.function_body = actual_function.function_body[:len(actual_function.function_body)-1]
+
+					for_node := NodeAST{}
+					for_node.node_kind = FOR_STATEMENT
+					for_node.node_kind_str = "ForStatement"
+					for_node.for_condition = condition
+					for_node.for_var_declaration = variable_declaration_node
+					for_node.for_var_operation = variable_modification_node
+					append_node(parser, for_node)
+
+					skip_token(parser, 1)
+					if parser.curr_token.kind == OPENBRACE {
+						parser.statement_open++
+						parser.is_for_statement_opened++
+						parser.last_statement_opened = "For"
+					} else {
+						barn_error_show_with_line(
+							SYNTAX_ERROR, "Expected `{` after for statement", parser.curr_token.filename,
+							parser.curr_token.row, parser.curr_token.col-1, true,
+							parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						os.Exit(1)
+					}
+				} else {
+					barn_error_show_with_line(
+						SYNTAX_ERROR, "You need to modify variable that you declared in for statement", parser.curr_token.filename,
+						parser.curr_token.row, parser.curr_token.col-1, true,
+						parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					os.Exit(1)
+				}
+			} else {
+				barn_error_show_with_line(
+					SYNTAX_ERROR, "Expected `;` after for condition", parser.curr_token.filename,
+					parser.curr_token.row, parser.curr_token.col-1, true,
+					parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				os.Exit(1)
+			}
+		} else {
+			barn_error_show_with_line(
+				SYNTAX_ERROR, "Expected `;` after variable declaration", parser.curr_token.filename,
+				parser.curr_token.row, parser.curr_token.col-1, true,
+				parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			os.Exit(1)
+		}
+	} else {
+		barn_error_show_with_line(
+			SYNTAX_ERROR, "Expected variable declaration expression", parser.curr_token.filename,
+			parser.curr_token.row, parser.curr_token.col-1, true,
+			parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+		os.Exit(1)
+	}
+}
+
+func parse_incrementation(parser *Parser, variable_name string) {
+	error_when_we_arent_in_function(parser)
+	if variable := find_variable_both(parser, variable_name); variable != nil {
+		incrementation_node := NodeAST{}
+		incrementation_node.node_kind = VARIABLE_INCREMENTATION
+		incrementation_node.node_kind_str = "VariableIncrementation"
+		incrementation_node.variable_name = variable_name
+		append_node(parser, incrementation_node)
+	} else {
+		barn_error_show_with_line(
+			UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
+			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+		os.Exit(1)
+	}
+}
+
+func parse_decrementation(parser *Parser, variable_name string) {
+	error_when_we_arent_in_function(parser)
+	if variable := find_variable_both(parser, variable_name); variable != nil {
+		decrementation_node := NodeAST{}
+		decrementation_node.node_kind = VARIABLE_DECREMENTATION
+		decrementation_node.node_kind_str = "VariableDecrementation"
+		decrementation_node.variable_name = variable_name
+		append_node(parser, decrementation_node)
+	} else {
+		barn_error_show_with_line(
+			UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
+			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+		os.Exit(1)
 	}
 }
 
@@ -2033,6 +2181,12 @@ func parse_identifier(parser *Parser) {
 			parse_elif(parser)
 		case "while":
 			parse_while(parser)
+		case "continue":
+			parse_continue(parser)
+		case "break":
+			parse_break(parser)
+		case "for":
+			parse_for(parser)
 		}
 	} else {
 		if parser.is_function_opened == true {
@@ -2057,6 +2211,12 @@ func parse_identifier(parser *Parser) {
 			} else if parser.curr_token.kind == DIVASN {
 				// Variable div assigment
 				parse_variable_div_asn(parser, id)
+			} else if parser.curr_token.kind == INCREMENTATION {
+				// Variable div assigment
+				parse_incrementation(parser, id)
+			} else if parser.curr_token.kind == DECREMENTATION {
+				// Variable div assigment
+				parse_decrementation(parser, id)
 			} else {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Unexpected use of token `%s` after `IDENTIFIER`", parser.curr_token.value),
@@ -2167,7 +2327,11 @@ func parser_start(lex *Lexer) *Parser {
 					} else if parser.last_statement_opened == "Elif" {
 						node.end_statement_kind = ELIF_STATEMENT_END
 					} else if parser.last_statement_opened == "While" {
+						parser.is_while_statement_opened--
 						node.end_statement_kind = WHILE_STATEMENT_END
+					} else if parser.last_statement_opened == "For" {
+						parser.is_for_statement_opened--
+						node.end_statement_kind = FOR_STATEMENT_END
 					}
 
 					append_node(&parser, node)

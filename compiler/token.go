@@ -15,15 +15,18 @@ const (
 	IDENTIFIER
 
 	/* Operators */
-	PLUS     // "+"
-	MINUS    // "-"
-	MUL      // "*"
-	DIV      // "/"
-	BANG     // "!"
-	PLUSASN  // "+="
-	MINUSASN // "-="
-	MULASN   // "*="
-	DIVASN   // "/="
+	PLUS           // "+"
+	MINUS          // "-"
+	MUL            // "*"
+	DIV            // "/"
+	MOD            // "%"
+	BANG           // "!"
+	PLUSASN        // "+="
+	MINUSASN       // "-="
+	MULASN         // "*="
+	DIVASN         // "/="
+	INCREMENTATION // "++"
+	DECREMENTATION // "--"
 
 	/* Logical Operators */
 	GT  // ">"
@@ -140,6 +143,10 @@ func kind_to_str(kind int) string {
 		return "SEMICOL"
 	case CONDITIONBLOCK:
 		return "CONDITIONBLOCK"
+	case MOD:
+		return "MOD"
+	case ARROW:
+		return "ARROW"
 	}
 
 	return "NONE"

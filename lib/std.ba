@@ -44,3 +44,8 @@ fun input() -> string {
 fun print(string s) {
 	__code__("printf(s);")
 }
+
+// Function for printing numbers
+fun printnum(int num) {
+	__code__("printf(\"%d\", num);")
+}

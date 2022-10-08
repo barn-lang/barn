@@ -31,6 +31,8 @@ const (
 	VARIABLE_MINUS_ASSIGNMENT
 	VARIABLE_MUL_ASSIGNMENT
 	VARIABLE_DIV_ASSIGNMENT
+	VARIABLE_INCREMENTATION
+	VARIABLE_DECREMENTATION
 
 	/* If, elif, else statements */
 	IF_STATEMENT
@@ -39,6 +41,7 @@ const (
 
 	/* While & for statements */
 	WHILE_STATEMENT
+	FOR_STATEMENT
 	CONTINUE_STATEMENT
 	BREAK_STATEMENT
 
@@ -47,10 +50,11 @@ const (
 )
 
 const (
-	IF_STATEMENT_END    int = iota
-	ELSE_STATEMENT_END  int = iota
-	ELIF_STATEMENT_END  int = iota
-	WHILE_STATEMENT_END int = iota
+	IF_STATEMENT_END int = iota
+	ELSE_STATEMENT_END
+	ELIF_STATEMENT_END
+	WHILE_STATEMENT_END
+	FOR_STATEMENT_END
 )
 
 type ArgsFunctionDeclaration struct {
@@ -125,6 +129,11 @@ type NodeAST struct {
 
 	/* End statement */
 	end_statement_kind int
+
+	/* For statement */
+	for_var_declaration *NodeAST
+	for_condition       string
+	for_var_operation   *NodeAST
 }
 
 func (n *NodeAST) show() {

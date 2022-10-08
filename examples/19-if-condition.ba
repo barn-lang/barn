@@ -1,3 +1,5 @@
+@import "lib/std.ba"
+
 fun main() {
     let age: int = 13
     if |age == 13| {

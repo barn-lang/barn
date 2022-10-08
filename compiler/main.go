@@ -1,8 +1,7 @@
 package main
 
-// TODO: while
-// TODO: variable decrement & increment
-// TODO: for
+// TODO: mathematical operations with variables first
+// TODO: conditional operations with math
 
 import (
 	"errors"

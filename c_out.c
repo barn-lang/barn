@@ -67,55 +67,71 @@ char* __barn_input() {
 
 
 __BARN_FUNCTION__ bool string_compare(char* s1, char* s2) {
-		/* __code__ ./examples/26-while-keyword.ba */
+		/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
 return __barn_string_compare(s1, s2);
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ int string_length(char* s) {
-	/* __code__ ./examples/26-while-keyword.ba */
+	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
 return __barn_string_length(s);
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ void string_reverse(char* s) {
-	/* __code__ ./examples/26-while-keyword.ba */
+	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
 return __barn_reverse(s);
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ void iota(int num, char* buf, int base) {
-			/* __code__ ./examples/26-while-keyword.ba */
+			/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
 return __barn_iota(num, buf, base);
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ char* string_malloc(int size) {
-	/* __code__ ./examples/26-while-keyword.ba */
+	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
 return ((char*)malloc(size));
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ char* input() {
-/* __code__ ./examples/26-while-keyword.ba */
+/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
 return __barn_input();
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ void print(char* s) {
-	/* __code__ ./examples/26-while-keyword.ba */
+	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
 printf(s);
 /* __code__ end */
 }
 
+__BARN_FUNCTION__ void printnum(int num) {
+	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
+printf("%d", num);
+/* __code__ end */
+}
+
 __BARN_FUNCTION__ void main() {
-	int i = 0;
-	while (i!=10) {
-		print("OK\n");
-		i += 1;
-		if (i==9) {
-			print("OKOK\n");
-		}
+	for (int i = 0;i!=1000;i++) {
+	int i_15 = (i%15);
+	int i_3 = (i%3);
+	int i_5 = (i%5);
+	if (i_15==0) {
+		print("FizzBuzz\t");
 	}
+	else if (i_3==0) {
+		print("Fizz\t");
+	}
+	else if (i_5==0) {
+		print("Buzz\t");
+	}
+	else {
+		printnum(i);
+		print("\t");
+	}
+}
 }
 

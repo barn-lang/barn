@@ -1,0 +1,19 @@
+@import "lib/std.ba"
+
+fun main() {
+    for let i: int = 0; i != 1000; i++ {
+        let i_15: int = (i % 15)
+        let i_3: int = (i % 3)
+        let i_5: int = (i % 5)
+        if |i_15 == 0| {
+            print("FizzBuzz\t")
+        } elif |i_3 == 0| {
+            print("Fizz\t")
+        } elif |i_5 == 0| {
+            print("Buzz\t")
+        } else {
+            printnum(i)
+            print("\t")
+        }
+    }
+}

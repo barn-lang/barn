@@ -341,6 +341,8 @@ func detect_symbol(lex *Lexer) (bool, string, int) {
 		return true, ".", DOT
 	case ';':
 		return true, ";", SEMICOL
+	case '%':
+		return true, "%", MOD
 	case '|':
 		if lex.next_char == '|' {
 			advance(lex, 1)
@@ -370,6 +372,9 @@ func detect_symbol(lex *Lexer) (bool, string, int) {
 		if lex.next_char == '=' {
 			advance(lex, 1)
 			return true, "+=", PLUSASN
+		} else if lex.next_char == '+' {
+			advance(lex, 1)
+			return true, "++", INCREMENTATION
 		}
 		return true, "+", PLUS
 	case '-':
@@ -379,6 +384,9 @@ func detect_symbol(lex *Lexer) (bool, string, int) {
 		} else if lex.next_char == '>' {
 			advance(lex, 1)
 			return true, "->", ARROW
+		} else if lex.next_char == '-' {
+			advance(lex, 1)
+			return true, "--", DECREMENTATION
 		}
 		lex.is_negative_value_possible = true
 		return true, "-", MINUS

@@ -75,6 +75,67 @@ func gen_tab(tabs int) string {
 	return to_ret
 }
 
+func generate_variable_declaration(node *NodeAST, codegen *Codegen) string {
+	variable := node
+	to_ret := ""
+	if variable.variable_fn_call_value == true {
+		to_ret += fmt.Sprintf("%s %s = %s",
+			barn_types_to_c_types(variable.variable_type),
+			variable.variable_name,
+			strings.Split(variable.variable_value, "	")[1])
+	} else {
+		if variable.variable_is_arg == false {
+			if variable.variable_type == BARN_STR {
+				to_ret += fmt.Sprintf("%s %s = \"%s\"",
+					barn_types_to_c_types(variable.variable_type),
+					variable.variable_name,
+					variable.variable_value)
+			} else if variable.variable_type == BARN_CHAR {
+				to_ret += fmt.Sprintf("%s %s = '%s'",
+					barn_types_to_c_types(variable.variable_type),
+					variable.variable_name,
+					variable.variable_value)
+			} else {
+				to_ret += fmt.Sprintf("%s %s = %s",
+					barn_types_to_c_types(variable.variable_type),
+					variable.variable_name,
+					variable.variable_value)
+			}
+		}
+	}
+	return to_ret
+}
+
+func generate_variable_modify(node *NodeAST, codegen *Codegen) string {
+	to_ret := ""
+	if node.node_kind == VARIABLE_ASSIGNMENT {
+		to_ret += fmt.Sprintf("%s = %s",
+			node.variable_assignment_name,
+			node.variable_assignment_value)
+	} else if node.node_kind == VARIABLE_PLUS_ASSIGNMENT {
+		to_ret += fmt.Sprintf("%s += %s",
+			node.variable_plus_assignment_name,
+			node.variable_plus_assignment_value)
+	} else if node.node_kind == VARIABLE_MINUS_ASSIGNMENT {
+		to_ret += fmt.Sprintf("%s -= %s",
+			node.variable_minus_assignment_name,
+			node.variable_minus_assignment_value)
+	} else if node.node_kind == VARIABLE_MUL_ASSIGNMENT {
+		to_ret += fmt.Sprintf("%s *= %s",
+			node.variable_mul_assignment_name,
+			node.variable_mul_assignment_value)
+	} else if node.node_kind == VARIABLE_DIV_ASSIGNMENT {
+		to_ret += fmt.Sprintf("%s /= %s",
+			node.variable_div_assignment_name,
+			node.variable_div_assignment_value)
+	} else if node.node_kind == VARIABLE_DECREMENTATION {
+		to_ret += fmt.Sprintf("%s--", node.variable_name)
+	} else if node.node_kind == VARIABLE_INCREMENTATION {
+		to_ret += fmt.Sprintf("%s++", node.variable_name)
+	}
+	return to_ret
+}
+
 func generate_code_c_function_body_nodes(node *NodeAST, codegen *Codegen) {
 	if node.node_kind == FUNCTION_CALL {
 		if node.call_name == "__code__" {
@@ -194,6 +255,24 @@ func generate_code_c_function_body_nodes(node *NodeAST, codegen *Codegen) {
 		codegen.tab -= 1
 		codegen.c_code += gen_tab(codegen.tab)
 		codegen.c_code += "}\n"
+	} else if node.node_kind == BREAK_STATEMENT {
+		codegen.c_code += gen_tab(codegen.tab)
+		codegen.c_code += "break;\n"
+	} else if node.node_kind == CONTINUE_STATEMENT {
+		codegen.c_code += gen_tab(codegen.tab)
+		codegen.c_code += "continue;\n"
+	} else if node.node_kind == VARIABLE_DECREMENTATION {
+		codegen.c_code += gen_tab(codegen.tab)
+		codegen.c_code += fmt.Sprintf("%s--;\n", node.variable_name)
+	} else if node.node_kind == VARIABLE_INCREMENTATION {
+		codegen.c_code += gen_tab(codegen.tab)
+		codegen.c_code += fmt.Sprintf("%s++;\n", node.variable_name)
+	} else if node.node_kind == FOR_STATEMENT {
+		codegen.c_code += gen_tab(codegen.tab)
+		codegen.c_code += fmt.Sprintf("for (%s;%s;%s) {\n",
+			generate_variable_declaration(node.for_var_declaration, codegen),
+			node.for_condition,
+			generate_variable_modify(node.for_var_operation, codegen))
 	} else {
 		barn_error_show(
 			COMPILER_ERROR,
