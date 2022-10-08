@@ -273,6 +273,12 @@ func generate_code_c_function_body_nodes(node *NodeAST, codegen *Codegen) {
 			generate_variable_declaration(node.for_var_declaration, codegen),
 			node.for_condition,
 			generate_variable_modify(node.for_var_operation, codegen))
+	} else if node.node_kind == IMPORT_C {
+		if strings.HasPrefix(node.import_c_header, "./") {
+			codegen.c_header += fmt.Sprintf("#include \"%s\"\n", node.import_c_header)
+		} else {
+			codegen.c_header += fmt.Sprintf("#include <%s>\n", node.import_c_header)
+		}
 	} else {
 		barn_error_show(
 			COMPILER_ERROR,

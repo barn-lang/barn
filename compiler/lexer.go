@@ -426,7 +426,7 @@ func detect_symbol(lex *Lexer) (bool, string, int) {
 }
 
 // Main lexer function
-func lexer_start(data string, data_lines [][]string, filename string) *Lexer {
+func lexer_start(data string, data_lines [][]string, filename string, filename_count int) *Lexer {
 	// Create lexer stucture that will be returned to main function
 	var lex Lexer
 
@@ -434,6 +434,7 @@ func lexer_start(data string, data_lines [][]string, filename string) *Lexer {
 	lex.data = data
 	lex.filename = filename
 	lex.data_lines = data_lines
+	lex.filename_count = filename_count
 	lex.curr_char = 0
 	lex.next_char = 0
 	lex.is_space = false
@@ -538,7 +539,7 @@ func import_files(lexer *Lexer) *Lexer {
 					lexer_import := lexer_start(
 						string(content),
 						[][]string{strings.Split(string(content), "\n")},
-						lexer.tokens[i+1].value)
+						lexer.tokens[i+1].value, len(lexer.data_lines)-1)
 					copy_tokens := lexer.tokens
 					lexer_import.tokens = lexer_import.tokens[:len(lexer_import.tokens)-1]
 					lexer.data_lines = append(lexer.data_lines, strings.Split(string(content), "\n"))

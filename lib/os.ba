@@ -1,0 +1,54 @@
+/* Official Barn OS library file */
+/* Copyright Solindek (C) 2022 */
+
+fun os_current_system() -> string {
+	__code__("#if defined (__APPLE__)") // Apple
+		return "MacOS"
+	__code__("#elif defined (__unix__)") // Unix
+		@import_c "sys/utsname.h"
+		__code__("struct utsname __buf = { 0 };")
+		__code__("uname(&__buf);")
+		__code__("return strdup(__buf.sysname);")
+	__code__("#elif defined (_WIN32)") // Windows
+		return "Windows"
+	__code__("#endif")
+}
+
+fun os_file_exists(string filename) -> bool {
+	@import_c "sys/types.h"
+    @import_c "sys/stat.h"
+    @import_c "unistd.h"
+	__code__("struct stat __buf;")
+  	__code__("return (bool)(stat (filename, &__buf) == 0);")
+}
+
+fun os_read_file(string filename) -> string {
+	__code__("FILE* f = fopen(filename, \"r\");")
+	__code__("if (f == NULL)")
+	__code__("	return strdup(\"\");")
+    __code__("long size;")
+    __code__("int flen = 0;")
+    __code__("char* buf = \"\";")
+    __code__("fseek(f, 0, SEEK_END);")
+    __code__("flen = ftell(f) + 1;")
+    __code__("buf = malloc(flen * sizeof(char));")
+    // memset(buf, 0, flen);
+    __code__("fseek(f, 0, SEEK_SET);")
+    __code__("size = fread(buf, 1, flen, f);")
+	__code__("if (size != flen - 1) {")
+	__code__("	fclose(f);")
+    __code__("    return buf;")
+	__code__("}")
+	__code__("fclose(f);")
+    __code__("return buf;")
+}
+
+fun os_write_file(string filename, string value) -> bool {
+	__code__("FILE* f = fopen(filename, \"w\");")
+	__code__("if (f == NULL)")
+	__code__("	return false;")
+	__code__("int success = fprintf(f, \"%s\", value);")
+	__code__("if (success != 0)")
+	__code__("	return false;")
+	return true
+}

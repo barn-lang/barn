@@ -49,3 +49,12 @@ fun print(string s) {
 fun printnum(int num) {
 	__code__("printf(\"%d\", num);")
 }
+
+// Function for printing numbers
+fun printbool(bool boo) {
+	if |boo == true| { print("true") } else { print("false") }
+}
+
+fun free_string(string s) {
+	__code__("free(s);")
+}

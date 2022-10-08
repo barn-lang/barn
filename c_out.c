@@ -65,73 +65,192 @@ char* __barn_input() {
     return str;
 }
 
+#include <sys/utsname.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+__BARN_FUNCTION__ char* os_current_system() {
+/* __code__ ./examples/33-read-file.ba */
+#if defined (__APPLE__)
+/* __code__ end */
+	return MacOS;
+/* __code__ ./examples/33-read-file.ba */
+#elif defined (__unix__)
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+struct utsname __buf = { 0 };
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+uname(&__buf);
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+return strdup(__buf.sysname);
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+#elif defined (_WIN32)
+/* __code__ end */
+	return Windows;
+/* __code__ ./examples/33-read-file.ba */
+#endif
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ bool os_file_exists(char* filename) {
+	/* __code__ ./examples/33-read-file.ba */
+struct stat __buf;
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+return (bool)(stat (filename, &__buf) == 0);
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ char* os_read_file(char* filename) {
+	/* __code__ ./examples/33-read-file.ba */
+FILE* f = fopen(filename, "r");
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+if (f == NULL)
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+return strdup("");
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+long size;
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+int flen = 0;
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+char* buf = "";
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+fseek(f, 0, SEEK_END);
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+flen = ftell(f) + 1;
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+buf = malloc(flen * sizeof(char));
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+fseek(f, 0, SEEK_SET);
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+size = fread(buf, 1, flen, f);
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+if (size != flen - 1) {
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+fclose(f);
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+    return buf;
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+}
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+fclose(f);
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+return buf;
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ bool os_write_file(char* filename, char* value) {
+		/* __code__ ./examples/33-read-file.ba */
+FILE* f = fopen(filename, "w");
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+if (f == NULL)
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+return false;
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+int success = fprintf(f, "%s", value);
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+if (success != 0)
+/* __code__ end */
+/* __code__ ./examples/33-read-file.ba */
+return false;
+/* __code__ end */
+	return true;
+}
 
 __BARN_FUNCTION__ bool string_compare(char* s1, char* s2) {
-		/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
+		/* __code__ ./examples/33-read-file.ba */
 return __barn_string_compare(s1, s2);
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ int string_length(char* s) {
-	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
+	/* __code__ ./examples/33-read-file.ba */
 return __barn_string_length(s);
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ void string_reverse(char* s) {
-	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
+	/* __code__ ./examples/33-read-file.ba */
 return __barn_reverse(s);
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ void iota(int num, char* buf, int base) {
-			/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
+			/* __code__ ./examples/33-read-file.ba */
 return __barn_iota(num, buf, base);
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ char* string_malloc(int size) {
-	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
+	/* __code__ ./examples/33-read-file.ba */
 return ((char*)malloc(size));
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ char* input() {
-/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
+/* __code__ ./examples/33-read-file.ba */
 return __barn_input();
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ void print(char* s) {
-	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
+	/* __code__ ./examples/33-read-file.ba */
 printf(s);
 /* __code__ end */
 }
 
 __BARN_FUNCTION__ void printnum(int num) {
-	/* __code__ ./examples/31-fizz-buzz-in-barn.ba */
+	/* __code__ ./examples/33-read-file.ba */
 printf("%d", num);
 /* __code__ end */
 }
 
-__BARN_FUNCTION__ void main() {
-	for (int i = 0;i!=1000;i++) {
-	int i_15 = (i%15);
-	int i_3 = (i%3);
-	int i_5 = (i%5);
-	if (i_15==0) {
-		print("FizzBuzz\t");
-	}
-	else if (i_3==0) {
-		print("Fizz\t");
-	}
-	else if (i_5==0) {
-		print("Buzz\t");
+__BARN_FUNCTION__ void printbool(bool boo) {
+		if (boo==true) {
+		print("true");
 	}
 	else {
-		printnum(i);
-		print("\t");
+		print("false");
 	}
 }
+
+__BARN_FUNCTION__ void free_string(char* s) {
+	/* __code__ ./examples/33-read-file.ba */
+free(s);
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ void main() {
+	bool file = os_file_exists("./get_os_info.c");
+	printbool(file);
+	puts("");
+	char* file_content = os_read_file("./get_os_info.c");
+	puts(file_content);
+	free_string(file_content);
+	os_write_file("./get_os_info.c", "Siema");
 }
 

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -36,7 +37,7 @@ func main() {
 			file_lines := [][]string{strings.Split(file_value, "\n")}
 
 			time_compilation, is_time_compilation := register_time_compilation(args)
-			lexer := lexer_start(file_value, file_lines, args.filename)
+			lexer := lexer_start(file_value, file_lines, args.filename, 0)
 			lexer = import_files(lexer)
 			parser := parser_start(lexer)
 
@@ -62,6 +63,13 @@ func main() {
 
 			file.WriteString(code)
 
+			out, err := exec.Command("gcc", "./c_out.c").Output()
+			if err != nil {
+				barn_error_show(COMPILER_ERROR, "Something gone wrong while compiling with gcc")
+				fmt.Println(err)
+				fmt.Println(out)
+				os.Exit(1)
+			}
 		}
 	} else {
 		if len(args.flags) == 0 {

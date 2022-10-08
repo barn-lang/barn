@@ -1463,27 +1463,27 @@ func parse_let(parser *Parser) {
 // @import_c "stdio.h"
 // ----------------------------------------------------
 func parse_import_c(parser *Parser) {
-	if parser.is_function_opened == true {
+	// if parser.is_function_opened == true {
+	// 	barn_error_show_with_line(
+	// 		SYNTAX_ERROR, "`@import_c` must be outside of function",
+	// 		parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+	// 		true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+	// 	os.Exit(1)
+	// } else {
+	is_next_token_kind(parser, STRING)
+	if len(parser.curr_token.value) == 0 {
 		barn_error_show_with_line(
-			SYNTAX_ERROR, "`@import_c` must be outside of function",
+			SYNTAX_ERROR, "C header is too short",
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
 			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
-		os.Exit(1)
-	} else {
-		is_next_token_kind(parser, STRING)
-		if len(parser.curr_token.value) == 0 {
-			barn_error_show_with_line(
-				SYNTAX_ERROR, "C header is too short",
-				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
-			return
-		}
-		node := NodeAST{}
-		node.node_kind = IMPORT_C
-		node.node_kind_str = "ImportC"
-		node.import_c_header = parser.curr_token.value
-		append_node(parser, node)
+		return
 	}
+	node := NodeAST{}
+	node.node_kind = IMPORT_C
+	node.node_kind_str = "ImportC"
+	node.import_c_header = parser.curr_token.value
+	append_node(parser, node)
+	// }
 }
 
 // Function for parsing variable assignments
@@ -1658,10 +1658,9 @@ func parse_return(parser *Parser) {
 	if parser.is_function_opened {
 		function := find_function(parser, parser.actual_function.function_name)
 		return_value := parse_value(parser, function.function_return)
-		// if function.function_return == BARN_INTREGER || function.function_return == BARN_FLOAT {
-		// 	skip_token(parser, -1)
-		// }
-		skip_token(parser, -1)
+		if function.function_return == BARN_INTREGER || function.function_return == BARN_FLOAT {
+			skip_token(parser, -1)
+		}
 		node := NodeAST{}
 		node.node_kind = FUNCTION_RETURN
 		node.node_kind_str = "FunctionReturn"
