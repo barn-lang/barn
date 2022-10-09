@@ -18,6 +18,8 @@ If you found a bug immediately call me about it, you can create [Github Issue]()
 [Here!](./extensions/vscode/), copy **barn-lang** folder to $HOME/.vscode/extensions/ for unix or there where you installed visual studio code
 ## Vim
 [Here!](./extensions/vim/) Put file barn.vim to .vim/syntax/barn.vim and add in your .vimrc file this `autocmd BufRead,BufNewFile *.barn set filetype=barn`
+# Documentation
+[HERE!!](https://barn-lang.github.io/barn-docs/)
 # Syntax
 ## Hello World
 [01-hello-world.ba](./examples/01-hello-world.ba)
