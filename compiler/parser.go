@@ -740,7 +740,12 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 	expect_number := true
 	parents := 0
 	to_ret := ""
-	if parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == OPENPARENT || parser.curr_token.kind == CLOSEPARENT {
+	first_token_kind := parser.curr_token.kind
+	skip_token(parser, 1)
+	second_token_kind := parser.curr_token.kind
+	skip_token(parser, -1)
+	identifier_and_math := first_token_kind == IDENTIFIER && (second_token_kind == PLUS || second_token_kind == MINUS || second_token_kind == MUL || second_token_kind == DIV || second_token_kind == MOD)
+	if parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == OPENPARENT || parser.curr_token.kind == CLOSEPARENT || identifier_and_math {
 		for do_we_continue {
 			if (parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT) && expect_number == true {
 				to_ret += parser.curr_token.value
@@ -1798,6 +1803,22 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 		} else if (parser.curr_token.kind == GT || parser.curr_token.kind == GTE || parser.curr_token.kind == LT || parser.curr_token.kind == LTE || parser.curr_token.kind == EQ || parser.curr_token.kind == NEQ || parser.curr_token.kind == OROR || parser.curr_token.kind == ANDAND) && expected_symbol {
 			if last_type_lhs == BARN_STR {
 				to_ret += ","
+			} else {
+				to_ret += parser.curr_token.value
+			}
+			expected_symbol = false
+			expected_value = true
+			last_symbol = parser.curr_token.kind
+			last_symbol_str = parser.curr_token.value
+			skip_token(parser, 1)
+			continue
+		} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && expected_symbol == true {
+			if last_type_lhs == BARN_STR {
+				barn_error_show_with_line(
+					SYNTAX_ERROR, fmt.Sprintf("Can't use `%s` with `%s` type", parser.curr_token.value, last_type_lhs.as_string()),
+					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				os.Exit(1)
 			} else {
 				to_ret += parser.curr_token.value
 			}

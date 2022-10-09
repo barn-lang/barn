@@ -1,0 +1,7 @@
+@import "std.ba"
+
+fun main() {
+    let number: int = 9 + 1 
+    let number1: int = number + 1
+    printnum(number1)
+}

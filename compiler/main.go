@@ -1,6 +1,5 @@
 package main
 
-// TODO: mathematical operations with variables first
 // TODO: conditional operations with math
 
 import (
