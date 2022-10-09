@@ -529,11 +529,14 @@ func import_files(lexer *Lexer) *Lexer {
 					if err != nil {
 						content, err = ioutil.ReadFile("./" + lexer.tokens[i+1].value)
 						if err != nil {
-							barn_error_show_with_line(
-								SYNTAX_ERROR, fmt.Sprintf("Import file is not found `%s`", lexer.tokens[i+1].value),
-								lexer.filename, lexer.tokens[i].row, lexer.tokens[i].col-1,
-								true, lexer.data_lines[0][lexer.tokens[i].row-1])
-							os.Exit(1)
+							content, err = ioutil.ReadFile(get_barn_libs_directory() + lexer.tokens[i+1].value)
+							if err != nil {
+								barn_error_show_with_line(
+									SYNTAX_ERROR, fmt.Sprintf("Import file is not found `%s`", lexer.tokens[i+1].value),
+									lexer.filename, lexer.tokens[i].row, lexer.tokens[i].col-1,
+									true, lexer.data_lines[0][lexer.tokens[i].row-1])
+								os.Exit(1)
+							}
 						}
 					}
 					lexer_import := lexer_start(

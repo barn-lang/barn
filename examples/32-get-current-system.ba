@@ -1,5 +1,5 @@
-@import "lib/std.ba"
-@import "lib/os.ba"
+@import "std.ba"
+@import "os.ba"
 
 fun main() {
     let system: string = os_current_system()

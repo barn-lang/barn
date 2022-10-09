@@ -1,4 +1,4 @@
-@import "lib/opengl-barn/gl.ba"
+@import "opengl-barn/gl.ba"
 
 fun display_func() {
     clear_default_gl()

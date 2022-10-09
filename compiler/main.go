@@ -64,10 +64,8 @@ func main() {
 			file.WriteString(code)
 
 			out, err := exec.Command("gcc", "./c_out.c").Output()
-			if err != nil {
-				barn_error_show(COMPILER_ERROR, "Something gone wrong while compiling with gcc")
-				fmt.Println(err)
-				fmt.Println(out)
+			if len(out) != 0 {
+				fmt.Println(string(out))
 				os.Exit(1)
 			}
 		}

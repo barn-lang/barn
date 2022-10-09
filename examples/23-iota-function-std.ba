@@ -1,4 +1,4 @@
-@import "lib/std.ba"
+@import "std.ba"
 
 fun main() -> int {
     let len: int = string_length("12345")

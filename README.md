@@ -59,7 +59,7 @@ fun main() {
 ```
 ## User input
 ```kotlin
-@import "lib/std.ba"
+@import "std.ba"
 
 fun main() {
 	print("What's your name: ")

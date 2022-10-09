@@ -1,4 +1,4 @@
-@import "lib/std.ba"
+@import "std.ba"
 
 fun main() {
     let is_5_dividable_by_5: int = 5 % 5

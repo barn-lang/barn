@@ -1,4 +1,4 @@
-@import "lib/std.ba"
+@import "std.ba"
 
 fun main() {
     while |true| {

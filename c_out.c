@@ -1,4 +1,4 @@
-#include "lib/std-c/barn_header.h"
+#include "/home/solindek/.barn/libs/std-c/barn_header.h"
 
 int __barn_string_length(char* str) {
     int i = 0;
@@ -245,12 +245,12 @@ free(s);
 }
 
 __BARN_FUNCTION__ void main() {
-	bool file = os_file_exists("./get_os_info.c");
+	bool file = os_file_exists("./file.txt");
 	printbool(file);
 	puts("");
-	char* file_content = os_read_file("./get_os_info.c");
+	char* file_content = os_read_file("./file.txt");
 	puts(file_content);
 	free_string(file_content);
-	os_write_file("./get_os_info.c", "Siema");
+	os_write_file("./file.txt", "Hi");
 }
 

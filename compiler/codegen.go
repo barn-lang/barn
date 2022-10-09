@@ -289,10 +289,13 @@ func generate_code_c_function_body_nodes(node *NodeAST, codegen *Codegen) {
 }
 
 func codegen_c(codegen *Codegen) {
-	codegen.c_header += "#include \"lib/std-c/barn_header.h\"\n\n"
+	codegen.c_header += "#include \"" + get_barn_libs_directory() + "std-c/barn_header.h" + "\"\n\n"
 	content, err := ioutil.ReadFile("./lib/std-c/barn-std.c")
 	if err != nil {
-		fmt.Println("./lib/std-c/barn-std.c is not found")
+		content, err = ioutil.ReadFile(get_barn_libs_directory() + "std-c/barn-std.c")
+		if err != nil {
+			fmt.Println(get_barn_libs_directory() + "std-c/barn-std.c" + " is not found")
+		}
 	}
 	codegen.c_header += string(content)
 	codegen.c_header += "\n"
@@ -354,6 +357,9 @@ func codegen_fasm(codegen *Codegen) {
 }
 
 func codegen_nasm(codegen *Codegen) {
+	fmt.Println("Generating code with NASM is not supported yet")
+	os.Exit(1)
+
 	codegen.nasm_file_header = `bits   64
 global _start`
 	codegen.nasm_section_data = `

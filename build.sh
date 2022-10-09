@@ -7,6 +7,13 @@ function compile {
 	cd ../
 }
 
+function save_barn_libraries {
+	echo -e "[ \e[35mWAIT\e[0m ] Saving barn libraries to $HOME/.barn/libs/"
+	mkdir -p $HOME/.barn/libs/
+	cp -r ./lib/* $HOME/.barn/libs/
+        echo -e "[  \e[32mOK\e[0m  ] Successfully saved barn libraries to $HOME/.barn/libs/"
+}
+
 function recognize_distro_and_how_to_install {
 	distro=$(uname -n)
 	if [ $distro == "debian" ]; then
@@ -32,6 +39,8 @@ if [ -d ~/go ]; then
 	echo -e "[  \e[32mOK\e[0m  ] Go Compiler have been found on your machine"
 	echo -e "[ \e[35mWAIT\e[0m ] Start compiling Barn compiler"
 	compile
+	save_barn_libraries
+	sudo cp ./barn /bin/barn
 	# compile_std_c
 else
 	echo -e "[ \e[31mERR\e[0m  ] Go Compiler have not been found on your machine, install it and then run this command"
