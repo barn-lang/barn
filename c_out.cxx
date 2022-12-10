@@ -1,3 +1,5 @@
+#include "/home/solindek/.barn/libs/std-cxx/barn_header.hxx"
+
 // int __barn_string_length(char* str) {
 //     int i = 0;
 //     while (str[i] != '\0') ++i;
@@ -62,3 +64,67 @@
 //     }
 //     return str;
 // }
+
+
+__BARN_FUNCTION__ bool string_compare(std::string s1, std::string s2) {
+		/* __code__ ./examples/36-generating-with-cxx.ba */
+return (bool)s1.compare(s2);
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ int string_length(std::string s) {
+	/* __code__ ./examples/36-generating-with-cxx.ba */
+return s.size();
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ void string_reverse(std::string s) {
+	/* __code__ ./examples/36-generating-with-cxx.ba */
+return std::reverse(s.begin(), s.end());
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ std::string iota(int num) {
+	/* __code__ ./examples/36-generating-with-cxx.ba */
+return std::to_string(num);
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ std::string input() {
+/* __code__ ./examples/36-generating-with-cxx.ba */
+std::string str;std::cin >> str;return str;
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ void print(std::string s) {
+	/* __code__ ./examples/36-generating-with-cxx.ba */
+std::cout << s;
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ void printf(std::string s) {
+	/* __code__ ./examples/36-generating-with-cxx.ba */
+std::cout << s;
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ void printnum(int num) {
+	/* __code__ ./examples/36-generating-with-cxx.ba */
+std::cout << num;
+/* __code__ end */
+}
+
+__BARN_FUNCTION__ void printbool(bool boo) {
+		if (boo==true) {
+		print("true");
+	}
+	else {
+		print("false");
+	}
+}
+
+__BARN_FUNCTION__ void main() {
+	std::string example_string = "Hello World";
+	print(example_string);
+}
+

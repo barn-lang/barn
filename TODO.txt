@@ -1,2 +1,0 @@
-- Compile to c++
-- Better way that strings work

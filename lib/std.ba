@@ -1,60 +1,53 @@
 /* Official Barn Standard library file */
 /* Copyright Solindek (C) 2022 */
 
+// TODO: add printf so it works
+
 // Function for comparing string
 fun string_compare(string s1, string s2) -> bool {
-	__code__("return __barn_string_compare(s1, s2);")
+	__code__("return (bool)s1.compare(s2);")
 }
 
 // Function for getting string length
 fun string_length(string s) -> int {
-	__code__("return __barn_string_length(s);")
+	__code__("return s.size();")
 }
 
 // Function for reversing string
 fun string_reverse(string s) {
-	__code__("return __barn_reverse(s);")
+	__code__("return std::reverse(s.begin(), s.end());")
 }
 
 // Function for changing number to string
-// -- EXAMPLE USE --
-// let buf: string = ""
-// let num: int = 10
-// iota(10, buf, 10)
-// -----------------
-//
-// num - number to convert
-// buf - string to write output
-// base - 10 (decimal), 16 (hexadecimal), 2 (binary)
-fun iota(int num, string buf, int base) {
-	__code__("return __barn_iota(num, buf, base);")
-}
-
-// C string malloc
-fun string_malloc(int size) -> string {
-	__code__("return ((char*)malloc(size));")
+fun iota(int num) -> string {
+	__code__("return std::to_string(num);")
 }
 
 // Function for getting user input from console
 fun input() -> string {
-	__code__("return __barn_input();")
+	__code__("
+		std::string str;
+		std::cin >> str;
+		return str;
+	")
 }
 
 // Function just for printing
 fun print(string s) {
-	__code__("printf(s);")
+	__code__("std::cout << s;")
+}
+
+// Just a alias of print
+fun printf(string s) {
+	__code__("std::cout << s;")
 }
 
 // Function for printing numbers
 fun printnum(int num) {
-	__code__("printf(\"%d\", num);")
+	__code__("std::cout << num;")
 }
 
 // Function for printing numbers
 fun printbool(bool boo) {
 	if |boo == true| { print("true") } else { print("false") }
-}
-
-fun free_string(string s) {
-	__code__("free(s);")
 }

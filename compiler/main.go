@@ -1,6 +1,6 @@
 package main
 
-// TODO: conditional operations with math
+// TODO: add enums
 
 import (
 	"errors"
@@ -62,7 +62,7 @@ func main() {
 
 			file.WriteString(code)
 
-			out, err := exec.Command("gcc", "./c_out.c").Output()
+			out, err := exec.Command("g++", "./c_out.c").Output()
 			if len(out) != 0 {
 				fmt.Println(string(out))
 				os.Exit(1)

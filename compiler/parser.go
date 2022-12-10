@@ -484,7 +484,6 @@ func append_node_ptr(parser *Parser, node *NodeAST) {
 // Function for parsing function declarations in
 // code
 func parse_function_declaration(parser *Parser) {
-	// TODO: implement type returning in functions
 	// var function_return BarnTypes
 	if parser.is_function_opened == false {
 		// Try to get function name
@@ -673,7 +672,6 @@ func parse_function_call(parser *Parser, function_name string) {
 						// 	true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
 						// os.Exit(1)
 						skip_token(parser, 1)
-						// TODO: get comma to work
 					}
 				} else {
 					barn_error_show_with_line(
@@ -695,7 +693,6 @@ func parse_function_call(parser *Parser, function_name string) {
 				// skip_token(parser, 1)
 				// if parser.curr_token.kind == COMMA {
 				// 	skip_token(parser, 1)
-				// 	// TODO: get comma to work
 				// }
 			} else {
 				barn_error_show_with_line(
@@ -808,7 +805,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 											// 	true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
 											// os.Exit(1)
 											skip_token(parser, 1)
-											// TODO: get comma to work
 										}
 									} else {
 										barn_error_show_with_line(
@@ -830,7 +826,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 									// skip_token(parser, 1)
 									// if parser.curr_token.kind == COMMA {
 									// 	skip_token(parser, 1)
-									// 	// TODO: get comma to work
 									// }
 								} else {
 									barn_error_show_with_line(
@@ -842,7 +837,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 							}
 							if argument_count == len(mentioned_function.function_args) {
 								if parser.curr_token.kind == CLOSEPARENT {
-									// TODO: add to `to_ret`
 									to_ret += fmt.Sprintf("%s(", function_name)
 									if 0 == len(arguments_to_node) {
 										to_ret += ");\n"
@@ -1014,7 +1008,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 										// 	true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
 										// os.Exit(1)
 										skip_token(parser, 1)
-										// TODO: get comma to work
 									}
 								} else {
 									barn_error_show_with_line(
@@ -1036,7 +1029,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 								// skip_token(parser, 1)
 								// if parser.curr_token.kind == COMMA {
 								// 	skip_token(parser, 1)
-								// 	// TODO: get comma to work
 								// }
 							} else {
 								barn_error_show_with_line(
@@ -1048,7 +1040,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 						}
 						if argument_count == len(mentioned_function.function_args) {
 							if parser.curr_token.kind == CLOSEPARENT {
-								// TODO: add to `to_ret`
 								to_ret += fmt.Sprintf("	%s(", function_name)
 								if 0 == len(arguments_to_node) {
 									to_ret += ");\n"
@@ -2210,8 +2201,6 @@ func parse_identifier(parser *Parser) {
 		}
 	} else {
 		if parser.is_function_opened == true {
-			// TODO: implement interaction with variables and other
-			//       important things
 			skip_token(parser, 1)
 			if parser.curr_token.kind == OPENPARENT {
 				// Function calls

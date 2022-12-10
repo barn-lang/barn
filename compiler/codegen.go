@@ -38,7 +38,7 @@ func (codegen *Codegen) get_code(codegen_type int) (string, string) {
 	case C:
 		return fmt.Sprintf("%s\n%s", codegen.cxx_header, codegen.cxx_code), "c_out.cxx"
 	case FASM:
-		return "TODO fasm", "fasm_out.asm"
+		return "fasm", "fasm_out.asm"
 	case NASM:
 		return fmt.Sprintf("%s\n\nsection .data%s\nsection .bss%s\nsection .text%s", codegen.nasm_file_header, codegen.nasm_section_data, codegen.nasm_section_bss, codegen.nasm_section_text), "nasm_out.asm"
 	}
@@ -289,10 +289,10 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 }
 
 func codegen_c(codegen *Codegen) {
-	codegen.cxx_header += "#include \"" + get_barn_libs_directory() + "std-cxx/barn_header.h" + "\"\n\n"
+	codegen.cxx_header += "#include \"" + get_barn_libs_directory() + "std-cxx/barn_header.hxx" + "\"\n\n"
 	content, err := ioutil.ReadFile("./lib/std-c/barn-std.cxx")
 	if err != nil {
-		content, err = ioutil.ReadFile(get_barn_libs_directory() + "std-c/barn-std.cxx")
+		content, err = ioutil.ReadFile(get_barn_libs_directory() + "std-cxx/barn-std.cxx")
 		if err != nil {
 			fmt.Println(get_barn_libs_directory() + "std-c/barn-std.cxx" + " is not found")
 		}

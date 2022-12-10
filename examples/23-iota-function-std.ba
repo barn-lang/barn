@@ -1,9 +1,7 @@
 @import "std.ba"
 
 fun main() -> int {
-    let len: int = string_length("12345")
-    let buf: string = string_malloc(1)
-    iota(len, buf, 10)
-    printf(buf)
+    let str: string = iota(20)
+    printf(str)
     return 0
 }
