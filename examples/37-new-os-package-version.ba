@@ -1,0 +1,16 @@
+@import "os.ba"
+@import "std.ba"
+
+fun main() {
+    let os: string = os_current_system()
+    println(os)
+
+    let exists: bool = os_file_exists("c_out.cxx")
+    printbool(exists)
+
+    let file_write: bool = os_write_file("text.txt", "Welcome everyone")
+    printbool(file_write)
+
+    let file_content: string = os_read_file("text.txt")
+    println(file_content)
+}

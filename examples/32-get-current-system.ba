@@ -4,5 +4,4 @@
 fun main() {
     let system: string = os_current_system()
     puts(system)
-    free_string(system)
 }

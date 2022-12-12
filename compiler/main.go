@@ -1,6 +1,7 @@
 package main
 
 // TODO: add enums
+// TODO: add match
 
 import (
 	"errors"

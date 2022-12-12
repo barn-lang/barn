@@ -8,7 +8,6 @@ fun main() {
 
     let file_content: string = os_read_file("./file.txt")
     puts(file_content)
-    free_string(file_content)
     
     os_write_file("./file.txt", "Hi")
 }

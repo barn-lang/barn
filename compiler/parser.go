@@ -306,6 +306,8 @@ func is_keyword(value_token string) bool {
 		return true
 	case "for":
 		return true
+	case "enum":
+		return true
 	}
 
 	return false
@@ -1753,12 +1755,8 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 		} else if (parser.curr_token.kind == STRING) && expected_value {
 			if last_type_lhs == BARN_TYPE_NONE || last_type_lhs == BARN_STR {
 				if last_type_lhs == BARN_STR {
-
-					to_ret += fmt.Sprintf("\"%s\")", parser.curr_token.value)
-					if last_symbol == EQ {
-						to_ret += " == true"
-					} else if last_symbol == NEQ {
-						to_ret += " != true"
+					if last_symbol == EQ || last_symbol == NEQ {
+						to_ret += "\"" + parser.curr_token.value + "\""
 					} else {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, fmt.Sprintf("Symbol `%s` can be used with string comparation", last_symbol_str),
@@ -1766,6 +1764,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
 						os.Exit(1)
 					}
+
 				} else {
 					to_ret += fmt.Sprintf("barn_string_compare(\"%s\"", parser.curr_token.value)
 				}
@@ -1784,19 +1783,8 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
 				os.Exit(1)
 			}
-			// } else if (parser.curr_token.kind == GT || parser.curr_token.kind == GTE || parser.curr_token.kind == LT || parser.curr_token.kind == LTE || parser.curr_token.kind == EQ || parser.curr_token.kind == NEQ || parser.curr_token.kind == OROR || parser.curr_token.kind == ANDAND) && expected_symbol {
-			// 	to_ret += parser.curr_token.value
-			// 	expected_symbol = false
-			// 	expected_value = true
-			// 	skip_token(parser, 1)
-			// 	continue
-			// }
 		} else if (parser.curr_token.kind == GT || parser.curr_token.kind == GTE || parser.curr_token.kind == LT || parser.curr_token.kind == LTE || parser.curr_token.kind == EQ || parser.curr_token.kind == NEQ || parser.curr_token.kind == OROR || parser.curr_token.kind == ANDAND) && expected_symbol {
-			if last_type_lhs == BARN_STR {
-				to_ret += ","
-			} else {
-				to_ret += parser.curr_token.value
-			}
+			to_ret += parser.curr_token.value
 			expected_symbol = false
 			expected_value = true
 			last_symbol = parser.curr_token.kind
@@ -2134,6 +2122,10 @@ func parse_for(parser *Parser) {
 	}
 }
 
+func parse_enum(parser *Parser) {
+	// TODO: implement enums
+}
+
 func parse_incrementation(parser *Parser, variable_name string) {
 	error_when_we_arent_in_function(parser)
 	if variable := find_variable_both(parser, variable_name); variable != nil {
@@ -2198,6 +2190,8 @@ func parse_identifier(parser *Parser) {
 			parse_break(parser)
 		case "for":
 			parse_for(parser)
+		case "enum":
+			parse_enum(parser)
 		}
 	} else {
 		if parser.is_function_opened == true {

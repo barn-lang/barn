@@ -301,7 +301,12 @@ func codegen_c(codegen *Codegen) {
 	codegen.cxx_header += "\n"
 	for i := 0; i < len(codegen.parser.nodes); i++ {
 		if codegen.parser.nodes[i].node_kind == FUNCTION_DECLARATION {
-			codegen.cxx_code += fmt.Sprintf("__BARN_FUNCTION__ %s %s(", barn_types_to_cxx_types(codegen.parser.nodes[i].function_return), codegen.parser.nodes[i].function_name)
+			if codegen.parser.nodes[i].function_name == "main" {
+				codegen.cxx_code += "int main("
+			} else {
+				codegen.cxx_code += fmt.Sprintf("__BARN_FUNCTION__ %s %s(", barn_types_to_cxx_types(codegen.parser.nodes[i].function_return), codegen.parser.nodes[i].function_name)
+			}
+
 			for j := 0; j < len(codegen.parser.nodes[i].function_args); j++ {
 				c_type := barn_types_to_cxx_types(codegen.parser.nodes[i].function_args[j].type_arg)
 				if j+1 == len(codegen.parser.nodes[i].function_args) {
@@ -323,6 +328,7 @@ func codegen_c(codegen *Codegen) {
 			}
 			codegen.tab -= 1
 			codegen.cxx_code += "}\n\n"
+
 		} else if codegen.parser.nodes[i].node_kind == IMPORT_C {
 			if strings.HasPrefix(codegen.parser.nodes[i].import_c_header, "./") {
 				codegen.cxx_header += fmt.Sprintf("#include \"%s\"\n", codegen.parser.nodes[i].import_c_header)

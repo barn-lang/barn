@@ -37,6 +37,11 @@ fun print(string s) {
 	__code__("std::cout << s;")
 }
 
+// Function just for printing with newline after it
+fun println(string s) {
+	__code__("std::cout << s << std::endl;")
+}
+
 // Just a alias of print
 fun printf(string s) {
 	__code__("std::cout << s;")
@@ -48,6 +53,6 @@ fun printnum(int num) {
 }
 
 // Function for printing numbers
-fun printbool(bool boo) {
-	if |boo == true| { print("true") } else { print("false") }
+fun printbool(bool _bool) {
+	if |_bool == true| { print("true") } else { print("false") }
 }

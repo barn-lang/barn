@@ -5,57 +5,46 @@ fun os_current_system() -> string {
 	__code__("#if defined (__APPLE__)") // Apple
 		return "Apple"
 	__code__("#elif defined (__unix__)") // Unix
-		@import_c "sys/utsname.h"
 		__code__("struct utsname __buf = { 0 };")
 		__code__("uname(&__buf);")
-		__code__("return strdup(__buf.sysname);")
+		__code__("return std::string(__buf.sysname);")
 	__code__("#elif defined (_WIN32)") // Windows
 		return "Windows"
 	__code__("#endif")
 }
 
 fun os_file_exists(string filename) -> bool {
-	let os: string = os_current_system()
-	if |os == "Apple"| {
-		// TODO: implement os_file_exists(string filename) for apple
-		print("os_file_exists(string filename) is not implemented for ios")
-	} elif |os == "Windows"| {
-		@import_c "windows.h"
-		__code__("return (bool)(GetFileAttributesA(filename) == 0xFFFFFFFF);")
-	} elif |os == "Linux"| {
-		@import_c "sys/types.h"
-		@import_c "sys/stat.h"
-		@import_c "unistd.h"
+	__code__("#if defined (__APPLE__)")
+		__code__("std::cout << \"os_file_exists(string filename) is not implemented for ios\" << std::endl;")
+		__code__("return false;")
+	__code__("#elif defined (__unix__)")
 		__code__("struct stat __buf;")
-		__code__("return (bool)(stat (filename, &__buf) == 0);")
-	} else {
-		print("os_file_exists(string filename) is not implemented for your system")
-	}
+		__code__("return (bool)(stat (filename.c_str(), &__buf) == 0);")
+	__code__("#elif defined (_WIN32)")
+		__code__("return (bool)(GetFileAttributesA(filename) == 0xFFFFFFFF);")
+	__code__("#else")
+		__code__("std::cout << \"os_file_exists(string filename) is not implemented for your system\" << std::endl;")
+		__code__("return false;")
+	__code__("#endif")
 }
 
 fun os_read_file(string filename) -> string {
-	__code__("
-		std::string value;
-		std::ifstream file(filename);
-		char ac;
-
-		if (file.is_open()) {
-			while (file) {
-				ac = file.get();
-				value.append(1, ac);
-			}
-		}
-
-		file.close();
-		return value;
-	")
+	__code__("std::string value;")
+	__code__("std::ifstream file(filename);")
+	__code__("char ac;")
+	__code__("if (file.is_open()) {")
+		__code__("while (file) {")
+			__code__("ac = file.get();")
+			__code__("value.append(1, ac);")
+		__code__("}")
+	__code__("}")
+	__code__("file.close();")
+	__code__("return value;")
 }
 
 fun os_write_file(string filename, string value) -> bool {
-	__code__("
-		std::ofstream file(filename);
-		file << value;
-		file.close();
-	")
+	__code__("std::ofstream file(filename);")
+	__code__("file << value;")
+	__code__("file.close();")
 	return true
 }

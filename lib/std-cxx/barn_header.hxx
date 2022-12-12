@@ -1,10 +1,23 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
+
 #include <string>
 #include <compare>
 #include <cstdlib>
+#include <cstring>
+#include <cstdio>
 #include <algorithm>
+
+#if defined(__unix__)
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <unistd.h>
+    #include <sys/utsname.h>
+#elif defined(_WIN32)
+    #include <windows.h>
+#endif
 
 #define __BARN_FUNCTION__
 #define __BARN_GLOBAL_VARIABLE__

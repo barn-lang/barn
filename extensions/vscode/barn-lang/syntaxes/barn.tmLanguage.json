@@ -71,7 +71,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.barn",
-				"match": "\\b(fun|import_c|import|let|return|if|else|elif|while|continue|break|for)\\b"
+				"match": "\\b(fun|import_c|import|let|return|if|else|elif|while|continue|break|for|enum|match)\\b"
 			}]
 		},
 		"strings": {
@@ -99,7 +99,7 @@
 			}]
 		},
 		"reserved-words": {
-			"match": "\\b(print|printf|puts|putchar|input|string_length|string_compare|string_reverse|iota|string_malloc|printnum)\\b",
+			"match": "\\b(print|printf|println|printbool|puts|putchar|input|string_length|string_compare|string_reverse|iota|string_malloc|printnum)\\b",
 			"name": "entity.name.function.member.tpl"
 		},
 		"comments": {
