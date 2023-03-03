@@ -1,8 +1,5 @@
 package main
 
-// TODO: add enums
-// TODO: add match
-
 import (
 	"errors"
 	"fmt"
@@ -39,6 +36,13 @@ func main() {
 			time_compilation, is_time_compilation := register_time_compilation(args)
 			lexer := lexer_start(file_value, file_lines, args.filename, 0)
 			lexer = import_files(lexer)
+
+			if args.is_flag("--tokens") || args.is_flag("-t") {
+				for i := 0; i < len(lexer.tokens); i++ {
+					print_token(lexer.tokens[i]);
+				}
+			}
+
 			parser := parser_start(lexer)
 
 			// Recognize codegen type
@@ -63,7 +67,7 @@ func main() {
 
 			file.WriteString(code)
 
-			out, err := exec.Command("g++", "./c_out.c").Output()
+			out, err := exec.Command("g++", "./c_out.cxx").Output()
 			if len(out) != 0 {
 				fmt.Println(string(out))
 				os.Exit(1)

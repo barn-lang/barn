@@ -1,0 +1,8 @@
+- [ ] Implement new types
+- [ ] Check is number not overflow
+- [ ] Change if, while expressions look
+- [ ] Change for expression look
+- [ ] Rewrite standard library
+- [ ] Function calls in math expressions
+- [ ] Auto type variables
+- [ ] Benchmark Codegen

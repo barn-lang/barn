@@ -125,7 +125,7 @@ func comment_multiline_close(lex *Lexer) {
 // Function for creating identifier tokens
 func creator_identifer(lex *Lexer) {
 	if lex.last_token == nil {
-		lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+		lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 			string(lex.curr_char), lex.filename,
 			lex.col, lex.row, IDENTIFIER))
 	} else {
@@ -135,12 +135,12 @@ func creator_identifer(lex *Lexer) {
 				buf = append(buf, lex.curr_char)    // Append to the buffer another byte
 				lex.last_token.value = string(buf)  // Convert buffer to string
 			} else {
-				lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+				lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 					string(lex.curr_char), lex.filename,
 					lex.col, lex.row, IDENTIFIER))
 			}
 		} else {
-			lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+			lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 				string(lex.curr_char), lex.filename,
 				lex.col, lex.row, IDENTIFIER))
 		}
@@ -153,7 +153,7 @@ func creator_string(lex *Lexer) {
 	if lex.is_string {
 		lex.is_string = false
 	} else {
-		lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+		lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 			"", lex.filename, lex.col,
 			lex.row, STRING))
 		lex.is_string = true
@@ -195,7 +195,7 @@ func add_to_string(lex *Lexer) {
 // Function for creating a number token
 func creator_number(lex *Lexer) {
 	if lex.last_token == nil {
-		lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+		lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 			string(lex.curr_char), lex.filename,
 			lex.col, lex.row, INT))
 		lex.is_space = false
@@ -226,18 +226,18 @@ func creator_number(lex *Lexer) {
 			} else if lex.last_token.kind == MINUS && lex.is_negative_value_possible == true {
 				lex.is_negative_value_possible = false
 				lex.tokens = lex.tokens[:len(lex.tokens)-1]
-				lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+				lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 					"-"+string(lex.curr_char), lex.filename,
 					lex.col, lex.row, INT))
 				lex.is_space = false
 			} else {
-				lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+				lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 					string(lex.curr_char), lex.filename,
 					lex.col, lex.row, INT))
 				lex.is_space = false
 			}
 		} else {
-			lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+			lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 				string(lex.curr_char), lex.filename,
 				lex.col, lex.row, INT))
 			lex.is_space = false
@@ -257,7 +257,7 @@ func creator_char(lex *Lexer) {
 		value_of_char := lex.curr_char
 		advance(lex, 1)
 		if lex.curr_char == '\'' {
-			lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+			lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 				string(value_of_char), lex.filename,
 				lex.col, lex.row, CHAR))
 			lex.is_space = false
@@ -274,7 +274,7 @@ func creator_char(lex *Lexer) {
 func creator_float(lex *Lexer) {
 	if lex.last_token != nil {
 		if lex.last_token.kind == NONE {
-			lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+			lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 				".", lex.filename,
 				lex.col, lex.row, DOT))
 			lex.is_space = false
@@ -291,14 +291,14 @@ func creator_float(lex *Lexer) {
 					lex.filename, lex.row, lex.col-1, true, lex.data_lines[0][lex.row-1])
 				os.Exit(1)
 			} else {
-				lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+				lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 					".", lex.filename,
 					lex.col, lex.row, DOT))
 				lex.is_space = false
 			}
 		}
 	} else {
-		lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+		lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 			".", lex.filename,
 			lex.col, lex.row, DOT))
 		lex.is_space = false
@@ -482,7 +482,7 @@ func lexer_start(data string, data_lines [][]string, filename string, filename_c
 		} else {
 			is_symbol, value_symbol, kind_symbol := detect_symbol(&lex)
 			if is_symbol {
-				lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+				lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 					value_symbol, lex.filename,
 					lex.col, lex.row, kind_symbol))
 				lex.is_space = false
@@ -495,7 +495,7 @@ func lexer_start(data string, data_lines [][]string, filename string, filename_c
 		}
 	}
 
-	lex.tokens = append(lex.tokens, create_token(lex.filename_count,
+	lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 		"EOF", lex.filename,
 		lex.col, lex.row, EOF))
 

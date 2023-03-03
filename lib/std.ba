@@ -54,5 +54,5 @@ fun printnum(int num) {
 
 // Function for printing numbers
 fun printbool(bool _bool) {
-	if |_bool == true| { print("true") } else { print("false") }
+	if (_bool == true) { print("true") } else { print("false") }
 }

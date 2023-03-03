@@ -35,7 +35,7 @@ function recognize_distro_and_how_to_install {
 # }
 
 echo -e "[ \e[35mWAIT\e[0m ] Looking for Go Compiler"
-if [ -d ~/go ]; then
+if [ -d ~/go ] || [ -f /bin/go ]; then
 	echo -e "[  \e[32mOK\e[0m  ] Go Compiler have been found on your machine"
 	echo -e "[ \e[35mWAIT\e[0m ] Start compiling Barn compiler"
 	compile

@@ -23,14 +23,6 @@ type Parser struct {
 	is_for_statement_opened   int
 }
 
-// func get_next_token(parser *Parser) *Token {
-// 	if len(parser.lex.tokens) == parser.index {
-// 		return nil
-// 	} else {
-// 		return parser.lex.tokens[parser.index+1]
-// 	}
-// }
-
 // Function for parsing values
 func parse_value(parser *Parser, expected_type BarnTypes) string {
 	skip_token(parser, 1)
@@ -59,14 +51,14 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						barn_error_show_with_line(
 							UNDEFINED_ERROR, fmt.Sprintf("Expected variable with type `int` or `float` not `%s`", find_var.variable_type.as_string()),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					}
 				} else {
 					barn_error_show_with_line(
 						UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 			} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && expect_symbol == true {
@@ -88,7 +80,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, "Unexpected use of `)`",
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					} else {
 						to_ret += parser.curr_token.value
@@ -103,7 +95,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "Expected number",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			} else if expect_symbol == true {
 				break
@@ -117,7 +109,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Expected expression with type `int` or `float` not `%s`", expected_type.as_string()),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	} else if parser.curr_token.kind == IDENTIFIER {
@@ -128,7 +120,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Expected expression with type `bool` not `%s`", expected_type.as_string()),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else {
@@ -163,14 +155,14 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 								barn_error_show_with_line(
 									UNDEFINED_ERROR, fmt.Sprintf("Expected variable with type `int` or `float` not `%s`", find_var.variable_type.as_string()),
 									parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-									true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+									true, parser.curr_token.line)
 								os.Exit(1)
 							}
 						} else {
 							barn_error_show_with_line(
 								UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-								true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+								true, parser.curr_token.line)
 							os.Exit(1)
 						}
 					} else if parser.curr_token.kind == OPENPARENT || parser.curr_token.kind == CLOSEPARENT {
@@ -186,7 +178,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 								barn_error_show_with_line(
 									SYNTAX_ERROR, "Unexpected use of `)`",
 									parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-									true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+									true, parser.curr_token.line)
 								os.Exit(1)
 							} else {
 								to_ret += parser.curr_token.value
@@ -201,7 +193,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, "Expected number",
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					} else if expect_symbol == true {
 						break
@@ -215,7 +207,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 					barn_error_show_with_line(
 						SYNTAX_ERROR, fmt.Sprintf("Expected expression with type `int` or `float` not `%s`", expected_type.as_string()),
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 			} else {
@@ -225,7 +217,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 					barn_error_show_with_line(
 						UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				} else {
 					if expected_type == find_var.variable_type {
@@ -235,7 +227,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, fmt.Sprintf("Expected expression with type `%s` not `%s`", expected_type.as_string(), find_variable_both(parser, parser.curr_token.value).variable_type.as_string()),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					}
 				}
@@ -248,7 +240,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Expected expression with type `string` not `%s`", expected_type.as_string()),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	} else if parser.curr_token.kind == CHAR {
@@ -258,14 +250,14 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Expected expression with type `char` not `%s`", expected_type.as_string()),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	} else {
 		barn_error_show_with_line(
 			SYNTAX_ERROR, fmt.Sprintf("Unexpected use of `%s`", kind_to_str(parser.curr_token.kind)),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 		return "none"
 	}
@@ -322,7 +314,7 @@ func is_next_token_kind(parser *Parser, kind int) bool {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Expected `%s`, but found `%s`", kind_to_str(kind), kind_to_str(parser.curr_token.kind)),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 		return false
@@ -330,7 +322,7 @@ func is_next_token_kind(parser *Parser, kind int) bool {
 		barn_error_show_with_line(
 			SYNTAX_ERROR, fmt.Sprintf("Expected `%s`", kind_to_str(kind)),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 		return false
 	}
@@ -391,7 +383,7 @@ func parse_function_args(parser *Parser) []ArgsFunctionDeclaration {
 							barn_error_show_with_line(
 								SYNTAX_ERROR, fmt.Sprintf("`%s` is not a type, maybe `char`, `int` or `string`", parser.curr_token.value),
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-								true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+								true, parser.curr_token.line)
 							os.Exit(1)
 						} else {
 							var arg ArgsFunctionDeclaration
@@ -408,7 +400,7 @@ func parse_function_args(parser *Parser) []ArgsFunctionDeclaration {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, "Expected `IDENTIFIER` that represents type",
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					}
 				} else if expecting_type == false && expecting_name == true && expecting_comma == false {
@@ -417,7 +409,7 @@ func parse_function_args(parser *Parser) []ArgsFunctionDeclaration {
 							barn_error_show_with_line(
 								SYNTAX_ERROR, fmt.Sprintf("Argument name `%s` is already taken", parser.curr_token.value),
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-								true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+								true, parser.curr_token.line)
 							os.Exit(1)
 						} else {
 							to_return[len(to_return)-1].name = parser.curr_token.value
@@ -431,7 +423,7 @@ func parse_function_args(parser *Parser) []ArgsFunctionDeclaration {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, "Expected `IDENTIFIER` that represents name of argument",
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					}
 				} else if expecting_type == false && expecting_name == false && expecting_comma == true {
@@ -445,7 +437,7 @@ func parse_function_args(parser *Parser) []ArgsFunctionDeclaration {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, "Expected `COMMA` (`,`) that seperate arguments of function",
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					}
 				}
@@ -510,7 +502,7 @@ func parse_function_declaration(parser *Parser) {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, fmt.Sprintf("Unknown return type `%s`", parser.curr_token.value),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					} else {
 						variable_return = return_type
@@ -521,7 +513,7 @@ func parse_function_declaration(parser *Parser) {
 							barn_error_show_with_line(
 								SYNTAX_ERROR, "Expected `{` after return type",
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-								true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+								true, parser.curr_token.line)
 							os.Exit(1)
 						}
 					}
@@ -529,7 +521,7 @@ func parse_function_declaration(parser *Parser) {
 					barn_error_show_with_line(
 						SYNTAX_ERROR, "Expected `{` after function declaration",
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 
@@ -564,14 +556,14 @@ func parse_function_declaration(parser *Parser) {
 					barn_error_show_with_line(
 						SYNTAX_ERROR, "Something gone wrong while declaring function",
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 			} else {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "Expected `OPENBRACE` `{` after function declaration",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		}
@@ -579,7 +571,7 @@ func parse_function_declaration(parser *Parser) {
 		barn_error_show_with_line(
 			SYNTAX_ERROR, "Function is already opened",
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	}
 }
@@ -590,7 +582,7 @@ func error_when_we_arent_in_function(parser *Parser) {
 		barn_error_show_with_line(
 			SYNTAX_ERROR, "This token can be use only in function body",
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	}
 }
@@ -624,7 +616,7 @@ func change_token_to_barn_type(parser *Parser, tk *Token) (BarnTypes, bool) {
 				barn_error_show_with_line(
 					UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", tk.value),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			} else {
 				return find_var.variable_type, true
@@ -643,7 +635,7 @@ func parse_function_call(parser *Parser, function_name string) {
 		barn_error_show_with_line(
 			UNDEFINED_ERROR, fmt.Sprintf("Function with name `%s` can't be found", function_name),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1-len(function_name),
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
 		argument_count := 0
@@ -654,7 +646,7 @@ func parse_function_call(parser *Parser, function_name string) {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Too many arguments have been passed, expected only %d to call function `%s`", len(mentioned_function.function_args), function_name),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			} else if parser.curr_token.kind == STRING || parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == IDENTIFIER || parser.curr_token.kind == CHAR {
 				tk_barn_type, is_var := change_token_to_barn_type(parser, parser.curr_token)
@@ -671,7 +663,7 @@ func parse_function_call(parser *Parser, function_name string) {
 						// barn_error_show_with_line(
 						// 	SYNTAX_ERROR, "Expected use of comma in this place",
 						// 	parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						// 	true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						// 	true, parser.curr_token.line)
 						// os.Exit(1)
 						skip_token(parser, 1)
 					}
@@ -679,7 +671,7 @@ func parse_function_call(parser *Parser, function_name string) {
 					barn_error_show_with_line(
 						SYNTAX_ERROR, fmt.Sprintf("Argument type is `%s` not `%s`", mentioned_function.function_args[argument_count].type_arg.as_string(), tk_barn_type.as_string()),
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 				// argument := parse_value(parser, mentioned_function.function_args[argument_count].type_arg)
@@ -700,7 +692,7 @@ func parse_function_call(parser *Parser, function_name string) {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "Unexpected use of comma in this place",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		}
@@ -718,14 +710,14 @@ func parse_function_call(parser *Parser, function_name string) {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "At the end of function call expected `)`",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Too few arguments have been passed, expected %d arguments to call function `%s`", len(mentioned_function.function_args), function_name),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	}
@@ -765,7 +757,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 						barn_error_show_with_line(
 							UNDEFINED_ERROR, fmt.Sprintf("Expected variable with type `int` or `float` not `%s`", find_var.variable_type.as_string()),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					}
 				} else {
@@ -776,7 +768,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 							barn_error_show_with_line(
 								UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct function name", parser.curr_token.value),
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-								true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+								true, parser.curr_token.line)
 							os.Exit(1)
 						} else {
 							argument_count := 0
@@ -787,7 +779,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 									barn_error_show_with_line(
 										SYNTAX_ERROR, fmt.Sprintf("Too many arguments have been passed, expected only %d to call function `%s`", len(mentioned_function.function_args), function_name),
 										parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-										true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+										true, parser.curr_token.line)
 									os.Exit(1)
 								} else if parser.curr_token.kind == STRING || parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == IDENTIFIER || parser.curr_token.kind == CHAR {
 									tk_barn_type, is_var := change_token_to_barn_type(parser, parser.curr_token)
@@ -804,7 +796,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 											// barn_error_show_with_line(
 											// 	SYNTAX_ERROR, "Expected use of comma in this place",
 											// 	parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-											// 	true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+											// 	true, parser.curr_token.line)
 											// os.Exit(1)
 											skip_token(parser, 1)
 										}
@@ -812,7 +804,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 										barn_error_show_with_line(
 											SYNTAX_ERROR, fmt.Sprintf("Argument type is `%s` not `%s`", mentioned_function.function_args[argument_count].type_arg.as_string(), tk_barn_type.as_string()),
 											parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-											true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+											true, parser.curr_token.line)
 										os.Exit(1)
 									}
 									// argument := parse_value(parser, mentioned_function.function_args[argument_count].type_arg)
@@ -833,7 +825,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 									barn_error_show_with_line(
 										SYNTAX_ERROR, "Unexpected use of comma in this place",
 										parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-										true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+										true, parser.curr_token.line)
 									os.Exit(1)
 								}
 							}
@@ -875,14 +867,14 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 									barn_error_show_with_line(
 										SYNTAX_ERROR, "At the end of function call expected `)`",
 										parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-										true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+										true, parser.curr_token.line)
 									os.Exit(1)
 								}
 							} else {
 								barn_error_show_with_line(
 									SYNTAX_ERROR, fmt.Sprintf("Too few arguments have been passed, expected %d arguments to call function `%s`", len(mentioned_function.function_args), function_name),
 									parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-									true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+									true, parser.curr_token.line)
 								os.Exit(1)
 							}
 						}
@@ -890,7 +882,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 						barn_error_show_with_line(
 							UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					}
 				}
@@ -913,7 +905,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 						barn_error_show_with_line(
 							SYNTAX_ERROR, "Unexpected use of `)`",
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					} else {
 						to_ret += parser.curr_token.value
@@ -928,7 +920,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "Expected number",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			} else if expect_symbol == true {
 				break
@@ -942,7 +934,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Variable type is `int` or `float` not `%s`", expected_type.as_string()),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	} else if parser.curr_token.kind == IDENTIFIER {
@@ -953,7 +945,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Variable type is `bool` not `%s`", expected_type.as_string()),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else {
@@ -968,7 +960,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 					barn_error_show_with_line(
 						UNDEFINED_ERROR, fmt.Sprintf("Expected variable with type `int` or `float` not `%s`", find_var.variable_type.as_string()),
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 			} else {
@@ -979,7 +971,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 						barn_error_show_with_line(
 							UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct function name", parser.curr_token.value),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					} else {
 						argument_count := 0
@@ -990,7 +982,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 								barn_error_show_with_line(
 									SYNTAX_ERROR, fmt.Sprintf("Too many arguments have been passed, expected only %d to call function `%s`", len(mentioned_function.function_args), function_name),
 									parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-									true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+									true, parser.curr_token.line)
 								os.Exit(1)
 							} else if parser.curr_token.kind == STRING || parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == IDENTIFIER || parser.curr_token.kind == CHAR {
 								tk_barn_type, is_var := change_token_to_barn_type(parser, parser.curr_token)
@@ -1007,7 +999,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 										// barn_error_show_with_line(
 										// 	SYNTAX_ERROR, "Expected use of comma in this place",
 										// 	parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-										// 	true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+										// 	true, parser.curr_token.line)
 										// os.Exit(1)
 										skip_token(parser, 1)
 									}
@@ -1015,7 +1007,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 									barn_error_show_with_line(
 										SYNTAX_ERROR, fmt.Sprintf("Argument type is `%s` not `%s`", mentioned_function.function_args[argument_count].type_arg.as_string(), tk_barn_type.as_string()),
 										parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-										true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+										true, parser.curr_token.line)
 									os.Exit(1)
 								}
 								// argument := parse_value(parser, mentioned_function.function_args[argument_count].type_arg)
@@ -1036,7 +1028,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 								barn_error_show_with_line(
 									SYNTAX_ERROR, "Unexpected use of comma in this place",
 									parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-									true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+									true, parser.curr_token.line)
 								os.Exit(1)
 							}
 						}
@@ -1079,14 +1071,14 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 								barn_error_show_with_line(
 									SYNTAX_ERROR, "At the end of function call expected `)`",
 									parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-									true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+									true, parser.curr_token.line)
 								os.Exit(1)
 							}
 						} else {
 							barn_error_show_with_line(
 								SYNTAX_ERROR, fmt.Sprintf("Too few arguments have been passed, expected %d arguments to call function `%s`", len(mentioned_function.function_args), function_name),
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-								true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+								true, parser.curr_token.line)
 							os.Exit(1)
 						}
 
@@ -1096,7 +1088,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 							barn_error_show_with_line(
 								SYNTAX_ERROR, fmt.Sprintf("Function return type is `%s` not `%s`", mentioned_function.function_return.as_string(), expected_type.as_string()),
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-								true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+								true, parser.curr_token.line)
 							os.Exit(1)
 						}
 					}
@@ -1104,7 +1096,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 					barn_error_show_with_line(
 						UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 			}
@@ -1140,14 +1132,14 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			// 					barn_error_show_with_line(
 			// 						UNDEFINED_ERROR, fmt.Sprintf("Expected variable with type `int` or `float` not `%s`", find_var.variable_type.as_string()),
 			// 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			// 						true, parser.curr_token.line)
 			// 					os.Exit(1)
 			// 				}
 			// 			} else {
 			// 				barn_error_show_with_line(
 			// 					UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
 			// 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			// 					true, parser.curr_token.line)
 			// 				os.Exit(1)
 			// 			}
 			// 		} else if parser.curr_token.kind == OPENPARENT || parser.curr_token.kind == CLOSEPARENT {
@@ -1163,7 +1155,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			// 					barn_error_show_with_line(
 			// 						SYNTAX_ERROR, "Unexpected use of `)`",
 			// 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			// 						true, parser.curr_token.line)
 			// 					os.Exit(1)
 			// 				} else {
 			// 					to_ret += parser.curr_token.value
@@ -1178,7 +1170,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			// 			barn_error_show_with_line(
 			// 				SYNTAX_ERROR, "Expected number",
 			// 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			// 				true, parser.curr_token.line)
 			// 			os.Exit(1)
 			// 		} else if expect_symbol == true {
 			// 			break
@@ -1192,7 +1184,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			// 		barn_error_show_with_line(
 			// 			SYNTAX_ERROR, fmt.Sprintf("Variable type is `int` or `float` not `%s`", expected_type.as_string()),
 			// 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			// 			true, parser.curr_token.line)
 			// 		os.Exit(1)
 			// 	}
 			// } else {
@@ -1202,7 +1194,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			// 	barn_error_show_with_line(
 			// 		UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
 			// 		parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 		true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			// 		true, parser.curr_token.line)
 			// 	os.Exit(1)
 			// } else {
 			// 	if expected_type == find_var.variable_type {
@@ -1212,7 +1204,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			// 		barn_error_show_with_line(
 			// 			SYNTAX_ERROR, fmt.Sprintf("RHS is type `%s` not like variable type with type `%s`", find_variable_both(parser, parser.curr_token.value).variable_type.as_string(), expected_type.as_string()),
 			// 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			// 			true, parser.curr_token.line)
 			// 		os.Exit(1)
 			// 	}
 			// }
@@ -1225,7 +1217,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Variable type is `string` not `%s`", expected_type.as_string()),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	} else if parser.curr_token.kind == CHAR {
@@ -1235,14 +1227,14 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Variable type is `char` not `%s`", expected_type.as_string()),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	} else {
 		barn_error_show_with_line(
 			SYNTAX_ERROR, fmt.Sprintf("Unexpected use of `%s`", kind_to_str(parser.curr_token.kind)),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 		return false, "none"
 	}
@@ -1320,7 +1312,7 @@ func parse_let(parser *Parser) {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Variable with name `%s` is already defined", variable_name),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 
@@ -1331,7 +1323,7 @@ func parse_let(parser *Parser) {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, fmt.Sprintf("Unknown variable type `%s`", parser.curr_token.value),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					} else {
 						if is_next_token_kind_safe(parser, ASN) {
@@ -1359,7 +1351,7 @@ func parse_let(parser *Parser) {
 							barn_error_show_with_line(
 								SYNTAX_ERROR, "Expected `=` after variable type",
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-								true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+								true, parser.curr_token.line)
 							os.Exit(1)
 						}
 					}
@@ -1367,21 +1359,21 @@ func parse_let(parser *Parser) {
 					barn_error_show_with_line(
 						SYNTAX_ERROR, "Expected identifier that represents variable type",
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 			} else {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "Expected `:` after variable name",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, "Expected identifier that represents variable name",
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	} else {
@@ -1392,7 +1384,7 @@ func parse_let(parser *Parser) {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Variable with name `%s` is already defined", variable_name),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 
@@ -1403,7 +1395,7 @@ func parse_let(parser *Parser) {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, fmt.Sprintf("Unknown variable type `%s`", parser.curr_token.value),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					} else {
 						if is_next_token_kind_safe(parser, ASN) {
@@ -1428,7 +1420,7 @@ func parse_let(parser *Parser) {
 							barn_error_show_with_line(
 								SYNTAX_ERROR, "Expected `=` after variable type",
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-								true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+								true, parser.curr_token.line)
 							os.Exit(1)
 						}
 					}
@@ -1436,21 +1428,21 @@ func parse_let(parser *Parser) {
 					barn_error_show_with_line(
 						SYNTAX_ERROR, "Expected identifier that represents variable type",
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 			} else {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "Expected `:` after variable name",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, "Expected identifier that represents variable name",
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	}
@@ -1465,7 +1457,7 @@ func parse_import_c(parser *Parser) {
 	// 	barn_error_show_with_line(
 	// 		SYNTAX_ERROR, "`@import_c` must be outside of function",
 	// 		parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-	// 		true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+	// 		true, parser.curr_token.line)
 	// 	os.Exit(1)
 	// } else {
 	is_next_token_kind(parser, STRING)
@@ -1473,7 +1465,7 @@ func parse_import_c(parser *Parser) {
 		barn_error_show_with_line(
 			SYNTAX_ERROR, "C header is too short",
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		return
 	}
 	node := NodeAST{}
@@ -1495,7 +1487,7 @@ func parse_variable_asn(parser *Parser, variable_name string) {
 		barn_error_show_with_line(
 			UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is not defined", variable_name),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
 		value := parse_value(parser, variable.variable_type)
@@ -1522,7 +1514,7 @@ func parse_variable_plus_asn(parser *Parser, variable_name string) {
 		barn_error_show_with_line(
 			UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is not defined", variable_name),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
 		if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
@@ -1540,7 +1532,7 @@ func parse_variable_plus_asn(parser *Parser, variable_name string) {
 			barn_error_show_with_line(
 				UNDEFINED_ERROR, "`+=` can be only used when variable type is `int` or `float`",
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	}
@@ -1557,7 +1549,7 @@ func parse_variable_minus_asn(parser *Parser, variable_name string) {
 		barn_error_show_with_line(
 			UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is not defined", variable_name),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
 		if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
@@ -1575,7 +1567,7 @@ func parse_variable_minus_asn(parser *Parser, variable_name string) {
 			barn_error_show_with_line(
 				UNDEFINED_ERROR, "`-=` can be only used when variable type is `int` or `float`",
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	}
@@ -1592,7 +1584,7 @@ func parse_variable_mul_asn(parser *Parser, variable_name string) {
 		barn_error_show_with_line(
 			UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is not defined", variable_name),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
 		if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
@@ -1610,7 +1602,7 @@ func parse_variable_mul_asn(parser *Parser, variable_name string) {
 			barn_error_show_with_line(
 				UNDEFINED_ERROR, "`*=` can be only used when variable type is `int` or `float`",
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	}
@@ -1627,7 +1619,7 @@ func parse_variable_div_asn(parser *Parser, variable_name string) {
 		barn_error_show_with_line(
 			UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is not defined", variable_name),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
 		if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
@@ -1645,7 +1637,7 @@ func parse_variable_div_asn(parser *Parser, variable_name string) {
 			barn_error_show_with_line(
 				UNDEFINED_ERROR, "`/=` can be only used when variable type is `int` or `float`",
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	}
@@ -1668,14 +1660,14 @@ func parse_return(parser *Parser) {
 		barn_error_show_with_line(
 			SYNTAX_ERROR, "To return function value you need to first open it",
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	}
 }
 
 // Function that parse condition statements
 func parse_condition_statements(parser *Parser, end_kind int) string {
-	skip_token(parser, 1)
+	// skip_token(parser, 1)
 	var last_type_lhs BarnTypes = BARN_TYPE_NONE
 	var last_symbol int = NONE
 	var last_symbol_str string = ""
@@ -1688,7 +1680,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 		if parser.curr_token.kind == end_kind {
 			if to_ret == "" {
 				barn_error_show_with_line(
-					SYNTAX_ERROR, "Expected condition statement between `|`", parser.curr_token.filename,
+					SYNTAX_ERROR, "Expected condition statement between `()`", parser.curr_token.filename,
 					parser.curr_token.row, parser.curr_token.col-1, true,
 					parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
 				os.Exit(1)
@@ -1718,7 +1710,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Expected type `%s` not `%s`", last_type_lhs.as_string(), kind.as_string()),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else if (parser.curr_token.kind == IDENTIFIER) && expected_value {
@@ -1736,7 +1728,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 					barn_error_show_with_line(
 						UNDEFINED_ERROR, fmt.Sprintf("Expected variable with type `%s` not `%s`", last_type_lhs.as_string(), find_var.variable_type.as_string()),
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				}
 			} else if parser.curr_token.value == "true" || parser.curr_token.value == "false" {
@@ -1749,7 +1741,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 				barn_error_show_with_line(
 					UNDEFINED_ERROR, fmt.Sprintf("Variable with name `%s` is not defined", parser.curr_token.value),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else if (parser.curr_token.kind == STRING) && expected_value {
@@ -1761,7 +1753,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, fmt.Sprintf("Symbol `%s` can be used with string comparation", last_symbol_str),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-							true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+							true, parser.curr_token.line)
 						os.Exit(1)
 					}
 
@@ -1780,7 +1772,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Expected type `%s` not `%s`", last_type_lhs.as_string(), kind.as_string()),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else if (parser.curr_token.kind == GT || parser.curr_token.kind == GTE || parser.curr_token.kind == LT || parser.curr_token.kind == LTE || parser.curr_token.kind == EQ || parser.curr_token.kind == NEQ || parser.curr_token.kind == OROR || parser.curr_token.kind == ANDAND) && expected_symbol {
@@ -1796,7 +1788,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Can't use `%s` with `%s` type", parser.curr_token.value, last_type_lhs.as_string()),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			} else {
 				to_ret += parser.curr_token.value
@@ -1822,7 +1814,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 					barn_error_show_with_line(
 						SYNTAX_ERROR, "Unexpected use of `)`",
 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+						true, parser.curr_token.line)
 					os.Exit(1)
 				} else {
 					to_ret += parser.curr_token.value
@@ -1838,13 +1830,13 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, "Expected value",
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		} else if expected_symbol == true {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, "Expected `|` to close if statement",
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		} else {
 			barn_error_show_with_line(
@@ -1861,31 +1853,24 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 func parse_if(parser *Parser) {
 	error_when_we_arent_in_function(parser)
 	skip_token(parser, 1)
-	if parser.curr_token.kind == CONDITIONBLOCK {
-		condition_statement := parse_condition_statements(parser, CONDITIONBLOCK)
+	condition_statement := parse_condition_statements(parser, OPENBRACE)
+	skip_token(parser, -1)
 
-		if_node := NodeAST{}
-		if_node.node_kind = IF_STATEMENT
-		if_node.node_kind_str = "IfStatement"
-		if_node.if_condition = condition_statement
+	if_node := NodeAST{}
+	if_node.node_kind = IF_STATEMENT
+	if_node.node_kind_str = "IfStatement"
+	if_node.if_condition = condition_statement
 
-		append_node_ptr(parser, &if_node)
-		skip_token(parser, 1)
-		if parser.curr_token.kind == OPENBRACE {
-			parser.statement_open += 1
-			parser.last_statement_opened = "If"
-		} else {
-			barn_error_show_with_line(
-				SYNTAX_ERROR, "Expected `{` to open if body",
-				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
-			os.Exit(1)
-		}
+	append_node_ptr(parser, &if_node)
+	skip_token(parser, 1)
+	if parser.curr_token.kind == OPENBRACE {
+		parser.statement_open += 1
+		parser.last_statement_opened = "If"
 	} else {
 		barn_error_show_with_line(
-			SYNTAX_ERROR, fmt.Sprintf("Expected `|` to open if condition not `%s`", kind_to_str(parser.curr_token.kind)), parser.curr_token.filename,
-			parser.curr_token.row, parser.curr_token.col-1, true,
-			parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			SYNTAX_ERROR, "Expected `{` to open if body",
+			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+			true, parser.curr_token.line)
 		os.Exit(1)
 	}
 }
@@ -1911,7 +1896,7 @@ func parse_else(parser *Parser) {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, "Expected `{` to open else body",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else {
@@ -1934,36 +1919,29 @@ func parse_else(parser *Parser) {
 func parse_elif(parser *Parser) {
 	error_when_we_arent_in_function(parser)
 	skip_token(parser, 1)
-	if parser.curr_token.kind == CONDITIONBLOCK {
-		condition_statement := parse_condition_statements(parser, CONDITIONBLOCK)
+	condition_statement := parse_condition_statements(parser, OPENBRACE)
+	skip_token(parser, -1)
 
-		function := parser.nodes[len(parser.nodes)-1] // it should be function node
-		if len(function.function_body) != 0 {
-			if function.function_body[len(function.function_body)-1].node_kind == END_STATEMENT &&
-				(function.function_body[len(function.function_body)-1].end_statement_kind == IF_STATEMENT_END ||
-					function.function_body[len(function.function_body)-1].end_statement_kind == ELIF_STATEMENT_END) {
-				else_node := NodeAST{}
-				else_node.node_kind = ELSE_IF_STATEMENT
-				else_node.node_kind_str = "ElseIfStatement"
-				else_node.else_if_condition = condition_statement
+	function := parser.nodes[len(parser.nodes)-1] // it should be function node
+	if len(function.function_body) != 0 {
+		if function.function_body[len(function.function_body)-1].node_kind == END_STATEMENT &&
+			(function.function_body[len(function.function_body)-1].end_statement_kind == IF_STATEMENT_END ||
+				function.function_body[len(function.function_body)-1].end_statement_kind == ELIF_STATEMENT_END) {
+			else_node := NodeAST{}
+			else_node.node_kind = ELSE_IF_STATEMENT
+			else_node.node_kind_str = "ElseIfStatement"
+			else_node.else_if_condition = condition_statement
 
-				append_node_ptr(parser, &else_node)
-				skip_token(parser, 1)
-				if parser.curr_token.kind == OPENBRACE {
-					parser.statement_open += 1
-					parser.last_statement_opened = "Elif"
-				} else {
-					barn_error_show_with_line(
-						SYNTAX_ERROR, "Expected `{` to open elif body",
-						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-						true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
-					os.Exit(1)
-				}
+			append_node_ptr(parser, &else_node)
+			skip_token(parser, 1)
+			if parser.curr_token.kind == OPENBRACE {
+				parser.statement_open += 1
+				parser.last_statement_opened = "Elif"
 			} else {
 				barn_error_show_with_line(
-					SYNTAX_ERROR, "Expected if or elif statement before else", parser.curr_token.filename,
-					parser.curr_token.row, parser.curr_token.col-1, true,
-					parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					SYNTAX_ERROR, "Expected `{` to open elif body",
+					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else {
@@ -1975,7 +1953,7 @@ func parse_elif(parser *Parser) {
 		}
 	} else {
 		barn_error_show_with_line(
-			SYNTAX_ERROR, fmt.Sprintf("Expected `|` to open if condition not `%s`", kind_to_str(parser.curr_token.kind)), parser.curr_token.filename,
+			SYNTAX_ERROR, "Expected if or elif statement before else", parser.curr_token.filename,
 			parser.curr_token.row, parser.curr_token.col-1, true,
 			parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
 		os.Exit(1)
@@ -1990,29 +1968,23 @@ func parse_import(parser *Parser) {
 func parse_while(parser *Parser) {
 	error_when_we_arent_in_function(parser)
 	skip_token(parser, 1)
-	if parser.curr_token.kind == CONDITIONBLOCK {
-		condition := parse_condition_statements(parser, CONDITIONBLOCK)
+	condition := parse_condition_statements(parser, OPENBRACE)
+	skip_token(parser, -1)
 
-		while_node := NodeAST{}
-		while_node.node_kind = WHILE_STATEMENT
-		while_node.node_kind_str = "WhileStatement"
-		while_node.while_condition = condition
-		append_node(parser, while_node)
+	while_node := NodeAST{}
+	while_node.node_kind = WHILE_STATEMENT
+	while_node.node_kind_str = "WhileStatement"
+	while_node.while_condition = condition
+	append_node(parser, while_node)
 
-		skip_token(parser, 1)
-		if parser.curr_token.kind == OPENBRACE {
-			parser.statement_open++
-			parser.is_while_statement_opened++
-			parser.last_statement_opened = "While"
-		} else {
-			barn_error_show_with_line(
-				SYNTAX_ERROR, "Expected `{` after while condition", parser.curr_token.filename,
-				parser.curr_token.row, parser.curr_token.col-1, true,
-				parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
-		}
+	skip_token(parser, 1)
+	if parser.curr_token.kind == OPENBRACE {
+		parser.statement_open++
+		parser.is_while_statement_opened++
+		parser.last_statement_opened = "While"
 	} else {
 		barn_error_show_with_line(
-			SYNTAX_ERROR, "Expected `|` after while keyword", parser.curr_token.filename,
+			SYNTAX_ERROR, "Expected `{` after while condition", parser.curr_token.filename,
 			parser.curr_token.row, parser.curr_token.col-1, true,
 			parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
 	}
@@ -2138,7 +2110,7 @@ func parse_incrementation(parser *Parser, variable_name string) {
 		barn_error_show_with_line(
 			UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	}
 }
@@ -2155,7 +2127,7 @@ func parse_decrementation(parser *Parser, variable_name string) {
 		barn_error_show_with_line(
 			UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+			true, parser.curr_token.line)
 		os.Exit(1)
 	}
 }
@@ -2224,14 +2196,14 @@ func parse_identifier(parser *Parser) {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Unexpected use of token `%s` after `IDENTIFIER`", parser.curr_token.value),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("This `IDENTIFIER` can be used only in function", parser.curr_token.value),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	}
@@ -2347,21 +2319,17 @@ func parser_start(lex *Lexer) *Parser {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Unexpected use of `%s` token", kind_to_str(parser.curr_token.kind)),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-					true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+					true, parser.curr_token.line)
 				os.Exit(1)
 			}
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Unexpected use of `%s` token", kind_to_str(parser.curr_token.kind)),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.lex.data_lines[parser.curr_token.filename_count][parser.curr_token.row-1])
+				true, parser.curr_token.line)
 			os.Exit(1)
 		}
 	}
-
-	// for i := 0; i < len(parser.nodes); i++ {
-	// 	fmt.Println(parser.nodes[i])
-	// }
 
 	return &parser
 }
