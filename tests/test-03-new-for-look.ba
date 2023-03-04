@@ -1,0 +1,8 @@
+@import "std.ba"
+
+fun main() {
+    for let i: int = 0; i < 10; i++ {
+        printnum(i)
+        println("")
+    }
+}

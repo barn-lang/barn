@@ -2034,6 +2034,7 @@ func parse_for(parser *Parser) {
 
 		skip_token(parser, 1)
 		if parser.curr_token.kind == SEMICOL {
+			skip_token(parser, 1)
 			condition := parse_condition_statements(parser, SEMICOL)
 
 			if parser.curr_token.kind == SEMICOL {

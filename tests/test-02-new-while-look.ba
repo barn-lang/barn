@@ -3,7 +3,7 @@
 fun main()
 {
     let i: int = 0
-    while (i != 23)
+    while i != 23
     {
         printnum(i)
         print("\n")
