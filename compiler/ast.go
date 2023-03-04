@@ -10,6 +10,7 @@ const (
 	BARN_FLOAT
 	BARN_STR
 	BARN_BOOL
+	BARN_AUTO
 	BARN_TYPE_NONE = -1
 )
 
@@ -152,6 +153,8 @@ func (barn_type BarnTypes) as_string() string {
 		return "char"
 	case BARN_STR:
 		return "string"
+	case BARN_AUTO:
+		return "auto"
 	case BARN_TYPE_NONE:
 		return "none"
 	}

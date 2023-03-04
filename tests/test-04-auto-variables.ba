@@ -1,0 +1,12 @@
+@import "std.ba"
+
+fun call_example_function() -> int {
+    return 100
+}
+
+fun main() {
+    let i: auto = 1
+    let i1: auto = "string"
+    let i2: auto = call_example_function()
+    let i3: auto = false
+}

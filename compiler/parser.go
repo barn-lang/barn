@@ -348,6 +348,8 @@ func is_token_represent_type(value_token string) BarnTypes {
 		return BARN_STR
 	case "bool":
 		return BARN_BOOL
+	case "auto":
+		return BARN_AUTO
 	}
 
 	return BARN_TYPE_NONE
@@ -724,7 +726,7 @@ func parse_function_call(parser *Parser, function_name string) {
 }
 
 // Function that helps and parse variable value
-func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string) {
+func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string, BarnTypes) {
 	skip_token(parser, 1)
 	do_we_continue := true
 	expect_symbol := false
@@ -928,8 +930,8 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 				break
 			}
 		}
-		if expected_type == BARN_INTREGER || expected_type == BARN_FLOAT {
-			return false, to_ret
+		if expected_type == BARN_INTREGER || expected_type == BARN_FLOAT || expected_type == BARN_AUTO {
+			return false, to_ret, BARN_FLOAT
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Variable type is `int` or `float` not `%s`", expected_type.as_string()),
@@ -939,8 +941,8 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 		}
 	} else if parser.curr_token.kind == IDENTIFIER {
 		if parser.curr_token.value == "true" || parser.curr_token.value == "false" {
-			if expected_type == BARN_BOOL {
-				return false, parser.curr_token.value
+			if expected_type == BARN_BOOL || expected_type == BARN_AUTO {
+				return false, parser.curr_token.value, BARN_BOOL
 			} else {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Variable type is `bool` not `%s`", expected_type.as_string()),
@@ -1082,8 +1084,8 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 							os.Exit(1)
 						}
 
-						if expected_type == mentioned_function.function_return {
-							return true, to_ret
+						if expected_type == mentioned_function.function_return || expected_type == BARN_AUTO {
+							return true, to_ret, mentioned_function.function_return
 						} else {
 							barn_error_show_with_line(
 								SYNTAX_ERROR, fmt.Sprintf("Function return type is `%s` not `%s`", mentioned_function.function_return.as_string(), expected_type.as_string()),
@@ -1100,119 +1102,10 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 					os.Exit(1)
 				}
 			}
-
-			// to_ret_2 := parser.curr_token.value
-			// skip_token(parser, 1)
-			// if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && (expected_type == BARN_INTREGER || expected_type == BARN_FLOAT) {
-			// 	to_ret += to_ret_2
-			// 	expect_number = false
-			// 	expect_symbol = true
-			// 	for do_we_continue {
-			// 		if (parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT) && expect_number == true {
-			// 			to_ret += parser.curr_token.value
-			// 			expect_symbol = true
-			// 			expect_number = false
-			// 			skip_token(parser, 1)
-			// 			continue
-			// 		} else if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && expect_symbol == true {
-			// 			to_ret += parser.curr_token.value
-			// 			expect_symbol = false
-			// 			expect_number = true
-			// 			skip_token(parser, 1)
-			// 			continue
-			// 		} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
-			// 			if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-			// 				if find_var.variable_type == BARN_INTREGER || find_var.variable_type == BARN_FLOAT {
-			// 					to_ret += parser.curr_token.value
-			// 					expect_symbol = true
-			// 					expect_number = false
-			// 					skip_token(parser, 1)
-			// 					continue
-			// 				} else {
-			// 					barn_error_show_with_line(
-			// 						UNDEFINED_ERROR, fmt.Sprintf("Expected variable with type `int` or `float` not `%s`", find_var.variable_type.as_string()),
-			// 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 						true, parser.curr_token.line)
-			// 					os.Exit(1)
-			// 				}
-			// 			} else {
-			// 				barn_error_show_with_line(
-			// 					UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
-			// 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 					true, parser.curr_token.line)
-			// 				os.Exit(1)
-			// 			}
-			// 		} else if parser.curr_token.kind == OPENPARENT || parser.curr_token.kind == CLOSEPARENT {
-			// 			if parser.curr_token.kind == OPENPARENT {
-			// 				to_ret += parser.curr_token.value
-			// 				parents += 1
-			// 				expect_number = true
-			// 				expect_symbol = false
-			// 				skip_token(parser, 1)
-			// 				continue
-			// 			} else {
-			// 				if parents == 0 {
-			// 					barn_error_show_with_line(
-			// 						SYNTAX_ERROR, "Unexpected use of `)`",
-			// 						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 						true, parser.curr_token.line)
-			// 					os.Exit(1)
-			// 				} else {
-			// 					to_ret += parser.curr_token.value
-			// 					parents -= 1
-			// 					expect_number = false
-			// 					expect_symbol = true
-			// 					skip_token(parser, 1)
-			// 					continue
-			// 				}
-			// 			}
-			// 		} else if expect_number == true {
-			// 			barn_error_show_with_line(
-			// 				SYNTAX_ERROR, "Expected number",
-			// 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 				true, parser.curr_token.line)
-			// 			os.Exit(1)
-			// 		} else if expect_symbol == true {
-			// 			break
-			// 		} else {
-			// 			break
-			// 		}
-			// 	}
-			// 	if expected_type == BARN_INTREGER || expected_type == BARN_FLOAT {
-			// 		return to_ret
-			// 	} else {
-			// 		barn_error_show_with_line(
-			// 			SYNTAX_ERROR, fmt.Sprintf("Variable type is `int` or `float` not `%s`", expected_type.as_string()),
-			// 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 			true, parser.curr_token.line)
-			// 		os.Exit(1)
-			// 	}
-			// } else {
-			// skip_token(parser, -1)
-			// find_var := find_variable_both(parser, parser.curr_token.value)
-			// if find_var == nil {
-			// 	barn_error_show_with_line(
-			// 		UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
-			// 		parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 		true, parser.curr_token.line)
-			// 	os.Exit(1)
-			// } else {
-			// 	if expected_type == find_var.variable_type {
-			// 		skip_token(parser, 1)
-			// 		return to_ret_2
-			// 	} else {
-			// 		barn_error_show_with_line(
-			// 			SYNTAX_ERROR, fmt.Sprintf("RHS is type `%s` not like variable type with type `%s`", find_variable_both(parser, parser.curr_token.value).variable_type.as_string(), expected_type.as_string()),
-			// 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-			// 			true, parser.curr_token.line)
-			// 		os.Exit(1)
-			// 	}
-			// }
-			// }
 		}
 	} else if parser.curr_token.kind == STRING {
-		if expected_type == BARN_STR {
-			return false, parser.curr_token.value
+		if expected_type == BARN_STR || expected_type == BARN_AUTO {
+			return false, parser.curr_token.value, BARN_STR
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Variable type is `string` not `%s`", expected_type.as_string()),
@@ -1221,8 +1114,8 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			os.Exit(1)
 		}
 	} else if parser.curr_token.kind == CHAR {
-		if expected_type == BARN_CHAR {
-			return false, parser.curr_token.value
+		if expected_type == BARN_CHAR || expected_type == BARN_AUTO {
+			return false, parser.curr_token.value, BARN_CHAR
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Variable type is `char` not `%s`", expected_type.as_string()),
@@ -1236,9 +1129,9 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
 			true, parser.curr_token.line)
 		os.Exit(1)
-		return false, "none"
+		return false, "none", BARN_TYPE_NONE
 	}
-	return false, "none"
+	return false, "none", BARN_TYPE_NONE
 }
 
 func is_variable_defined(parser *Parser, name string) bool {
@@ -1327,7 +1220,7 @@ func parse_let(parser *Parser) {
 						os.Exit(1)
 					} else {
 						if is_next_token_kind_safe(parser, ASN) {
-							is_function_call_value, variable_value := parse_variable_value(parser, variable_type)
+							is_function_call_value, variable_value, variable_type_real := parse_variable_value(parser, variable_type)
 
 							// fmt.Printf("Variable name: `%s`, Variable type: `%s`, Variable value: `%s`\n", variable_name, variable_type.as_string(), variable_value)
 
@@ -1335,14 +1228,20 @@ func parse_let(parser *Parser) {
 							variable_node.node_kind = VARIABLE_DECLARATION
 							variable_node.node_kind_str = "VariableDeclaration"
 							variable_node.variable_name = variable_name
-							variable_node.variable_type = variable_type
 							variable_node.variable_value = variable_value
 							variable_node.variable_fn_call_value = is_function_call_value
 							variable_node.variable_is_arg = false
+
+							if variable_type == BARN_AUTO {
+								variable_node.variable_type = variable_type_real
+							} else {
+								variable_node.variable_type = variable_type
+							}
+
 							append_node(parser, variable_node)
 							parser.local_variables = append(parser.local_variables, &variable_node)
 
-							if (variable_type == BARN_INTREGER || variable_type == BARN_FLOAT) && is_function_call_value == false {
+							if (variable_type_real == BARN_INTREGER || variable_type_real == BARN_FLOAT) && is_function_call_value == false {
 								skip_token(parser, -1)
 							} else if is_function_call_value {
 								skip_token(parser, 0)
@@ -1399,7 +1298,7 @@ func parse_let(parser *Parser) {
 						os.Exit(1)
 					} else {
 						if is_next_token_kind_safe(parser, ASN) {
-							is_variable_value_fn_call, variable_value := parse_variable_value(parser, variable_type)
+							is_variable_value_fn_call, variable_value, _ := parse_variable_value(parser, variable_type)
 
 							// fmt.Printf("Variable name: `%s`, Variable type: `%s`, Variable value: `%s`\n", variable_name, variable_type.as_string(), variable_value)
 
