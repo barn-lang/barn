@@ -259,7 +259,7 @@ func creator_char(lex *Lexer) {
 		if lex.curr_char == '\'' {
 			lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
 				string(value_of_char), lex.filename,
-				lex.col, lex.row, CHAR))
+				lex.col - 2, lex.row, CHAR))
 			lex.is_space = false
 		} else {
 			barn_error_show_with_line(

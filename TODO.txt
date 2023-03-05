@@ -3,6 +3,7 @@
 - [X] Change if, while expressions look
 - [X] Change for expression look
 - [ ] Rewrite standard library
-- [ ] Function calls in math expressions
-- [ ] Auto type variables
+- [X] Auto type variables
 - [ ] Benchmark Codegen
+- [ ] Remake libraries copy and create a new build file
+- [ ] Error when there isn't function named main

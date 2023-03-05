@@ -51,7 +51,7 @@ const (
 	CONDITIONBLOCK // "|"
 
 	/* Seperators */
-	COMMA   // ","
+	COMMA   // "," 
 	COLON   // ":"
 	DOT     // "."
 	SEMICOL // ";"

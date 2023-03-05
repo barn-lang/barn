@@ -5,12 +5,23 @@ import "fmt"
 type BarnTypes int
 
 const (
-	BARN_CHAR BarnTypes = iota
-	BARN_INTREGER
-	BARN_FLOAT
-	BARN_STR
-	BARN_BOOL
-	BARN_AUTO
+	BARN_U8  BarnTypes = iota // Unsigned char 
+	BARN_U16  // Unsigned short
+	BARN_U32  // Unsigned int
+	BARN_U64  // Unsigned long 
+
+	BARN_I8   // Char
+	BARN_I16  // Short
+	BARN_I32  // Int
+	BARN_I64  // Long
+	
+	BARN_F32  // Float
+	BARN_F64  // Double
+
+	BARN_STR  // String
+	BARN_BOOL // Bool
+	
+	BARN_AUTO // Auto
 	BARN_TYPE_NONE = -1
 )
 
@@ -145,11 +156,11 @@ func (barn_type BarnTypes) as_string() string {
 	switch barn_type {
 	case BARN_BOOL:
 		return "bool"
-	case BARN_INTREGER:
+	case BARN_I32:
 		return "int"
-	case BARN_FLOAT:
+	case BARN_F32:
 		return "float"
-	case BARN_CHAR:
+	case BARN_I8:
 		return "char"
 	case BARN_STR:
 		return "string"

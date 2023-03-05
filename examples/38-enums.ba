@@ -1,13 +1,13 @@
 @import "std.ba"
 
-enum {
-    FAMILY = 1 // 1
-    FRIEND     // 2
-    GUEST      // 3
-}
-
-fun main() {
-    printnum(FAMILY)
-    printnum(FRIEND)
-    printnum(GUEST)
-}
+// enum {
+//     FAMILY = 1 // 1
+//     FRIEND     // 2
+//     GUEST      // 3
+// }
+// 
+// fun main() {
+//     printnum(FAMILY)
+//     printnum(FRIEND)
+//     printnum(GUEST)
+// }

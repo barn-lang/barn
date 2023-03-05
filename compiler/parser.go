@@ -41,7 +41,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 				continue
 			} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 				if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-					if find_var.variable_type == BARN_INTREGER || find_var.variable_type == BARN_FLOAT {
+					if find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_F32 {
 						to_ret += parser.curr_token.value
 						expect_symbol = true
 						expect_number = false
@@ -103,7 +103,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 				break
 			}
 		}
-		if expected_type == BARN_INTREGER || expected_type == BARN_FLOAT {
+		if expected_type == BARN_I32 || expected_type == BARN_F32 {
 			return to_ret
 		} else {
 			barn_error_show_with_line(
@@ -126,7 +126,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 		} else {
 			to_ret_2 := parser.curr_token.value
 			skip_token(parser, 1)
-			if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && (expected_type == BARN_INTREGER || expected_type == BARN_FLOAT) {
+			if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && (expected_type == BARN_I32 || expected_type == BARN_F32) {
 				to_ret += to_ret_2
 				expect_number = false
 				expect_symbol = true
@@ -145,7 +145,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						continue
 					} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 						if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-							if find_var.variable_type == BARN_INTREGER || find_var.variable_type == BARN_FLOAT {
+							if find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_F32 {
 								to_ret += parser.curr_token.value
 								expect_symbol = true
 								expect_number = false
@@ -201,7 +201,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						break
 					}
 				}
-				if expected_type == BARN_INTREGER || expected_type == BARN_FLOAT {
+				if expected_type == BARN_I32 || expected_type == BARN_F32 {
 					return to_ret
 				} else {
 					barn_error_show_with_line(
@@ -244,7 +244,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 			os.Exit(1)
 		}
 	} else if parser.curr_token.kind == CHAR {
-		if expected_type == BARN_CHAR {
+		if expected_type == BARN_I8 {
 			return parser.curr_token.value
 		} else {
 			barn_error_show_with_line(
@@ -339,18 +339,18 @@ func is_next_token_kind_safe(parser *Parser, kind int) bool {
 func is_token_represent_type(value_token string) BarnTypes {
 	switch value_token {
 	case "char":
-		return BARN_CHAR
+		return BARN_I8
 	case "int":
-		return BARN_INTREGER
+		return BARN_I32
 	case "float":
-		return BARN_FLOAT
+		return BARN_F32
 	case "string":
 		return BARN_STR
 	case "bool":
 		return BARN_BOOL
 	case "auto":
 		return BARN_AUTO
-	}
+ 	}
 
 	return BARN_TYPE_NONE
 }
@@ -391,6 +391,7 @@ func parse_function_args(parser *Parser) []ArgsFunctionDeclaration {
 							var arg ArgsFunctionDeclaration
 							arg.name = ""
 							arg.type_arg = kind_argument
+
 							to_return = append(to_return, arg)
 							expecting_type = false
 							expecting_name = true
@@ -604,11 +605,11 @@ func change_token_to_barn_type(parser *Parser, tk *Token) (BarnTypes, bool) {
 	case STRING:
 		return BARN_STR, false
 	case INT:
-		return BARN_INTREGER, false
+		return BARN_I32, false
 	case FLOAT:
-		return BARN_FLOAT, false
+		return BARN_F32, false
 	case CHAR:
-		return BARN_CHAR, false
+		return BARN_I8, false
 	case IDENTIFIER:
 		if tk.value == "true" || tk.value == "false" {
 			return BARN_BOOL, false
@@ -738,6 +739,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 	second_token_kind := parser.curr_token.kind
 	skip_token(parser, -1)
 	identifier_and_math := first_token_kind == IDENTIFIER && (second_token_kind == PLUS || second_token_kind == MINUS || second_token_kind == MUL || second_token_kind == DIV || second_token_kind == MOD)
+	
 	if parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == OPENPARENT || parser.curr_token.kind == CLOSEPARENT || identifier_and_math {
 		for do_we_continue {
 			if (parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT) && expect_number == true {
@@ -749,7 +751,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 				function_name := parser.curr_token.value
 				if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-					if find_var.variable_type == BARN_INTREGER || find_var.variable_type == BARN_FLOAT {
+					if find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_F32 {
 						to_ret += parser.curr_token.value
 						expect_symbol = true
 						expect_number = false
@@ -795,11 +797,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 
 										skip_token(parser, 1)
 										if parser.curr_token.kind == COMMA {
-											// barn_error_show_with_line(
-											// 	SYNTAX_ERROR, "Expected use of comma in this place",
-											// 	parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-											// 	true, parser.curr_token.line)
-											// os.Exit(1)
 											skip_token(parser, 1)
 										}
 									} else {
@@ -809,20 +806,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 											true, parser.curr_token.line)
 										os.Exit(1)
 									}
-									// argument := parse_value(parser, mentioned_function.function_args[argument_count].type_arg)
-									// fmt.Println(argument)
-									// arguments_to_node = append(arguments_to_node, ArgsFunctionCall{
-									// 	mentioned_function.function_args[argument_count].name,
-									// 	mentioned_function.function_args[argument_count].type_arg,
-									// 	parser.curr_token.value})
-									// argument_count++
-									// if mentioned_function.function_args[argument_count].type_arg == FLOAT || mentioned_function.function_args[argument_count].type_arg == INT {
-									// 	skip_token(parser, -1)
-									// }
-									// skip_token(parser, 1)
-									// if parser.curr_token.kind == COMMA {
-									// 	skip_token(parser, 1)
-									// }
 								} else {
 									barn_error_show_with_line(
 										SYNTAX_ERROR, "Unexpected use of comma in this place",
@@ -835,7 +818,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 								if parser.curr_token.kind == CLOSEPARENT {
 									to_ret += fmt.Sprintf("%s(", function_name)
 									if 0 == len(arguments_to_node) {
-										to_ret += ");\n"
+										to_ret += ")\n"
 									} else {
 										for k := 0; k < len(arguments_to_node); k++ {
 											pass_argument_value := arguments_to_node[k]
@@ -846,11 +829,11 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 													to_ret += "\""
 													to_ret += pass_argument_value.value
 													to_ret += "\""
-												} else if pass_argument_value.type_arg == BARN_CHAR {
+												} else if pass_argument_value.type_arg == BARN_I8 {
 													to_ret += "'"
 													to_ret += pass_argument_value.value
 													to_ret += "'"
-												} else if pass_argument_value.type_arg == BARN_FLOAT {
+												} else if pass_argument_value.type_arg == BARN_F32 {
 													to_ret += "(float)"
 													to_ret += pass_argument_value.value
 												} else {
@@ -861,7 +844,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 											if (k + 1) != len(arguments_to_node) {
 												to_ret += ", "
 											} else {
-												to_ret += ");\n"
+												to_ret += ")\n"
 											}
 										}
 									}
@@ -879,6 +862,11 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 									true, parser.curr_token.line)
 								os.Exit(1)
 							}
+
+							expect_symbol = true
+							expect_number = false
+							skip_token(parser, 1)
+							continue
 						}
 					} else {
 						barn_error_show_with_line(
@@ -930,8 +918,8 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 				break
 			}
 		}
-		if expected_type == BARN_INTREGER || expected_type == BARN_FLOAT || expected_type == BARN_AUTO {
-			return false, to_ret, BARN_FLOAT
+		if (expected_type == BARN_I32 || expected_type == BARN_F32 || expected_type == BARN_AUTO) {
+			return false, to_ret, BARN_F32
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Variable type is `int` or `float` not `%s`", expected_type.as_string()),
@@ -953,7 +941,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 		} else {
 			function_name := parser.curr_token.value
 			if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-				if find_var.variable_type == BARN_INTREGER || find_var.variable_type == BARN_FLOAT {
+				if find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_F32 {
 					to_ret += parser.curr_token.value
 					expect_symbol = true
 					expect_number = false
@@ -998,11 +986,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 
 									skip_token(parser, 1)
 									if parser.curr_token.kind == COMMA {
-										// barn_error_show_with_line(
-										// 	SYNTAX_ERROR, "Expected use of comma in this place",
-										// 	parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-										// 	true, parser.curr_token.line)
-										// os.Exit(1)
 										skip_token(parser, 1)
 									}
 								} else {
@@ -1012,20 +995,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 										true, parser.curr_token.line)
 									os.Exit(1)
 								}
-								// argument := parse_value(parser, mentioned_function.function_args[argument_count].type_arg)
-								// fmt.Println(argument)
-								// arguments_to_node = append(arguments_to_node, ArgsFunctionCall{
-								// 	mentioned_function.function_args[argument_count].name,
-								// 	mentioned_function.function_args[argument_count].type_arg,
-								// 	parser.curr_token.value})
-								// argument_count++
-								// if mentioned_function.function_args[argument_count].type_arg == FLOAT || mentioned_function.function_args[argument_count].type_arg == INT {
-								// 	skip_token(parser, -1)
-								// }
-								// skip_token(parser, 1)
-								// if parser.curr_token.kind == COMMA {
-								// 	skip_token(parser, 1)
-								// }
 							} else {
 								barn_error_show_with_line(
 									SYNTAX_ERROR, "Unexpected use of comma in this place",
@@ -1049,11 +1018,11 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 												to_ret += "\""
 												to_ret += pass_argument_value.value
 												to_ret += "\""
-											} else if pass_argument_value.type_arg == BARN_CHAR {
+											} else if pass_argument_value.type_arg == BARN_I8 {
 												to_ret += "'"
 												to_ret += pass_argument_value.value
 												to_ret += "'"
-											} else if pass_argument_value.type_arg == BARN_FLOAT {
+											} else if pass_argument_value.type_arg == BARN_F32 {
 												to_ret += "(float)"
 												to_ret += pass_argument_value.value
 											} else {
@@ -1114,8 +1083,8 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			os.Exit(1)
 		}
 	} else if parser.curr_token.kind == CHAR {
-		if expected_type == BARN_CHAR || expected_type == BARN_AUTO {
-			return false, parser.curr_token.value, BARN_CHAR
+		if expected_type == BARN_I8 || expected_type == BARN_AUTO {
+			return false, parser.curr_token.value, BARN_I8
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Variable type is `char` not `%s`", expected_type.as_string()),
@@ -1131,6 +1100,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 		os.Exit(1)
 		return false, "none", BARN_TYPE_NONE
 	}
+
 	return false, "none", BARN_TYPE_NONE
 }
 
@@ -1241,10 +1211,17 @@ func parse_let(parser *Parser) {
 							append_node(parser, variable_node)
 							parser.local_variables = append(parser.local_variables, &variable_node)
 
-							if (variable_type_real == BARN_INTREGER || variable_type_real == BARN_FLOAT) && is_function_call_value == false {
-								skip_token(parser, -1)
-							} else if is_function_call_value {
+							// if (variable_type_real == BARN_I32 || variable_type_real == BARN_F32) && is_function_call_value == false {
+							// 	// fmt.Println(parser.curr_token.value)
+							// 	skip_token(parser, -1)
+							// 	// fmt.Println(parser.curr_token.value)
+							// } else if is_function_call_value {
+							// 	skip_token(parser, 0)
+							// }
+							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
 								skip_token(parser, 0)
+							} else {
+								skip_token(parser, -1)
 							}
 						} else {
 							barn_error_show_with_line(
@@ -1312,7 +1289,7 @@ func parse_let(parser *Parser) {
 							append_node(parser, variable_node)
 							parser.global_variables = append(parser.global_variables, &variable_node)
 
-							if variable_type == BARN_INTREGER || variable_type == BARN_FLOAT {
+							if variable_type == BARN_I32 || variable_type == BARN_F32 {
 								skip_token(parser, -1)
 							}
 						} else {
@@ -1390,7 +1367,7 @@ func parse_variable_asn(parser *Parser, variable_name string) {
 		os.Exit(1)
 	} else {
 		value := parse_value(parser, variable.variable_type)
-		if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
+		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
 			skip_token(parser, -1)
 		}
 		node := NodeAST{}
@@ -1416,9 +1393,9 @@ func parse_variable_plus_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
-		if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
+		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
 			value := parse_value(parser, variable.variable_type)
-			if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
+			if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
 				skip_token(parser, -1)
 			}
 			node := NodeAST{}
@@ -1451,9 +1428,9 @@ func parse_variable_minus_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
-		if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
+		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
 			value := parse_value(parser, variable.variable_type)
-			if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
+			if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
 				skip_token(parser, -1)
 			}
 			node := NodeAST{}
@@ -1486,9 +1463,9 @@ func parse_variable_mul_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
-		if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
+		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
 			value := parse_value(parser, variable.variable_type)
-			if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
+			if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
 				skip_token(parser, -1)
 			}
 			node := NodeAST{}
@@ -1521,9 +1498,9 @@ func parse_variable_div_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
-		if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
+		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
 			value := parse_value(parser, variable.variable_type)
-			if variable.variable_type == BARN_INTREGER || variable.variable_type == BARN_FLOAT {
+			if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
 				skip_token(parser, -1)
 			}
 			node := NodeAST{}
@@ -1547,7 +1524,7 @@ func parse_return(parser *Parser) {
 	if parser.is_function_opened {
 		function := find_function(parser, parser.actual_function.function_name)
 		return_value := parse_value(parser, function.function_return)
-		if function.function_return == BARN_INTREGER || function.function_return == BARN_FLOAT {
+		if function.function_return == BARN_I32 || function.function_return == BARN_F32 {
 			skip_token(parser, -1)
 		}
 		node := NodeAST{}
@@ -1595,13 +1572,13 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 				}
 			}
 		} else if (parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT) && expected_value {
-			if last_type_lhs == BARN_TYPE_NONE || (last_type_lhs == BARN_INTREGER || last_type_lhs == BARN_FLOAT) {
+			if last_type_lhs == BARN_TYPE_NONE || (last_type_lhs == BARN_I32 || last_type_lhs == BARN_F32) {
 				to_ret += parser.curr_token.value
 				expected_symbol = true
 				expected_value = false
 				skip_token(parser, 1)
 				if last_type_lhs == BARN_TYPE_NONE {
-					last_type_lhs = BARN_INTREGER
+					last_type_lhs = BARN_I32
 				}
 				continue
 			} else {
@@ -2125,7 +2102,7 @@ func init_functions_lib(parser *Parser) {
 	exit__node__ := NodeAST{}
 
 	exit__node__args := []ArgsFunctionDeclaration{}
-	exit__node__args = append(exit__node__args, ArgsFunctionDeclaration{"__num", BARN_INTREGER})
+	exit__node__args = append(exit__node__args, ArgsFunctionDeclaration{"__num", BARN_I32})
 
 	exit__node__.function_args = exit__node__args
 	exit__node__.function_body = nil
@@ -2137,7 +2114,7 @@ func init_functions_lib(parser *Parser) {
 	putchar_node__ := NodeAST{}
 
 	putchar_node__args := []ArgsFunctionDeclaration{}
-	putchar_node__args = append(putchar_node__args, ArgsFunctionDeclaration{"__c", BARN_CHAR})
+	putchar_node__args = append(putchar_node__args, ArgsFunctionDeclaration{"__c", BARN_I8})
 
 	putchar_node__.function_args = putchar_node__args
 	putchar_node__.function_body = nil
@@ -2223,7 +2200,7 @@ func parser_start(lex *Lexer) *Parser {
 				os.Exit(1)
 			}
 		} else {
-			barn_error_show_with_line(
+			barn_error_show_with_line( 
 				SYNTAX_ERROR, fmt.Sprintf("Unexpected use of `%s` token", kind_to_str(parser.curr_token.kind)),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
 				true, parser.curr_token.line)

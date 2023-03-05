@@ -1,0 +1,12 @@
+@import "std.ba"
+
+let funny_number: int = 69
+
+fun get_age() -> int {
+    return 123
+}
+
+fun main() {
+    let math_with_func_return: int = (get_age() + funny_number)
+    printnum(get_age())
+}

@@ -48,11 +48,11 @@ func (codegen *Codegen) get_code(codegen_type int) (string, string) {
 // Helps with convertion barn types to basic c types
 func barn_types_to_cxx_types(barn_type BarnTypes) string {
 	switch barn_type {
-	case BARN_CHAR:
+	case BARN_I8:
 		return "char"
-	case BARN_INTREGER:
+	case BARN_I32:
 		return "int"
-	case BARN_FLOAT:
+	case BARN_F32:
 		return "float"
 	case BARN_STR:
 		return "std::string"
@@ -90,7 +90,7 @@ func generate_variable_declaration(node *NodeAST, codegen *Codegen) string {
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
 					variable.variable_value)
-			} else if variable.variable_type == BARN_CHAR {
+			} else if variable.variable_type == BARN_I8 {
 				to_ret += fmt.Sprintf("%s %s = '%s'",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
@@ -158,11 +158,11 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 							codegen.cxx_code += "\""
 							codegen.cxx_code += pass_argument_value.value
 							codegen.cxx_code += "\""
-						} else if pass_argument_value.type_arg == BARN_CHAR {
+						} else if pass_argument_value.type_arg == BARN_I8 {
 							codegen.cxx_code += "'"
 							codegen.cxx_code += pass_argument_value.value
 							codegen.cxx_code += "'"
-						} else if pass_argument_value.type_arg == BARN_FLOAT {
+						} else if pass_argument_value.type_arg == BARN_F32 {
 							codegen.cxx_code += "(float)"
 							codegen.cxx_code += pass_argument_value.value
 						} else {
@@ -193,7 +193,7 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 						barn_types_to_cxx_types(variable.variable_type),
 						variable.variable_name,
 						variable.variable_value)
-				} else if variable.variable_type == BARN_CHAR {
+				} else if variable.variable_type == BARN_I8 {
 					codegen.cxx_code += fmt.Sprintf("%s %s = '%s';\n",
 						barn_types_to_cxx_types(variable.variable_type),
 						variable.variable_name,
@@ -342,7 +342,7 @@ func codegen_c(codegen *Codegen) {
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
 					variable.variable_value)
-			} else if variable.variable_type == BARN_CHAR {
+			} else if variable.variable_type == BARN_I8 {
 				codegen.cxx_code += fmt.Sprintf("__BARN_GLOBAL_VARIABLE__ %s %s = '%s';\n",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,

@@ -1,5 +1,5 @@
 fun main() {
-    if |"Bruno" == "Bruno"| {
+    if "Bruno" == "Bruno" {
         printf("Bruno is Bruno lol")
     }
 }
