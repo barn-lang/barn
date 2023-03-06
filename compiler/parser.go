@@ -338,12 +338,41 @@ func is_next_token_kind_safe(parser *Parser, kind int) bool {
 
 func is_token_represent_type(value_token string) BarnTypes {
 	switch value_token {
-	case "char":
-		return BARN_I8
-	case "int":
-		return BARN_I32
+
+	/* Point values */
 	case "float":
 		return BARN_F32
+	case "f32":
+		return BARN_F32
+	case "f64":
+		return BARN_F64
+
+	/* Unsigned */
+	case "byte":
+		return BARN_U8
+	case "u8":
+		return BARN_U8
+	case "u16":
+		return BARN_U16
+	case "u32":
+		return BARN_U32
+	case "u64":
+		return BARN_U64
+
+	/* Ints */
+	case "char":
+		return BARN_I8
+	case "i8":
+		return BARN_I8
+	case "i16":
+		return BARN_I16
+	case "i32":
+		return BARN_I32
+	case "int":
+		return BARN_I32
+	case "i64":
+		return BARN_I64
+
 	case "string":
 		return BARN_STR
 	case "bool":
@@ -751,7 +780,9 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 				function_name := parser.curr_token.value
 				if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-					if find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_F32 {
+					if find_var.variable_type == BARN_I8 || find_var.variable_type == BARN_I16 || find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_I64 ||
+					   find_var.variable_type == BARN_U8 || find_var.variable_type == BARN_U16 || find_var.variable_type == BARN_U32 || find_var.variable_type == BARN_U64 ||
+					   find_var.variable_type == BARN_F32 || find_var.variable_type == BARN_F64 {
 						to_ret += parser.curr_token.value
 						expect_symbol = true
 						expect_number = false
@@ -918,7 +949,9 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 				break
 			}
 		}
-		if (expected_type == BARN_I32 || expected_type == BARN_F32 || expected_type == BARN_AUTO) {
+		if (expected_type == BARN_I8 || expected_type == BARN_I16 || expected_type == BARN_I32 || expected_type == BARN_I64 ||
+			expected_type == BARN_U8 || expected_type == BARN_U16 || expected_type == BARN_U32 || expected_type == BARN_U64 ||
+			expected_type == BARN_F32 || expected_type == BARN_F64 || expected_type == BARN_AUTO) {
 			return false, to_ret, BARN_F32
 		} else {
 			barn_error_show_with_line(
@@ -941,7 +974,9 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 		} else {
 			function_name := parser.curr_token.value
 			if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-				if find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_F32 {
+				if find_var.variable_type == BARN_I8 || find_var.variable_type == BARN_I16 || find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_I64 ||
+				find_var.variable_type == BARN_U8 || find_var.variable_type == BARN_U16 || find_var.variable_type == BARN_U32 || find_var.variable_type == BARN_U64 ||
+				find_var.variable_type == BARN_F32 || find_var.variable_type == BARN_F64 || find_var.variable_type == BARN_AUTO {
 					to_ret += parser.curr_token.value
 					expect_symbol = true
 					expect_number = false
@@ -1275,7 +1310,7 @@ func parse_let(parser *Parser) {
 						os.Exit(1)
 					} else {
 						if is_next_token_kind_safe(parser, ASN) {
-							is_variable_value_fn_call, variable_value, _ := parse_variable_value(parser, variable_type)
+							is_function_call_value, variable_value, variable_type_real := parse_variable_value(parser, variable_type)
 
 							// fmt.Printf("Variable name: `%s`, Variable type: `%s`, Variable value: `%s`\n", variable_name, variable_type.as_string(), variable_value)
 
@@ -1283,13 +1318,15 @@ func parse_let(parser *Parser) {
 							variable_node.node_kind = VARIABLE_DECLARATION
 							variable_node.node_kind_str = "VariableDeclaration"
 							variable_node.variable_name = variable_name
-							variable_node.variable_type = variable_type
+							variable_node.variable_type = variable_type_real
 							variable_node.variable_value = variable_value
-							variable_node.variable_fn_call_value = is_variable_value_fn_call
+							variable_node.variable_fn_call_value = is_function_call_value
 							append_node(parser, variable_node)
 							parser.global_variables = append(parser.global_variables, &variable_node)
 
-							if variable_type == BARN_I32 || variable_type == BARN_F32 {
+							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+								skip_token(parser, 0)
+							} else {
 								skip_token(parser, -1)
 							}
 						} else {

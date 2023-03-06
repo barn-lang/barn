@@ -1,4 +1,5 @@
-- [ ] Implement new types
+- [ ] Implement new types, For developer: We need to refactor every place where there is any operation the best way 
+                                          is just going from the top of the code and just fixing everything.. pain...
 - [ ] Check is number not overflow
 - [X] Change if, while expressions look
 - [X] Change for expression look
@@ -7,3 +8,5 @@
 - [ ] Benchmark Codegen
 - [ ] Remake libraries copy and create a new build file
 - [ ] Error when there isn't function named main
+- [ ] Constants
+- [ ] Don't need to provide the variable type

@@ -2,74 +2,18 @@
 
 
 
-__BARN_FUNCTION__ bool string_compare(std::string s1, std::string s2) {
-		/* __code__ ./examples/26-while-keyword.ba */
-return (bool)s1.compare(s2);
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ int string_length(std::string s) {
-	/* __code__ ./examples/26-while-keyword.ba */
-return s.size();
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void string_reverse(std::string s) {
-	/* __code__ ./examples/26-while-keyword.ba */
-return std::reverse(s.begin(), s.end());
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ std::string iota(int num) {
-	/* __code__ ./examples/26-while-keyword.ba */
-return std::to_string(num);
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ std::string input() {
-/* __code__ ./examples/26-while-keyword.ba */
-std::string str;std::cin >> str;return str;
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void print(std::string s) {
-	/* __code__ ./examples/26-while-keyword.ba */
-std::cout << s;
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void println(std::string s) {
-	/* __code__ ./examples/26-while-keyword.ba */
-std::cout << s << std::endl;
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void printf(std::string s) {
-	/* __code__ ./examples/26-while-keyword.ba */
-std::cout << s;
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void printnum(int num) {
-	/* __code__ ./examples/26-while-keyword.ba */
-std::cout << num;
-/* __code__ end */
-}
-
-__BARN_FUNCTION__ void printbool(bool _bool) {
-		if ((_bool==true)) {
-		print("true");
-	}
-	else {
-		print("false");
-	}
-}
-
 int main() {
-	int i = 0;
-	while (i!=10) {
-		print("OK\n");
-		i += 1;
-	}
+	unsigned char _u8 = 20;
+	unsigned char __u8 = -20;
+	unsigned char ___u8 = 1024;
+	unsigned short _u16 = 20;
+	unsigned short __u16 = -20;
+	unsigned short ___u16 = 65535+1;
+	unsigned int _u32 = 20;
+	unsigned int __u32 = -20;
+	unsigned int ___u32 = 4294967295+1;
+	unsigned long _u64 = 20;
+	unsigned long __u64 = -20;
+	unsigned long ___u64 = 4294967295+1;
 }
 
