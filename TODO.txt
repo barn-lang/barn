@@ -10,3 +10,4 @@
 - [ ] Error when there isn't function named main
 - [ ] Constants
 - [ ] Don't need to provide the variable type
+- [ ] Hexadecimals, octals and binaries

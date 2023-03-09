@@ -92,6 +92,9 @@ type NodeAST struct {
 	function_return BarnTypes
 	function_body   []*NodeAST
 
+	/* Last token of expression */
+	last_node_token *Token
+
 	/* Function call properties */
 	call_name string
 	call_args []ArgsFunctionCall

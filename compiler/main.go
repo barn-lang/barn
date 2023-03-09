@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 )
 
@@ -20,6 +19,8 @@ func help() {
 	fmt.Printf("    > %s--nasm%s compile and write output of program in NASM\n", get_color(Cyan), get_color(Reset))
 	fmt.Printf("    > %s--fasm%s compile and write output of program in FASM\n", get_color(Cyan), get_color(Reset))
 	fmt.Printf("    > %s--c%s compile and write output of program in C\n", get_color(Cyan), get_color(Reset))
+	fmt.Printf("    > %s--tokens%s show all tokens from lexer (for debug purposes)\n", get_color(Cyan), get_color(Reset))
+	fmt.Printf("    > %s--t%s show lexer, parser and codegen process time\n", get_color(Cyan), get_color(Reset))
 }
 
 func main() {
@@ -37,7 +38,7 @@ func main() {
 			lexer := lexer_start(file_value, file_lines, args.filename, 0)
 			lexer = import_files(lexer)
 
-			if args.is_flag("--tokens") || args.is_flag("-t") {
+			if args.is_flag("--tokens") || args.is_flag("-tk") {
 				for i := 0; i < len(lexer.tokens); i++ {
 					print_token(lexer.tokens[i]);
 				}
@@ -67,11 +68,20 @@ func main() {
 
 			file.WriteString(code)
 
-			out, err := exec.Command("g++", "./c_out.cxx").Output()
-			if len(out) != 0 {
-				fmt.Println(string(out))
-				os.Exit(1)
+			_, stderr, exit_code := run_command("g++", "./c_out.cxx")
+
+			if (exit_code != 0) {
+				barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
+				fmt.Print(stderr)
 			}
+
+			// Set stdout and run
+			// process_run.Run()
+
+			// if (process_run.Err != nil) {
+			// 	barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
+			// 	fmt.Print(output)
+			// }
 		}
 	} else {
 		if len(args.flags) == 0 {

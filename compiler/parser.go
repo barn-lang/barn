@@ -23,6 +23,12 @@ type Parser struct {
 	is_for_statement_opened   int
 }
 
+func is_type_number(is_type BarnTypes) bool {
+	return (is_type == BARN_I8  || is_type == BARN_I16 || is_type == BARN_I32 || is_type == BARN_I64 ||
+		    is_type == BARN_U8  || is_type == BARN_U16 || is_type == BARN_U32 || is_type == BARN_U64 ||
+		    is_type == BARN_F32 || is_type == BARN_F64)
+}
+
 // Function for parsing values
 func parse_value(parser *Parser, expected_type BarnTypes) string {
 	skip_token(parser, 1)
@@ -41,7 +47,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 				continue
 			} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 				if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-					if find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_F32 {
+					if is_type_number(find_var.variable_type) {
 						to_ret += parser.curr_token.value
 						expect_symbol = true
 						expect_number = false
@@ -103,7 +109,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 				break
 			}
 		}
-		if expected_type == BARN_I32 || expected_type == BARN_F32 {
+		if is_type_number(expected_type) {
 			return to_ret
 		} else {
 			barn_error_show_with_line(
@@ -126,7 +132,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 		} else {
 			to_ret_2 := parser.curr_token.value
 			skip_token(parser, 1)
-			if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && (expected_type == BARN_I32 || expected_type == BARN_F32) {
+			if (parser.curr_token.kind == PLUS || parser.curr_token.kind == MINUS || parser.curr_token.kind == MUL || parser.curr_token.kind == DIV || parser.curr_token.kind == MOD) && (is_type_number(expected_type)) {
 				to_ret += to_ret_2
 				expect_number = false
 				expect_symbol = true
@@ -145,7 +151,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						continue
 					} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 						if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-							if find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_F32 {
+							if is_type_number(find_var.variable_type){
 								to_ret += parser.curr_token.value
 								expect_symbol = true
 								expect_number = false
@@ -201,7 +207,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						break
 					}
 				}
-				if expected_type == BARN_I32 || expected_type == BARN_F32 {
+				if is_type_number(expected_type) {
 					return to_ret
 				} else {
 					barn_error_show_with_line(
@@ -645,7 +651,7 @@ func change_token_to_barn_type(parser *Parser, tk *Token) (BarnTypes, bool) {
 		} else {
 			find_var := find_variable_both(parser, tk.value)
 			if find_var == nil {
-				barn_error_show_with_line(
+				barn_error_show_with_line(	
 					UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", tk.value),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
 					true, parser.curr_token.line)
@@ -780,9 +786,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 				function_name := parser.curr_token.value
 				if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-					if find_var.variable_type == BARN_I8 || find_var.variable_type == BARN_I16 || find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_I64 ||
-					   find_var.variable_type == BARN_U8 || find_var.variable_type == BARN_U16 || find_var.variable_type == BARN_U32 || find_var.variable_type == BARN_U64 ||
-					   find_var.variable_type == BARN_F32 || find_var.variable_type == BARN_F64 {
+					if is_type_number(find_var.variable_type) {
 						to_ret += parser.curr_token.value
 						expect_symbol = true
 						expect_number = false
@@ -949,9 +953,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 				break
 			}
 		}
-		if (expected_type == BARN_I8 || expected_type == BARN_I16 || expected_type == BARN_I32 || expected_type == BARN_I64 ||
-			expected_type == BARN_U8 || expected_type == BARN_U16 || expected_type == BARN_U32 || expected_type == BARN_U64 ||
-			expected_type == BARN_F32 || expected_type == BARN_F64 || expected_type == BARN_AUTO) {
+		if is_type_number(expected_type) {
 			return false, to_ret, BARN_F32
 		} else {
 			barn_error_show_with_line(
@@ -974,9 +976,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 		} else {
 			function_name := parser.curr_token.value
 			if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
-				if find_var.variable_type == BARN_I8 || find_var.variable_type == BARN_I16 || find_var.variable_type == BARN_I32 || find_var.variable_type == BARN_I64 ||
-				find_var.variable_type == BARN_U8 || find_var.variable_type == BARN_U16 || find_var.variable_type == BARN_U32 || find_var.variable_type == BARN_U64 ||
-				find_var.variable_type == BARN_F32 || find_var.variable_type == BARN_F64 || find_var.variable_type == BARN_AUTO {
+				if is_type_number(find_var.variable_type) {
 					to_ret += parser.curr_token.value
 					expect_symbol = true
 					expect_number = false
@@ -1229,7 +1229,14 @@ func parse_let(parser *Parser) {
 
 							// fmt.Printf("Variable name: `%s`, Variable type: `%s`, Variable value: `%s`\n", variable_name, variable_type.as_string(), variable_value)
 
+							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+								skip_token(parser, 0)
+							} else {
+								skip_token(parser, -1)
+							}
+
 							variable_node := NodeAST{}
+							variable_node.last_node_token = parser.curr_token
 							variable_node.node_kind = VARIABLE_DECLARATION
 							variable_node.node_kind_str = "VariableDeclaration"
 							variable_node.variable_name = variable_name
@@ -1253,11 +1260,7 @@ func parse_let(parser *Parser) {
 							// } else if is_function_call_value {
 							// 	skip_token(parser, 0)
 							// }
-							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
-								skip_token(parser, 0)
-							} else {
-								skip_token(parser, -1)
-							}
+
 						} else {
 							barn_error_show_with_line(
 								SYNTAX_ERROR, "Expected `=` after variable type",
@@ -1315,6 +1318,7 @@ func parse_let(parser *Parser) {
 							// fmt.Printf("Variable name: `%s`, Variable type: `%s`, Variable value: `%s`\n", variable_name, variable_type.as_string(), variable_value)
 
 							variable_node := NodeAST{}
+							variable_node.last_node_token = parser.curr_token
 							variable_node.node_kind = VARIABLE_DECLARATION
 							variable_node.node_kind_str = "VariableDeclaration"
 							variable_node.variable_name = variable_name
@@ -1383,6 +1387,7 @@ func parse_import_c(parser *Parser) {
 	}
 	node := NodeAST{}
 	node.node_kind = IMPORT_C
+	node.last_node_token = parser.curr_token
 	node.node_kind_str = "ImportC"
 	node.import_c_header = parser.curr_token.value
 	append_node(parser, node)
@@ -1403,16 +1408,24 @@ func parse_variable_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
-		value := parse_value(parser, variable.variable_type)
-		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
+		is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
+
+		if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+			skip_token(parser, 0)
+		} else {
 			skip_token(parser, -1)
 		}
+
 		node := NodeAST{}
 		node.node_kind = VARIABLE_ASSIGNMENT
+		node.last_node_token = parser.curr_token
 		node.node_kind_str = "VariableAssignmemt"
+		node.variable_type = variable.variable_type
 		node.variable_assignment_name = variable_name
 		node.variable_assignment_value = value
 		append_node(parser, node)
+
+		
 	}
 }
 
@@ -1430,12 +1443,18 @@ func parse_variable_plus_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
-		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
-			value := parse_value(parser, variable.variable_type)
-			if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
+		if is_type_number(variable.variable_type) {
+			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
+
+			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+				skip_token(parser, 0)
+			} else {
 				skip_token(parser, -1)
 			}
+	
 			node := NodeAST{}
+			node.variable_type = variable.variable_type
+			node.last_node_token = parser.curr_token
 			node.node_kind = VARIABLE_PLUS_ASSIGNMENT
 			node.node_kind_str = "VariablePlusAssignmemt"
 			node.variable_plus_assignment_name = variable_name
@@ -1465,13 +1484,19 @@ func parse_variable_minus_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
-		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
-			value := parse_value(parser, variable.variable_type)
-			if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
+		if is_type_number(variable.variable_type) {
+			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
+
+			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+				skip_token(parser, 0)
+			} else {
 				skip_token(parser, -1)
 			}
+	
 			node := NodeAST{}
+			node.variable_type = variable.variable_type
 			node.node_kind = VARIABLE_MINUS_ASSIGNMENT
+			node.last_node_token = parser.curr_token
 			node.node_kind_str = "VariableMinusAssignmemt"
 			node.variable_minus_assignment_name = variable_name
 			node.variable_minus_assignment_value = value
@@ -1500,13 +1525,19 @@ func parse_variable_mul_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
-		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
-			value := parse_value(parser, variable.variable_type)
-			if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
+		if is_type_number(variable.variable_type) {
+			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
+
+			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+				skip_token(parser, 0)
+			} else {
 				skip_token(parser, -1)
 			}
+	
 			node := NodeAST{}
+			node.variable_type = variable.variable_type
 			node.node_kind = VARIABLE_MUL_ASSIGNMENT
+			node.last_node_token = parser.curr_token
 			node.node_kind_str = "VariableMulAssignmemt"
 			node.variable_mul_assignment_name = variable_name
 			node.variable_mul_assignment_value = value
@@ -1535,12 +1566,18 @@ func parse_variable_div_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
-		if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
-			value := parse_value(parser, variable.variable_type)
-			if variable.variable_type == BARN_I32 || variable.variable_type == BARN_F32 {
+		if is_type_number(variable.variable_type) {
+			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
+
+			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+				skip_token(parser, 0)
+			} else {
 				skip_token(parser, -1)
 			}
+	
 			node := NodeAST{}
+			node.last_node_token = parser.curr_token
+			node.variable_type = variable.variable_type
 			node.node_kind = VARIABLE_DIV_ASSIGNMENT
 			node.node_kind_str = "VariableDivAssignmemt"
 			node.variable_div_assignment_name = variable_name
@@ -1561,10 +1598,11 @@ func parse_return(parser *Parser) {
 	if parser.is_function_opened {
 		function := find_function(parser, parser.actual_function.function_name)
 		return_value := parse_value(parser, function.function_return)
-		if function.function_return == BARN_I32 || function.function_return == BARN_F32 {
+		if is_type_number(function.function_return) {
 			skip_token(parser, -1)
 		}
 		node := NodeAST{}
+		node.last_node_token = parser.curr_token
 		node.node_kind = FUNCTION_RETURN
 		node.node_kind_str = "FunctionReturn"
 		node.function_return_value = return_value
@@ -1609,7 +1647,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 				}
 			}
 		} else if (parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT) && expected_value {
-			if last_type_lhs == BARN_TYPE_NONE || (last_type_lhs == BARN_I32 || last_type_lhs == BARN_F32) {
+			if last_type_lhs == BARN_TYPE_NONE || (is_type_number(last_type_lhs)) {
 				to_ret += parser.curr_token.value
 				expected_symbol = true
 				expected_value = false
@@ -1770,9 +1808,11 @@ func parse_if(parser *Parser) {
 	skip_token(parser, -1)
 
 	if_node := NodeAST{}
+	if_node.last_node_token = parser.curr_token
 	if_node.node_kind = IF_STATEMENT
 	if_node.node_kind_str = "IfStatement"
 	if_node.if_condition = condition_statement
+	if_node.last_node_token = parser.curr_token
 
 	append_node_ptr(parser, &if_node)
 	skip_token(parser, 1)
@@ -1799,6 +1839,8 @@ func parse_else(parser *Parser) {
 			else_node := NodeAST{}
 			else_node.node_kind = ELSE_STATEMENT
 			else_node.node_kind_str = "ElseStatement"
+			else_node.last_node_token = parser.curr_token
+
 
 			append_node_ptr(parser, &else_node)
 			skip_token(parser, 1)
@@ -1844,6 +1886,7 @@ func parse_elif(parser *Parser) {
 			else_node.node_kind = ELSE_IF_STATEMENT
 			else_node.node_kind_str = "ElseIfStatement"
 			else_node.else_if_condition = condition_statement
+			else_node.last_node_token = parser.curr_token
 
 			append_node_ptr(parser, &else_node)
 			skip_token(parser, 1)
@@ -1888,6 +1931,7 @@ func parse_while(parser *Parser) {
 	while_node.node_kind = WHILE_STATEMENT
 	while_node.node_kind_str = "WhileStatement"
 	while_node.while_condition = condition
+	while_node.last_node_token = parser.curr_token
 	append_node(parser, while_node)
 
 	skip_token(parser, 1)
@@ -1909,6 +1953,7 @@ func parse_continue(parser *Parser) {
 		continue_node := NodeAST{}
 		continue_node.node_kind = CONTINUE_STATEMENT
 		continue_node.node_kind_str = "ContinueStatement"
+		continue_node.last_node_token = parser.curr_token
 		append_node(parser, continue_node)
 	} else {
 		barn_error_show_with_line(
@@ -1925,6 +1970,7 @@ func parse_break(parser *Parser) {
 		break_node := NodeAST{}
 		break_node.node_kind = BREAK_STATEMENT
 		break_node.node_kind_str = "BreakStatement"
+		break_node.last_node_token = parser.curr_token
 		append_node(parser, break_node)
 	} else {
 		barn_error_show_with_line(
@@ -1964,6 +2010,8 @@ func parse_for(parser *Parser) {
 					for_node.for_condition = condition
 					for_node.for_var_declaration = variable_declaration_node
 					for_node.for_var_operation = variable_modification_node
+					for_node.last_node_token = parser.curr_token
+
 					append_node(parser, for_node)
 
 					skip_token(parser, 1)
@@ -2019,6 +2067,7 @@ func parse_incrementation(parser *Parser, variable_name string) {
 		incrementation_node.node_kind = VARIABLE_INCREMENTATION
 		incrementation_node.node_kind_str = "VariableIncrementation"
 		incrementation_node.variable_name = variable_name
+		incrementation_node.last_node_token = parser.curr_token
 		append_node(parser, incrementation_node)
 	} else {
 		barn_error_show_with_line(
@@ -2036,6 +2085,7 @@ func parse_decrementation(parser *Parser, variable_name string) {
 		decrementation_node.node_kind = VARIABLE_DECREMENTATION
 		decrementation_node.node_kind_str = "VariableDecrementation"
 		decrementation_node.variable_name = variable_name
+		decrementation_node.last_node_token = parser.curr_token
 		append_node(parser, decrementation_node)
 	} else {
 		barn_error_show_with_line(
@@ -2195,15 +2245,6 @@ func parser_start(lex *Lexer) *Parser {
 			break
 		} else if parser.curr_token.kind == CLOSEBRACE {
 			if parser.is_function_opened {
-				// if parser.statement_open >= 1 {
-				// 	parser.statement_open -= 1
-				// 	node := NodeAST{}
-				// 	node.node_kind = END_WHILE_STATEMENT
-				// 	node.node_kind_str = "EndWhileStatement"
-
-				// 	append_node(&parser, node)
-				// 	continue
-				// }
 				if parser.statement_open >= 1 {
 					parser.statement_open -= 1
 					node := NodeAST{}
@@ -2243,6 +2284,14 @@ func parser_start(lex *Lexer) *Parser {
 				true, parser.curr_token.line)
 			os.Exit(1)
 		}
+	}
+
+	// Find function named "main" otherwise report and barn_error 
+	// which is an PARSER_ERROR
+	main_function_node := find_function(&parser, "main")
+	if main_function_node == nil {
+		barn_error_show(PARSER_ERROR, fmt.Sprintf("Expected definition of function named \"main\" without there isn't any entry point, for the program to run"))
+		os.Exit(1)
 	}
 
 	return &parser

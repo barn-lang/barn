@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"os"
 	"strings"
 )
@@ -89,7 +90,123 @@ func gen_tab(tabs int) string {
 	return to_ret
 }
 
-func is_value_correct_overflow(types BarnTypes, value string) string {
+func convert_types_to_bits(types BarnTypes) int {
+	if types == BARN_U8 || types == BARN_I8 {
+		return 8
+	} else if types == BARN_U16 || types == BARN_I16 {
+		return 16
+	} else if types == BARN_U32 || types == BARN_I32 {
+		return 32
+	} else if types == BARN_U64 || types == BARN_I64 {
+		return 64
+	}
+
+	return -1
+}
+
+func convert_types_to_bits_floats(types BarnTypes) int {
+	if types == BARN_U8 || types == BARN_F32 {
+		return 32
+	} else if types == BARN_U16 || types == BARN_F64 {
+		return 64
+	}
+
+	return -1
+}
+
+func is_number(value string) bool {
+	for i, letter := range value {
+		if letter == '1' || letter == '2' || letter == '3' || letter == '4' || letter == '5' || letter == '6' || letter == '7' || letter == '8' || letter == '9' || letter == '0' || letter == '.' { 
+			continue 
+		} else if letter == '-' {
+			if i != 0 {
+				return false
+			} else {
+				continue
+			}
+		} else { 
+			return false
+		}
+	}
+
+	return true
+}
+
+func is_value_correct_overflow(curr_token *Token, types BarnTypes, value string) string {
+	if types == BARN_U8 || types == BARN_U16 || types == BARN_U32 || types == BARN_U64 {
+		if is_number(value) == false {
+			return value
+		}
+
+		if strings.Contains(value, "-") || strings.Contains(value, ".") {
+			barn_error_show_with_line(OVERFLOW_ERROR, fmt.Sprintf("Value is incorrect (%s)", value),
+									  curr_token.filename, curr_token.row -1, curr_token.col - (len(value) - 1), true, curr_token.line)
+			os.Exit(1)
+		}
+
+		bits := convert_types_to_bits(types)
+		if bits == -1 {
+			barn_error_show(COMPILER_ERROR, "weird behaviour of `convert_types_to_bits()` in function `is_value_correct_overflow()` in file `codegen.go`")
+			os.Exit(1)
+		}
+
+		_, err := strconv.ParseUint(value, 10, bits)
+		if err != nil {
+			barn_error_show_with_line(OVERFLOW_ERROR, fmt.Sprintf("Value is incorrect (%s) for u%d type", value, bits),
+									  curr_token.filename, curr_token.row -1, curr_token.col - (len(value) - 1), true, curr_token.line)
+			os.Exit(1)
+		}
+
+		return value
+	} else if types == BARN_I8 || types == BARN_I16 || types == BARN_I32 || types == BARN_I64 {
+		if is_number(value) == false {
+			return value
+		}
+		
+		if strings.Contains(value, ".") {
+			barn_error_show_with_line(OVERFLOW_ERROR, fmt.Sprintf("Value is incorrect (%s)", value),
+									  curr_token.filename, curr_token.row -1, curr_token.col - (len(value) - 1), true, curr_token.line)
+			os.Exit(1)
+		}
+
+		bits := convert_types_to_bits(types)
+		if bits == -1 {
+			barn_error_show(COMPILER_ERROR, "weird behaviour of `convert_types_to_bits()` in function `is_value_correct_overflow()` in file `codegen.go`")
+			os.Exit(1)
+		}
+
+		_, err := strconv.ParseInt(value, 10, bits)
+		if err != nil {
+			barn_error_show_with_line(OVERFLOW_ERROR, fmt.Sprintf("Value is incorrect (%s) for i%d type", value, bits),
+									  curr_token.filename, curr_token.row -1, curr_token.col - (len(value) - 1), true, curr_token.line)
+			os.Exit(1)
+		}
+
+		return value
+	} else if types == BARN_F32 || types == BARN_F64 {
+		if is_number(value) == false {
+			return value
+		}
+
+		// If it's not decimal == show error
+
+		bits := convert_types_to_bits_floats(types)
+		if bits == -1 {
+			barn_error_show(COMPILER_ERROR, "weird behaviour of `convert_types_to_bits_floats()` in function `is_value_correct_overflow()` in file `codegen.go`")
+			os.Exit(1)
+		}
+
+		_, err := strconv.ParseFloat(value, bits)
+		if err != nil {
+			barn_error_show_with_line(OVERFLOW_ERROR, fmt.Sprintf("Value is incorrect (%s) for f%d type", value, bits),
+									  curr_token.filename, curr_token.row -1, curr_token.col - (len(value) - 1), true, curr_token.line)
+			os.Exit(1)
+		}
+		
+		return value
+	}
+
+	// Other type
 	return value
 }
 
@@ -100,24 +217,31 @@ func generate_variable_declaration(node *NodeAST, codegen *Codegen) string {
 		to_ret += fmt.Sprintf("%s %s = %s",
 			barn_types_to_cxx_types(variable.variable_type),
 			variable.variable_name,
-			is_value_correct_overflow(variable.variable_type, strings.Split(variable.variable_value, "	")[1]))
+			is_value_correct_overflow(node.last_node_token, variable.variable_type, strings.Split(variable.variable_value, "	")[1]))
 	} else {
 		if variable.variable_is_arg == false {
 			if variable.variable_type == BARN_STR {
 				to_ret += fmt.Sprintf("%s %s = \"%s\"",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
-					is_value_correct_overflow(variable.variable_type, variable.variable_value))
+					is_value_correct_overflow(node.last_node_token, variable.variable_type, variable.variable_value))
 			} else if variable.variable_type == BARN_I8 {
-				to_ret += fmt.Sprintf("%s %s = '%s'",
-					barn_types_to_cxx_types(variable.variable_type),
-					variable.variable_name,
-					is_value_correct_overflow(variable.variable_type, variable.variable_value))
+				if len(variable.variable_value) == 1 {
+					to_ret += fmt.Sprintf("%s %s = '%s'",
+						barn_types_to_cxx_types(variable.variable_type),
+						variable.variable_name,
+						variable.variable_value)
+				} else {
+					to_ret += fmt.Sprintf("%s %s = %s",
+						barn_types_to_cxx_types(variable.variable_type),
+						variable.variable_name,
+						is_value_correct_overflow(node.last_node_token, variable.variable_type, variable.variable_value))
+				}
 			} else {
 				to_ret += fmt.Sprintf("%s %s = %s",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
-					is_value_correct_overflow(variable.variable_type, variable.variable_value))
+					is_value_correct_overflow(node.last_node_token, variable.variable_type, variable.variable_value))
 			}
 		}
 	}
@@ -129,23 +253,23 @@ func generate_variable_modify(node *NodeAST, codegen *Codegen) string {
 	if node.node_kind == VARIABLE_ASSIGNMENT {
 		to_ret += fmt.Sprintf("%s = %s",
 			node.variable_assignment_name,
-			is_value_correct_overflow(node.variable_type, node.variable_assignment_value))
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_assignment_value))
 	} else if node.node_kind == VARIABLE_PLUS_ASSIGNMENT {
 		to_ret += fmt.Sprintf("%s += %s",
 			node.variable_plus_assignment_name,
-			is_value_correct_overflow(node.variable_type, node.variable_plus_assignment_value))
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_plus_assignment_value))
 	} else if node.node_kind == VARIABLE_MINUS_ASSIGNMENT {
 		to_ret += fmt.Sprintf("%s -= %s",
 			node.variable_minus_assignment_name,
-			is_value_correct_overflow(node.variable_type, node.variable_minus_assignment_value))
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_minus_assignment_value))
 	} else if node.node_kind == VARIABLE_MUL_ASSIGNMENT {
 		to_ret += fmt.Sprintf("%s *= %s",
 			node.variable_mul_assignment_name,
-			is_value_correct_overflow(node.variable_type, node.variable_mul_assignment_value))
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_mul_assignment_value))
 	} else if node.node_kind == VARIABLE_DIV_ASSIGNMENT {
 		to_ret += fmt.Sprintf("%s /= %s",
 			node.variable_div_assignment_name,
-			is_value_correct_overflow(node.variable_type, node.variable_div_assignment_value))
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_div_assignment_value))
 	} else if node.node_kind == VARIABLE_DECREMENTATION {
 		to_ret += fmt.Sprintf("%s--", node.variable_name)
 	} else if node.node_kind == VARIABLE_INCREMENTATION {
@@ -177,9 +301,13 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 							codegen.cxx_code += pass_argument_value.value
 							codegen.cxx_code += "\""
 						} else if pass_argument_value.type_arg == BARN_I8 {
-							codegen.cxx_code += "'"
-							codegen.cxx_code += pass_argument_value.value
-							codegen.cxx_code += "'"
+							if len(pass_argument_value.value) == 1 {
+								codegen.cxx_code += "'"
+								codegen.cxx_code += pass_argument_value.value
+								codegen.cxx_code += "'"
+							} else {
+								codegen.cxx_code += pass_argument_value.value
+							}
 						} else if pass_argument_value.type_arg == BARN_F32 {
 							codegen.cxx_code += "(float)"
 							codegen.cxx_code += pass_argument_value.value
@@ -210,17 +338,24 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 					codegen.cxx_code += fmt.Sprintf("%s %s = \"%s\";\n",
 						barn_types_to_cxx_types(variable.variable_type),
 						variable.variable_name,
-						variable.variable_value)
+						is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_value))
 				} else if variable.variable_type == BARN_I8 {
-					codegen.cxx_code += fmt.Sprintf("%s %s = '%s';\n",
-						barn_types_to_cxx_types(variable.variable_type),
-						variable.variable_name,
-						variable.variable_value)
+					if len(variable.variable_value) == 1 {
+						codegen.cxx_code += fmt.Sprintf("%s %s = '%s';\n",
+							barn_types_to_cxx_types(variable.variable_type),
+							variable.variable_name,
+							node.variable_value)
+					} else {
+						codegen.cxx_code += fmt.Sprintf("%s %s = %s;\n",
+							barn_types_to_cxx_types(variable.variable_type),
+							variable.variable_name,
+							is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_value))
+					}
 				} else {
 					codegen.cxx_code += fmt.Sprintf("%s %s = %s;\n",
 						barn_types_to_cxx_types(variable.variable_type),
 						variable.variable_name,
-						variable.variable_value)
+						is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_value))
 				}
 			}
 		}
@@ -228,27 +363,27 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 		codegen.cxx_code += gen_tab(codegen.tab)
 		codegen.cxx_code += fmt.Sprintf("%s = %s;\n",
 			node.variable_assignment_name,
-			node.variable_assignment_value)
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_assignment_value))
 	} else if node.node_kind == VARIABLE_PLUS_ASSIGNMENT {
 		codegen.cxx_code += gen_tab(codegen.tab)
 		codegen.cxx_code += fmt.Sprintf("%s += %s;\n",
 			node.variable_plus_assignment_name,
-			node.variable_plus_assignment_value)
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_plus_assignment_value))
 	} else if node.node_kind == VARIABLE_MINUS_ASSIGNMENT {
 		codegen.cxx_code += gen_tab(codegen.tab)
 		codegen.cxx_code += fmt.Sprintf("%s -= %s;\n",
 			node.variable_minus_assignment_name,
-			node.variable_minus_assignment_value)
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_minus_assignment_value))
 	} else if node.node_kind == VARIABLE_MUL_ASSIGNMENT {
 		codegen.cxx_code += gen_tab(codegen.tab)
 		codegen.cxx_code += fmt.Sprintf("%s *= %s;\n",
 			node.variable_mul_assignment_name,
-			node.variable_mul_assignment_value)
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_mul_assignment_value))
 	} else if node.node_kind == VARIABLE_DIV_ASSIGNMENT {
 		codegen.cxx_code += gen_tab(codegen.tab)
 		codegen.cxx_code += fmt.Sprintf("%s /= %s;\n",
 			node.variable_div_assignment_name,
-			node.variable_div_assignment_value)
+			is_value_correct_overflow(node.last_node_token, node.variable_type, node.variable_div_assignment_value))
 	} else if node.node_kind == FUNCTION_RETURN {
 		codegen.cxx_code += gen_tab(codegen.tab)
 		codegen.cxx_code += fmt.Sprintf("return %s;\n",
@@ -359,17 +494,24 @@ func codegen_c(codegen *Codegen) {
 				codegen.cxx_code += fmt.Sprintf("__BARN_GLOBAL_VARIABLE__ %s %s = \"%s\";\n",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
-					variable.variable_value)
+					is_value_correct_overflow(variable.last_node_token, variable.variable_type, variable.variable_value))
 			} else if variable.variable_type == BARN_I8 {
-				codegen.cxx_code += fmt.Sprintf("__BARN_GLOBAL_VARIABLE__ %s %s = '%s';\n",
-					barn_types_to_cxx_types(variable.variable_type),
-					variable.variable_name,
-					variable.variable_value)
+				if len(variable.variable_value) == 1 {
+					codegen.cxx_code += fmt.Sprintf("__BARN_GLOBAL_VARIABLE__ %s %s = '%s';\n",
+						barn_types_to_cxx_types(variable.variable_type),
+						variable.variable_name,
+						variable.variable_value)
+				} else {
+					codegen.cxx_code += fmt.Sprintf("__BARN_GLOBAL_VARIABLE__ %s %s = %s;\n",
+						barn_types_to_cxx_types(variable.variable_type),
+						variable.variable_name,
+						is_value_correct_overflow(variable.last_node_token, variable.variable_type, variable.variable_value))
+				}
 			} else {
-				codegen.cxx_code += fmt.Sprintf("__BARN_GLOBAL_VARIABLE__ %s %s = %s;\n",
+				codegen.cxx_code += fmt.Sprintf("__B1ARN_GLOBAL_VARIABLE__ %s %s = %s;\n",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
-					variable.variable_value)
+					is_value_correct_overflow(variable.last_node_token, variable.variable_type, variable.variable_value))
 			}
 		}
 	}

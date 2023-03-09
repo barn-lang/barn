@@ -11,6 +11,7 @@ const (
 	UNDEFINED_ERROR
 	UNKNOWN_ERROR
 	COMPILER_ERROR
+	OVERFLOW_ERROR
 )
 
 // Error code to string
@@ -30,6 +31,8 @@ func barn_error_code_to_string(code int) string {
 		return "UnknownError"
 	case COMPILER_ERROR:
 		return "CompilerError"
+	case OVERFLOW_ERROR:
+		return "OverflowError"
 	}
 
 	return "UnknownError"

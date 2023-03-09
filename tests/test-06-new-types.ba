@@ -1,19 +1,69 @@
 fun main() {
+
+    /* 
+
+        Unsigned
+    
+    */
+
     let _u8: u8   = 20
-    let __u8: u8  = -20    // Error: overflow
-    let ___u8: u8 = 1024   // Error: overflow
+    let __u8: u8  = 0    
+    let ___u8: u8 = 255  
+
+    let _byte: byte   = 20
+    let __byte: byte  = 0   
+    let ___byte: byte = 255  
 
     let _u16: u16   = 20
-    let __u16: u16  = -20         // Error: overflow
-    let ___u16: u16 = 65536       // Error: overflow
+    let __u16: u16  = 0         
+    let ___u16: u16 = 65535     
 
     let _u32: u32   = 20
-    let __u32: u32  = -20              // Error: overflow
-    let ___u32: u32 = 4294967296       // Error: overflow
+    let __u32: u32  = 0              
+    let ___u32: u32 = 4294967295     
 
     let _u64: u64 = 20
-    let __u64: u64 = -20               // Error: overflow
-    let ___u64: u64 = 4294967296       // Error: overflow
+    let __u64: u64 = 0                         
+    let ___u64: u64 = 18446744073709551615     
+
+    /* 
+
+        Int
+    
+    */
+
+    let _i8: i8   = 20
+    let __i8: i8  = -127    
+    let ___i8: i8 = 127     
+
+    let _char: char   = 20
+    let __char: char  = -127    
+    let ___char: char = 127     
+
+    let _i16: i16   = 20
+    let __i16: i16  = -32768      
+    let ___i16: i16 = 32767       
+
+    let _i32: i32   = 20
+    let __i32: i32  = -2147483648    
+    let ___i32: i32 = 2147483647     
+
+    let _int: int   = 20
+    let __int: int  = -2147483648    
+    let ___int: int = 2147483647     
+
+    let _i64: i64 = 20
+    let __i64: i64 = -9223372036854775808     
+    let ___i64: i64 = 9223372036854775807     
+
+    /*
+
+        Floats 
+
+    */
+
+    let _f32: f32 = 20.23330319041
+    let _f64: f64 = 20.23330319041
 
     /* To test:
         u8, byte, u16, u32, u64
