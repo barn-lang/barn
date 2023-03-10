@@ -11,7 +11,7 @@ fun init_gl(string window_title, int y_size, int x_size) -> int {
 	__code__("glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);")
 	__code__("glutInitWindowPosition(-1,-1);")
 	__code__("glutInitWindowSize(y_size, x_size);")
-	__code__("glutCreateWindow(window_title);")
+	__code__("glutCreateWindow(window_title.c_str());")
     return 1
 }
 
@@ -23,7 +23,6 @@ fun main_loop_gl() {
 // To use this function you need to have function display_func()
 // defined in main file
 fun register_display_func() {
-    __code__("glutDisplayFunc(display_func);")
 }
 
 fun swap_buffers_gl() {
@@ -34,3 +33,6 @@ fun clear_default_gl() {
     __code__("glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);")
 }
 
+fun clear_color(f32 r, f32 g, f32 b, f32 a) {
+    __code__("glClearColor(r, g, b, a);")
+}

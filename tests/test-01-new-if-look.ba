@@ -2,8 +2,8 @@ fun main()
 {
     let i: int = 2
     if i == 1 {
-        puts("i == 1")
+        println("i == 1")
     } elif i == 2 {
-        puts("i == 2")
+        println("i == 2")
     } 
 }

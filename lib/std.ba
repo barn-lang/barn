@@ -1,10 +1,15 @@
 /* Official Barn Standard library file */
 /* Copyright Solindek (C) 2022 */
 
-// TODO: add printf so it works
+// TODO: add println so it works
 
 // Function for comparing string
 fun string_compare(string s1, string s2) -> bool {
+	__code__("return (bool)s1.compare(s2);")
+}
+
+// Function for comparing string used in if
+fun __barn_string_compare(string s1, string s2) -> bool {
 	__code__("return (bool)s1.compare(s2);")
 }
 
@@ -42,9 +47,9 @@ fun println(string s) {
 	__code__("std::cout << s << std::endl;")
 }
 
-// Just a alias of print
-fun printf(string s) {
-	__code__("std::cout << s;")
+// Just a alias of println
+fun puts(string s) {
+	__code__("std::cout << s << std::endl;")
 }
 
 // Function for printing numbers
@@ -54,5 +59,5 @@ fun printnum(int num) {
 
 // Function for printing numbers
 fun printbool(bool _bool) {
-	if (_bool == true) { print("true") } else { print("false") }
+	if (_bool == true) { println("true") } else { println("false") }
 }

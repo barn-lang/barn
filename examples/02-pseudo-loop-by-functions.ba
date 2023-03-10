@@ -1,4 +1,6 @@
+@import "std.ba"
+
 fun main() {
-    printf("Pseudo loop\n")
+    println("Pseudo loop\n")
     main()
 }

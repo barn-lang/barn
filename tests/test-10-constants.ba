@@ -1,0 +1,7 @@
+@import "std.ba"
+
+const CONSTANT: string = "HI A CONSTANT"
+
+fun main() {
+    println(CONSTANT)
+}

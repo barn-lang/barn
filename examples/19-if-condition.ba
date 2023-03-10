@@ -3,10 +3,10 @@
 fun main() {
     let age: int = 13
     if age == 13 {
-        print("Age is 13\n")
+        println("Age is 13\n")
     } elif age == 14 {
-        print("Age is 14\n")    
+        println("Age is 14\n")    
     } else {
-        print("Age isn't 13\n")
+        println("Age isn't 13\n")
     }
 }

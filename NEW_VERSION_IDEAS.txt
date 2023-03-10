@@ -4,17 +4,17 @@ New version of barn (0.2v) will have in it these things:
           types to the language so we can operate on every value
 	- Change the statements look so insted of
 		. if |1 == 1| {
-		. 	print("1 is 1, easy lol")
+		. 	println("1 is 1, easy lol")
 		. }
           We have something like this more modern and without some weird
 	  characters, 'cause after all this time i see this syntax mistake
 	  very well
 		. if 1 == 1 {
-		.	print("1 is 1, easy lol")
+		.	println("1 is 1, easy lol")
 		. }
 	- Also now for will look like this
 		. for let i: int = 0; i < 100; i++ {
-		. 	print("printing this hundred times")
+		. 	println("printing this hundred times")
 		. }
 	  So if, while, for look this same
 	- Better Standard library, in 0.1v this library is very very obscured

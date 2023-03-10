@@ -213,6 +213,11 @@ func is_value_correct_overflow(curr_token *Token, types BarnTypes, value string)
 func generate_variable_declaration(node *NodeAST, codegen *Codegen) string {
 	variable := node
 	to_ret := ""
+
+	if variable.variable_constant == true {
+		to_ret += "const "
+	}
+
 	if variable.variable_fn_call_value == true {
 		to_ret += fmt.Sprintf("%s %s = %s",
 			barn_types_to_cxx_types(variable.variable_type),
@@ -490,25 +495,28 @@ func codegen_c(codegen *Codegen) {
 			}
 		} else if codegen.parser.nodes[i].node_kind == VARIABLE_DECLARATION {
 			variable := codegen.parser.nodes[i]
+			if variable.variable_constant == true {
+				codegen.cxx_code += "__BARN_GLOBAL_VARIABLE__ const "
+			}
 			if variable.variable_type == BARN_STR {
-				codegen.cxx_code += fmt.Sprintf("__BARN_GLOBAL_VARIABLE__ %s %s = \"%s\";\n",
+				codegen.cxx_code += fmt.Sprintf("%s %s = \"%s\";\n",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
 					is_value_correct_overflow(variable.last_node_token, variable.variable_type, variable.variable_value))
 			} else if variable.variable_type == BARN_I8 {
 				if len(variable.variable_value) == 1 {
-					codegen.cxx_code += fmt.Sprintf("__BARN_GLOBAL_VARIABLE__ %s %s = '%s';\n",
+					codegen.cxx_code += fmt.Sprintf("%s %s = '%s';\n",
 						barn_types_to_cxx_types(variable.variable_type),
 						variable.variable_name,
 						variable.variable_value)
 				} else {
-					codegen.cxx_code += fmt.Sprintf("__BARN_GLOBAL_VARIABLE__ %s %s = %s;\n",
+					codegen.cxx_code += fmt.Sprintf("%s %s = %s;\n",
 						barn_types_to_cxx_types(variable.variable_type),
 						variable.variable_name,
 						is_value_correct_overflow(variable.last_node_token, variable.variable_type, variable.variable_value))
 				}
 			} else {
-				codegen.cxx_code += fmt.Sprintf("__B1ARN_GLOBAL_VARIABLE__ %s %s = %s;\n",
+				codegen.cxx_code += fmt.Sprintf("%s %s = %s;\n",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
 					is_value_correct_overflow(variable.last_node_token, variable.variable_type, variable.variable_value))

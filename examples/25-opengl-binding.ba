@@ -2,13 +2,13 @@
 
 fun display_func() {
     clear_default_gl()
-
+    clear_color(255.0, 255.0, 0.0, 255.0)
     swap_buffers_gl()
 }
 
 fun main() -> int {
     init_gl("OpenGL Barn Biding", 1024, 512)
-    register_display_func()
+    __code__("glutDisplayFunc(display_func);")
     main_loop_gl()
     return 0
 }

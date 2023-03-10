@@ -1,8 +1,0 @@
-@import "./examples/22-second-import-file.ba"
-@import "./std.ba"
-
-fun main() {
-    printf("Imported std and ./examples/22-second-import-file.ba\n")
-    one()
-    let len: int = string_length("12345")
-}

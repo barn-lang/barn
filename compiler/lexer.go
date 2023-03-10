@@ -85,7 +85,7 @@ func comment_multiline_open(lex *Lexer) {
 		buf = append(buf, lex.curr_char)    // Append to the buffer another byte
 		lex.last_token.value = string(buf)  // Convert buffer to string
 	} else {
-		// If multiline comment is already opened then print out error
+		// If multiline comment is already opened then println out error
 		// in other situation set multline property to `true`
 		if lex.is_comment_multiline == false {
 			lex.is_comment_multiline = true

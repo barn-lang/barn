@@ -4,10 +4,10 @@
 fun main() {
     let file: bool = os_file_exists("./file.txt")
     printbool(file)
-    puts("")
+    println("")
 
     let file_content: string = os_read_file("./file.txt")
-    puts(file_content)
+    println(file_content)
     
     os_write_file("./file.txt", "Hi")
 }

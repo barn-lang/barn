@@ -20,7 +20,8 @@ func help() {
 	fmt.Printf("    > %s--fasm%s compile and write output of program in FASM\n", get_color(Cyan), get_color(Reset))
 	fmt.Printf("    > %s--c%s compile and write output of program in C\n", get_color(Cyan), get_color(Reset))
 	fmt.Printf("    > %s--tokens%s show all tokens from lexer (for debug purposes)\n", get_color(Cyan), get_color(Reset))
-	fmt.Printf("    > %s--t%s show lexer, parser and codegen process time\n", get_color(Cyan), get_color(Reset))
+	fmt.Printf("    > %s--time%s show lexer, parser and codegen process time\n", get_color(Cyan), get_color(Reset))
+	fmt.Printf("    > %s--cflags%s argument that can add c flags to compilation\n", get_color(Cyan), get_color(Reset))
 }
 
 func main() {
@@ -68,20 +69,33 @@ func main() {
 
 			file.WriteString(code)
 
-			_, stderr, exit_code := run_command("g++", "./c_out.cxx")
+			if args.is_flag("--cflags") || args.is_flag("-cf") {
+				if args.is_flag("--cflags") {
+					cflags := "./c_out.cxx " + args.get_flag_by_index(args.get_flag_index("--cflags") + 1)
+					splited_cflags := strings.Split(cflags, " ")
 
-			if (exit_code != 0) {
-				barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
-				fmt.Print(stderr)
+					_, stderr, exit_code := run_command("g++", splited_cflags...)
+					if (exit_code != 0) {
+						barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
+						fmt.Print(stderr)
+					}
+				} else {
+					cflags := "./c_out.cxx " + args.get_flag_by_index(args.get_flag_index("-cf") + 1)
+					splited_cflags := strings.Split(cflags, " ")
+
+					_, stderr, exit_code := run_command("g++", splited_cflags...)
+					if (exit_code != 0) {
+						barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
+						fmt.Print(stderr)
+					}
+				}
+			} else {
+				_, stderr, exit_code := run_command("g++", "./c_out.cxx")
+				if (exit_code != 0) {
+					barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
+					fmt.Print(stderr)
+				}
 			}
-
-			// Set stdout and run
-			// process_run.Run()
-
-			// if (process_run.Err != nil) {
-			// 	barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
-			// 	fmt.Print(output)
-			// }
 		}
 	} else {
 		if len(args.flags) == 0 {

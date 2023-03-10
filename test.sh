@@ -1,4 +1,4 @@
 for file in ./examples/*.ba; do
     echo "Testing file $file"
-    ./barn $file -t
+    ./barn $file
 done

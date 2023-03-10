@@ -2,7 +2,7 @@
 
 fun main() {
     while true {
-        print("siema")
+        println("siema")
         break
     }
 }

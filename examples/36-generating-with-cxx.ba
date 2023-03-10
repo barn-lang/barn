@@ -2,5 +2,5 @@
 
 fun main() {
     let example_string: string = "Hello World"
-    print(example_string)
+    println(example_string)
 }

@@ -1,5 +1,7 @@
+@import "std.ba"
+
 fun main() {
     if 9 + 1 == 10 {
-        puts("9 + 1 == 10")
+        println("9 + 1 == 10")
     }
 }

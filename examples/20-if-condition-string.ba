@@ -1,5 +1,7 @@
+@import "std.ba"
+
 fun main() {
     if "Bruno" == "Bruno" {
-        printf("Bruno is Bruno lol")
+        println("Bruno is Bruno lol")
     }
 }

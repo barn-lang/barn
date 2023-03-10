@@ -288,6 +288,8 @@ func is_keyword(value_token string) bool {
 		return true
 	case "let":
 		return true
+	case "const":
+		return true
 	case "return":
 		return true
 	case "if":
@@ -1199,6 +1201,91 @@ func reset_local_variables(parser *Parser) {
 	parser.local_variables = []*NodeAST{}
 }
 
+// Function that parse `const` keyword for declaring variables
+func parse_const(parser *Parser) {
+	// error_when_we_arent_in_function(parser)
+	if parser.is_function_opened == true {
+		barn_error_show_with_line(
+			SYNTAX_ERROR, "Couldn't declare constant in function",
+			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+			true, parser.curr_token.line)
+		os.Exit(1)
+	} else {
+		if is_next_token_kind_safe(parser, IDENTIFIER) {
+			variable_name := parser.curr_token.value
+
+			if is_variable_defined_global(parser, variable_name) == true {
+				barn_error_show_with_line(
+					SYNTAX_ERROR, fmt.Sprintf("Variable with name `%s` is already defined", variable_name),
+					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+					true, parser.curr_token.line)
+				os.Exit(1)
+			}
+
+			if is_next_token_kind_safe(parser, COLON) {
+				if is_next_token_kind_safe(parser, IDENTIFIER) {
+					variable_type := is_token_represent_type(parser.curr_token.value)
+					if variable_type == BARN_TYPE_NONE {
+						barn_error_show_with_line(
+							SYNTAX_ERROR, fmt.Sprintf("Unknown variable type `%s`", parser.curr_token.value),
+							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+							true, parser.curr_token.line)
+						os.Exit(1)
+					} else {
+						if is_next_token_kind_safe(parser, ASN) {
+							is_function_call_value, variable_value, variable_type_real := parse_variable_value(parser, variable_type)
+
+							// fmt.Printf("Variable name: `%s`, Variable type: `%s`, Variable value: `%s`\n", variable_name, variable_type.as_string(), variable_value)
+
+							variable_node := NodeAST{}
+							variable_node.last_node_token = parser.curr_token
+							variable_node.node_kind = VARIABLE_DECLARATION
+							variable_node.node_kind_str = "VariableDeclaration"
+							variable_node.variable_name = variable_name
+							variable_node.variable_type = variable_type_real
+							variable_node.variable_value = variable_value
+							variable_node.variable_fn_call_value = is_function_call_value
+							variable_node.variable_constant = true
+							append_node(parser, variable_node)
+							parser.global_variables = append(parser.global_variables, &variable_node)
+
+							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+								skip_token(parser, 0)
+							} else {
+								skip_token(parser, -1)
+							}
+						} else {
+							barn_error_show_with_line(
+								SYNTAX_ERROR, "Expected `=` after variable type",
+								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+								true, parser.curr_token.line)
+							os.Exit(1)
+						}
+					}
+				} else {
+					barn_error_show_with_line(
+						SYNTAX_ERROR, "Expected identifier that represents variable type",
+						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+						true, parser.curr_token.line)
+					os.Exit(1)
+				}
+			} else {
+				barn_error_show_with_line(
+					SYNTAX_ERROR, "Expected `:` after variable name",
+					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+					true, parser.curr_token.line)
+				os.Exit(1)
+			}
+		} else {
+			barn_error_show_with_line(
+				SYNTAX_ERROR, "Expected identifier that represents variable name",
+				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+				true, parser.curr_token.line)
+			os.Exit(1)
+		}
+	}
+}
+
 // Function that parse `let` keyword for declaring variables
 func parse_let(parser *Parser) {
 	// error_when_we_arent_in_function(parser)
@@ -1408,6 +1495,14 @@ func parse_variable_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
+		if variable.variable_constant == true {
+			barn_error_show_with_line(
+				UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is an constant", variable_name),
+				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+				true, parser.curr_token.line)
+			os.Exit(1)
+		}
+
 		is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
 		if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
@@ -1443,6 +1538,14 @@ func parse_variable_plus_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
+		if variable.variable_constant == true {
+			barn_error_show_with_line(
+				UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is an constant", variable_name),
+				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+				true, parser.curr_token.line)
+			os.Exit(1)
+		}
+
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
@@ -1484,6 +1587,14 @@ func parse_variable_minus_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
+		if variable.variable_constant == true {
+			barn_error_show_with_line(
+				UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is an constant", variable_name),
+				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+				true, parser.curr_token.line)
+			os.Exit(1)
+		}
+
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
@@ -1525,6 +1636,14 @@ func parse_variable_mul_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
+		if variable.variable_constant == true {
+			barn_error_show_with_line(
+				UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is an constant", variable_name),
+				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+				true, parser.curr_token.line)
+			os.Exit(1)
+		}
+
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
@@ -1566,6 +1685,14 @@ func parse_variable_div_asn(parser *Parser, variable_name string) {
 			true, parser.curr_token.line)
 		os.Exit(1)
 	} else {
+		if variable.variable_constant == true {
+			barn_error_show_with_line(
+				UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is an constant", variable_name),
+				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+				true, parser.curr_token.line)
+			os.Exit(1)
+		}
+
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
@@ -1699,7 +1826,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 			if last_type_lhs == BARN_TYPE_NONE || last_type_lhs == BARN_STR {
 				if last_type_lhs == BARN_STR {
 					if last_symbol == EQ || last_symbol == NEQ {
-						to_ret += "\"" + parser.curr_token.value + "\""
+						to_ret += "\"" + parser.curr_token.value + "\")"
 					} else {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, fmt.Sprintf("Symbol `%s` can be used with string comparation", last_symbol_str),
@@ -1709,7 +1836,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 					}
 
 				} else {
-					to_ret += fmt.Sprintf("barn_string_compare(\"%s\"", parser.curr_token.value)
+					to_ret += fmt.Sprintf("__barn_string_compare(\"%s\"", parser.curr_token.value)
 				}
 				expected_symbol = true
 				expected_value = false
@@ -1727,7 +1854,11 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 				os.Exit(1)
 			}
 		} else if (parser.curr_token.kind == GT || parser.curr_token.kind == GTE || parser.curr_token.kind == LT || parser.curr_token.kind == LTE || parser.curr_token.kind == EQ || parser.curr_token.kind == NEQ || parser.curr_token.kind == OROR || parser.curr_token.kind == ANDAND) && expected_symbol {
-			to_ret += parser.curr_token.value
+			if (parser.curr_token.kind == EQ && last_type_lhs == BARN_STR) {
+				to_ret += ","
+			} else {
+				to_ret += parser.curr_token.value
+			}
 			expected_symbol = false
 			expected_value = true
 			last_symbol = parser.curr_token.kind
@@ -1816,7 +1947,7 @@ func parse_if(parser *Parser) {
 
 	append_node_ptr(parser, &if_node)
 	skip_token(parser, 1)
-	if parser.curr_token.kind == OPENBRACE {
+	if parser .curr_token.kind == OPENBRACE {
 		parser.statement_open += 1
 		parser.last_statement_opened = "If"
 	} else {
@@ -2063,6 +2194,14 @@ func parse_enum(parser *Parser) {
 func parse_incrementation(parser *Parser, variable_name string) {
 	error_when_we_arent_in_function(parser)
 	if variable := find_variable_both(parser, variable_name); variable != nil {
+		if variable.variable_constant == true {
+			barn_error_show_with_line(
+				UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is an constant", variable_name),
+				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+				true, parser.curr_token.line)
+			os.Exit(1)
+		}
+
 		incrementation_node := NodeAST{}
 		incrementation_node.node_kind = VARIABLE_INCREMENTATION
 		incrementation_node.node_kind_str = "VariableIncrementation"
@@ -2081,6 +2220,14 @@ func parse_incrementation(parser *Parser, variable_name string) {
 func parse_decrementation(parser *Parser, variable_name string) {
 	error_when_we_arent_in_function(parser)
 	if variable := find_variable_both(parser, variable_name); variable != nil {
+		if variable.variable_constant == true {
+			barn_error_show_with_line(
+				UNDEFINED_ERROR, fmt.Sprintf("`%s` variable is an constant", variable_name),
+				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+				true, parser.curr_token.line)
+			os.Exit(1)
+		}
+		
 		decrementation_node := NodeAST{}
 		decrementation_node.node_kind = VARIABLE_DECREMENTATION
 		decrementation_node.node_kind_str = "VariableDecrementation"
@@ -2110,6 +2257,8 @@ func parse_identifier(parser *Parser) {
 			parse_import(parser)
 		case "let":
 			parse_let(parser)
+		case "const":
+			parse_const(parser)
 		case "return":
 			parse_return(parser)
 		case "if":
@@ -2174,18 +2323,6 @@ func parse_identifier(parser *Parser) {
 }
 
 func init_functions_lib(parser *Parser) {
-	printf__node__ := NodeAST{}
-
-	printf__node__args := []ArgsFunctionDeclaration{}
-	printf__node__args = append(printf__node__args, ArgsFunctionDeclaration{"__str", BARN_STR})
-
-	printf__node__.function_args = printf__node__args
-	printf__node__.function_body = nil
-	printf__node__.function_name = "printf"
-	printf__node__.function_return = BARN_TYPE_NONE
-
-	parser.functions = append(parser.functions, &printf__node__)
-
 	exit__node__ := NodeAST{}
 
 	exit__node__args := []ArgsFunctionDeclaration{}
@@ -2209,15 +2346,6 @@ func init_functions_lib(parser *Parser) {
 	putchar_node__.function_return = BARN_TYPE_NONE
 
 	parser.functions = append(parser.functions, &putchar_node__)
-
-	puts__node__ := NodeAST{}
-
-	puts__node__.function_args = printf__node__args
-	puts__node__.function_body = nil
-	puts__node__.function_name = "puts"
-	puts__node__.function_return = BARN_TYPE_NONE
-
-	parser.functions = append(parser.functions, &puts__node__)
 
 	__code__node__ := NodeAST{}
 

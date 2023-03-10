@@ -3,14 +3,14 @@
 fun main() {
     for let i: int = 0; i != 1000; i++ {
         if (i % 15) == 0 {
-            print("FizzBuzz\t")
+            println("FizzBuzz\t")
         } elif (i % 3) == 0 {
-            print("Fizz\t")
+            println("Fizz\t")
         } elif (i % 5) == 0 {
-            print("Buzz\t")
+            println("Buzz\t")
         } else {
             printnum(i)
-            print("\t")
+            println("\t")
         }
     }
 }

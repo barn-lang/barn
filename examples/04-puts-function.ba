@@ -1,3 +1,0 @@
-fun main() {
-    puts("Hello, World with newline with out writting it to string that easy pfff")
-}

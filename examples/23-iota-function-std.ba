@@ -2,6 +2,6 @@
 
 fun main() -> int {
     let str: string = iota(20)
-    printf(str)
+    println(str)
     return 0
 }

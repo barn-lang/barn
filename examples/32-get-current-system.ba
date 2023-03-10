@@ -3,5 +3,5 @@
 
 fun main() {
     let system: string = os_current_system()
-    puts(system)
+    println(system)
 }

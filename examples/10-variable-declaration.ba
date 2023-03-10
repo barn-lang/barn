@@ -13,5 +13,5 @@ fun main() {
     let str1: string = "String"
     let yeah: bool = true
 
-    // printf(str1)
+    // println(str1)
 }

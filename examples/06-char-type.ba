@@ -1,5 +1,7 @@
+@import "std.ba"
+
 fun _char(char __c) {
-    printf("Yeah getting a char\n")
+    println("Yeah getting a char\n")
 }
 
 fun main() {

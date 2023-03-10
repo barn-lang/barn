@@ -22,6 +22,22 @@ func (args_parser ArgsParser) is_flag(flag string) bool {
 	return false
 }
 
+func (args_parser ArgsParser) get_flag_index(flag string) int {
+	for i := 0; i < len(args_parser.flags); i++ {
+		if args_parser.flags[i] == flag {
+			return i
+		}
+	}
+
+	return -1
+}
+
+func (args_parser ArgsParser) get_flag_by_index(index int) string {
+	if index == -1 { return "" }
+	if index > len(args_parser.flags) { return "" }
+	return args_parser.flags[index]
+}
+
 func args_parser_start() ArgsParser {
 	var return_value ArgsParser
 

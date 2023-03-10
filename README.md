@@ -25,15 +25,15 @@ If you found a bug immediately call me about it, you can create [Github Issue]()
 [01-hello-world.ba](./examples/01-hello-world.ba)
 ```kotlin
 fun main() {
-   puts("Hello World\n")
+   println("Hello World\n")
 }
 ```
 ## Variables
 [14-function-arguments-variable.ba](./examples/14-function-arguments-variable.ba)
 ```kotlin
 fun example_function(int i1, string str1, bool b1, char c1, float f1) {
-    print(str1)
-    print("\n")
+    println(str1)
+    println("\n")
 }
 
 fun main() {
@@ -51,11 +51,11 @@ fun main() {
 fun main() {
     let age: int = 13
     if (age == 13) {
-        print("Age is 13\n")
+        println("Age is 13\n")
     } elif (age == 14) {
-        print("Age is 14\n")    
+        println("Age is 14\n")    
     } else {
-        print("Age isn't 13\n")
+        println("Age isn't 13\n")
     }
 }
 ```
@@ -64,9 +64,9 @@ fun main() {
 @import "std.ba"
 
 fun main() {
-	print("What's your name: ")
+	println("What's your name: ")
 	let user_name: string = input()
-	print("Welcome ")
-	puts(user_name)
+	println("Welcome ")
+	println(user_name)
 }
 ```

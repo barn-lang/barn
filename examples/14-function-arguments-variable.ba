@@ -1,8 +1,8 @@
 @import "std.ba"
 
 fun example_function(int i1, string str1, bool b1, char c1, float f1) {
-    print(str1)
-    print("\n")
+    println(str1)
+    println("\n")
 }
 
 fun main() {

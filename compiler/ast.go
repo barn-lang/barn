@@ -109,6 +109,7 @@ type NodeAST struct {
 	variable_value         string
 	variable_is_arg        bool
 	variable_fn_call_value bool
+	variable_constant      bool
 
 	/* Variable assignment properties */
 	variable_assignment_name  string
