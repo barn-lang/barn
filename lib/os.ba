@@ -26,6 +26,9 @@ fun os_file_exists(string filename) -> bool {
 		__code__("std::cout << \"os_file_exists(string filename) is not implemented for your system\" << std::endl;")
 		__code__("return false;")
 	__code__("#endif")
+
+	// Give it __use__ so there wouldn't be any warnings from os.ba
+	__use__(filename)
 }
 
 fun os_read_file(string filename) -> string {
@@ -40,6 +43,9 @@ fun os_read_file(string filename) -> string {
 	__code__("}")
 	__code__("file.close();")
 	__code__("return value;")
+
+	// Give it __use__ so there wouldn't be any warnings from os.ba
+	__use__(filename)
 }
 
 fun os_write_file(string filename, string value) -> bool {
@@ -47,4 +53,8 @@ fun os_write_file(string filename, string value) -> bool {
 	__code__("file << value;")
 	__code__("file.close();")
 	return true
+
+	// Give it __use__ so there wouldn't be any warnings from os.ba
+	__use__(filename)
+	__use__(value)
 }

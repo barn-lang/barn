@@ -7,9 +7,11 @@ import (
 
 type Parser struct {
 	nodes      []*NodeAST
+	index      int
+
+	args       *ArgsParser
 	curr_token *Token
 	lex        *Lexer
-	index      int
 
 	is_function_opened        bool
 	actual_function           *NodeAST
@@ -47,6 +49,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 				continue
 			} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 				if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
+					find_var.variable_used = true
 					if is_type_number(find_var.variable_type) {
 						to_ret += parser.curr_token.value
 						expect_symbol = true
@@ -151,6 +154,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 						continue
 					} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 						if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
+							find_var.variable_used = true
 							if is_type_number(find_var.variable_type){
 								to_ret += parser.curr_token.value
 								expect_symbol = true
@@ -219,6 +223,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 			} else {
 				skip_token(parser, -1)
 				find_var := find_variable_both(parser, parser.curr_token.value)
+				find_var.variable_used = true
 				if find_var == nil {
 					barn_error_show_with_line(
 						UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
@@ -584,11 +589,19 @@ func parse_function_declaration(parser *Parser) {
 						arg := function_node.function_args[i]
 						variable_node := NodeAST{}
 						variable_node.node_kind = VARIABLE_DECLARATION
+						variable_node.variable_used = false
 						variable_node.node_kind_str = "VariableDeclaration"
 						variable_node.variable_name = arg.name
 						variable_node.variable_type = arg.type_arg
 						variable_node.variable_value = ""
 						variable_node.variable_is_arg = true
+
+						if variable_node.variable_name[0] == '_' {
+							variable_node.variable_used = true
+						} else {
+							variable_node.variable_used = false
+						}
+
 						append_node(parser, variable_node)
 						parser.local_variables = append(parser.local_variables, &variable_node)
 					}
@@ -659,6 +672,7 @@ func change_token_to_barn_type(parser *Parser, tk *Token) (BarnTypes, bool) {
 					true, parser.curr_token.line)
 				os.Exit(1)
 			} else {
+				find_var.variable_used = true
 				return find_var.variable_type, true
 			}
 		}
@@ -690,7 +704,8 @@ func parse_function_call(parser *Parser, function_name string) {
 				os.Exit(1)
 			} else if parser.curr_token.kind == STRING || parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == IDENTIFIER || parser.curr_token.kind == CHAR {
 				tk_barn_type, is_var := change_token_to_barn_type(parser, parser.curr_token)
-				if tk_barn_type == mentioned_function.function_args[argument_count].type_arg {
+				if tk_barn_type == mentioned_function.function_args[argument_count].type_arg ||
+				   mentioned_function.function_args[argument_count].type_arg == BARN_ANY {
 					arguments_to_node = append(arguments_to_node, ArgsFunctionCall{
 						mentioned_function.function_args[argument_count].name,
 						mentioned_function.function_args[argument_count].type_arg,
@@ -788,6 +803,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			} else if parser.curr_token.kind == IDENTIFIER && expect_number == true {
 				function_name := parser.curr_token.value
 				if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
+					find_var.variable_used = true
 					if is_type_number(find_var.variable_type) {
 						to_ret += parser.curr_token.value
 						expect_symbol = true
@@ -978,11 +994,15 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 		} else {
 			function_name := parser.curr_token.value
 			if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
+				find_var.variable_used = true
 				if is_type_number(find_var.variable_type) {
+					// to_ret += parser.curr_token.value
+					// expect_symbol = true
+					// expect_number = false
+					// skip_token(parser, 1)
 					to_ret += parser.curr_token.value
-					expect_symbol = true
-					expect_number = false
 					skip_token(parser, 1)
+					return false, to_ret, find_var.variable_type
 				} else {
 					barn_error_show_with_line(
 						UNDEFINED_ERROR, fmt.Sprintf("Expected variable with type `int` or `float` not `%s`", find_var.variable_type.as_string()),
@@ -1135,7 +1155,6 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
 			true, parser.curr_token.line)
 		os.Exit(1)
-		return false, "none", BARN_TYPE_NONE
 	}
 
 	return false, "none", BARN_TYPE_NONE
@@ -1246,6 +1265,11 @@ func parse_const(parser *Parser) {
 							variable_node.variable_value = variable_value
 							variable_node.variable_fn_call_value = is_function_call_value
 							variable_node.variable_constant = true
+							if variable_node.variable_name[0] == '_' {
+								variable_node.variable_used = true
+							} else {
+								variable_node.variable_used = false
+							}
 							append_node(parser, variable_node)
 							parser.global_variables = append(parser.global_variables, &variable_node)
 
@@ -1331,6 +1355,12 @@ func parse_let(parser *Parser) {
 							variable_node.variable_fn_call_value = is_function_call_value
 							variable_node.variable_is_arg = false
 
+							if variable_node.variable_name[0] == '_' {
+								variable_node.variable_used = true
+							} else {
+								variable_node.variable_used = false
+							}
+
 							if variable_type == BARN_AUTO {
 								variable_node.variable_type = variable_type_real
 							} else {
@@ -1411,6 +1441,13 @@ func parse_let(parser *Parser) {
 							variable_node.variable_name = variable_name
 							variable_node.variable_type = variable_type_real
 							variable_node.variable_value = variable_value
+
+							if variable_node.variable_name[0] == '_' {
+								variable_node.variable_used = true
+							} else {
+								variable_node.variable_used = false
+							}
+
 							variable_node.variable_fn_call_value = is_function_call_value
 							append_node(parser, variable_node)
 							parser.global_variables = append(parser.global_variables, &variable_node)
@@ -1503,6 +1540,7 @@ func parse_variable_asn(parser *Parser, variable_name string) {
 			os.Exit(1)
 		}
 
+		variable.variable_used = true
 		is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
 		if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
@@ -1545,6 +1583,7 @@ func parse_variable_plus_asn(parser *Parser, variable_name string) {
 				true, parser.curr_token.line)
 			os.Exit(1)
 		}
+		variable.variable_used = true
 
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
@@ -1594,6 +1633,7 @@ func parse_variable_minus_asn(parser *Parser, variable_name string) {
 				true, parser.curr_token.line)
 			os.Exit(1)
 		}
+		variable.variable_used = true
 
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
@@ -1643,6 +1683,7 @@ func parse_variable_mul_asn(parser *Parser, variable_name string) {
 				true, parser.curr_token.line)
 			os.Exit(1)
 		}
+		variable.variable_used = true
 
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
@@ -1692,6 +1733,7 @@ func parse_variable_div_asn(parser *Parser, variable_name string) {
 				true, parser.curr_token.line)
 			os.Exit(1)
 		}
+		variable.variable_used = true
 
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
@@ -2201,6 +2243,7 @@ func parse_incrementation(parser *Parser, variable_name string) {
 				true, parser.curr_token.line)
 			os.Exit(1)
 		}
+		variable.variable_used = true
 
 		incrementation_node := NodeAST{}
 		incrementation_node.node_kind = VARIABLE_INCREMENTATION
@@ -2227,6 +2270,7 @@ func parse_decrementation(parser *Parser, variable_name string) {
 				true, parser.curr_token.line)
 			os.Exit(1)
 		}
+		variable.variable_used = true
 		
 		decrementation_node := NodeAST{}
 		decrementation_node.node_kind = VARIABLE_DECREMENTATION
@@ -2358,11 +2402,24 @@ func init_functions_lib(parser *Parser) {
 	__code__node__.function_return = BARN_TYPE_NONE
 
 	parser.functions = append(parser.functions, &__code__node__)
+
+	__use__node__ := NodeAST{}
+
+	__use__node__args := []ArgsFunctionDeclaration{}
+	__use__node__args = append(__use__node__args, ArgsFunctionDeclaration{"__any_value__", BARN_ANY})
+
+	__use__node__.function_args = __use__node__args
+	__use__node__.function_body = nil
+	__use__node__.function_name = "__use__"
+	__use__node__.function_return = BARN_TYPE_NONE
+
+	parser.functions = append(parser.functions, &__use__node__)
 }
 
-func parser_start(lex *Lexer) *Parser {
+func parser_start(lex *Lexer, args *ArgsParser) *Parser {
 	var parser Parser
 	parser.lex = lex
+	parser.args = args
 	init_functions_lib(&parser)
 	for parser.index = 0; parser.index < len(lex.tokens); parser.index++ {
 		skip_token(&parser, 0)
@@ -2396,6 +2453,17 @@ func parser_start(lex *Lexer) *Parser {
 					continue
 				} else {
 					parser.is_function_opened = false
+					if parser.args.is_flag("--w-disable-unused") == false {
+						for i := 0; i < len(parser.local_variables); i++ {
+							if parser.local_variables[i].variable_used == false {
+								if parser.local_variables[i].last_node_token == nil {
+									barn_warning_show(UNUSED_WARNING, fmt.Sprintf("[disable with --w-disable-unused] Variable with name \"%s\" is not used", parser.local_variables[i].variable_name))
+								} else {
+									barn_warning_show(UNUSED_WARNING, fmt.Sprintf("[disable with --w-disable-unused] Variable with name \"%s\" is not used", parser.local_variables[i].variable_name))
+								}
+							}
+						}
+					}
 					reset_local_variables(&parser)
 				}
 			} else {
@@ -2420,6 +2488,18 @@ func parser_start(lex *Lexer) *Parser {
 	if main_function_node == nil {
 		barn_error_show(PARSER_ERROR, fmt.Sprintf("Expected definition of function named \"main\" without there isn't any entry point, for the program to run"))
 		os.Exit(1)
+	}
+
+	if parser.args.is_flag("--w-disable-unused") == false {
+		for i := 0; i < len(parser.global_variables); i++ {
+			if parser.global_variables[i].variable_used == false {
+				if parser.global_variables[i].last_node_token == nil {
+					barn_warning_show(UNUSED_WARNING, fmt.Sprintf("[disable with --w-disable-unused] Variable with name \"%s\" is not used", parser.global_variables[i].variable_name))
+				} else {
+					barn_warning_show(UNUSED_WARNING, fmt.Sprintf("[disable with --w-disable-unused] Variable with name \"%s\" is not used", parser.global_variables[i].variable_name))
+				}
+			}
+		}
 	}
 
 	return &parser

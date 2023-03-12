@@ -22,6 +22,8 @@
 #define __BARN_FUNCTION__
 #define __BARN_GLOBAL_VARIABLE__
 
+#define __use__(x) {x;}
+
 // int __barn_string_length(char* str);
 // bool __barn_string_compare(char* str1, char* str2);
 

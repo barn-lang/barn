@@ -1,0 +1,9 @@
+
+fun hi(string _arg) {
+    // Because of _ before argument name there isn't warning
+}
+
+fun main() {
+    let variable: int = 10
+    __use__(variable)
+}

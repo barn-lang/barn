@@ -1,0 +1,8 @@
+@import "std.ba"
+
+fun main() {
+    let unused_variable: int = 110101
+    __use__(unused_variable)
+
+    let _unused_variable2: int = 10223
+}

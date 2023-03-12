@@ -8,5 +8,5 @@ fun get_age() -> int {
 
 fun main() {
     let math_with_func_return: int = (get_age() + funny_number)
-    printnum(get_age())
+    printnum(math_with_func_return)
 }

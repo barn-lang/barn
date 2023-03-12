@@ -6,26 +6,36 @@
 // Function for comparing string
 fun string_compare(string s1, string s2) -> bool {
 	__code__("return (bool)s1.compare(s2);")
+
+	__use__(s1)
+	__use__(s2)
 }
 
 // Function for comparing string used in if
 fun __barn_string_compare(string s1, string s2) -> bool {
 	__code__("return (bool)s1.compare(s2);")
+
+	__use__(s1)
+	__use__(s2)
 }
 
 // Function for getting string length
 fun string_length(string s) -> int {
 	__code__("return s.size();")
+
+	__use__(s)
 }
 
 // Function for reversing string
 fun string_reverse(string s) {
 	__code__("return std::reverse(s.begin(), s.end());")
+	__use__(s)
 }
 
 // Function for changing number to string
 fun iota(int num) -> string {
 	__code__("return std::to_string(num);")
+	__use__(num)
 }
 
 // Function for getting user input from console
@@ -40,24 +50,29 @@ fun input() -> string {
 // Function just for printing
 fun print(string s) {
 	__code__("std::cout << s;")
+	__use__(s)
 }
 
 // Function just for printing with newline after it
 fun println(string s) {
 	__code__("std::cout << s << std::endl;")
+	__use__(s)
 }
 
 // Just a alias of println
 fun puts(string s) {
 	__code__("std::cout << s << std::endl;")
+	__use__(s)
 }
 
 // Function for printing numbers
 fun printnum(int num) {
 	__code__("std::cout << num;")
+	__use__(num)
 }
 
 // Function for printing numbers
-fun printbool(bool _bool) {
-	if (_bool == true) { println("true") } else { println("false") }
+fun printbool(bool to_print_bool) {
+	if (to_print_bool == true) { println("true") } else { println("false") }
+	__use__(to_print_bool)
 }

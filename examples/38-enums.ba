@@ -11,3 +11,7 @@
 //     printnum(FRIEND)
 //     printnum(GUEST)
 // }
+
+fun main() {
+    // Enums don't work
+}

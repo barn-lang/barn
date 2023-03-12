@@ -22,6 +22,7 @@ const (
 	BARN_BOOL // Bool
 	
 	BARN_AUTO // Auto
+	BARN_ANY  // Any
 	BARN_TYPE_NONE = -1
 )
 
@@ -110,6 +111,7 @@ type NodeAST struct {
 	variable_is_arg        bool
 	variable_fn_call_value bool
 	variable_constant      bool
+	variable_used          bool
 
 	/* Variable assignment properties */
 	variable_assignment_name  string

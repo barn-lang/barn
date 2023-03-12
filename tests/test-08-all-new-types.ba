@@ -9,7 +9,7 @@ fun main() {
     let _char: char = 34
     let _i16: i16 = 3121
     let _i32: i32 = 1231534252
-    let _int: int = 4324314132
+    let _int: int = 1231534252
     let _i64: i64 = 54354252342432
 
     let _f32: f32 = 20.23330319041

@@ -1,3 +1,7 @@
+// While running file test.sh this file can not compile
+// successfully because -lglut and -lGL is not passed
+// as --cflags
+
 @import "opengl-barn/gl.ba"
 
 fun display_func() {
