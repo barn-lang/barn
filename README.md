@@ -1,25 +1,12 @@
 #### Barn is in experimental version (BETA)
 # Barn
 # About
-It's a simple programming language written in Go that is compiled to C.
-Syntax is very easy and complex, Barn can call C. Barn is very optimilized
-and fast, it was written with idea to be the most fastes as he can and the 
-most easiest to use as he can.
-# Dependeces
-- GoLang compiler
-- Bash/Bash
-- GCC
-# Author
-[Owner (SolindekDev)](https://github.com/solindekdev/)
-# Bugs
-If you found a bug immediately call me about it, you can create [Github Issue](), write to me on Discord Solindek#4773 or on my [website contact page](https://solindek.tech/contact.html)
-# Extensions
-## Visual Studio Code
-[Here!](./extensions/vscode/), copy **barn-lang** folder to $HOME/.vscode/extensions/ for unix or there where you installed visual studio code
-## Vim
-[Here!](./extensions/vim/) Put file barn.vim to .vim/syntax/barn.vim and add in your .vimrc file this `autocmd BufRead,BufNewFile *.barn set filetype=barn`
+**Barn** It's a simple programming language written in GoLang that is compiled to C++.
+Syntax is very easy, Barn can call C/C++ functions so doing some bindings won't be hard. Barn is very optimilized
+and fast, it was written with idea to be the most fastes as he can, and the 
+most easiest to use. Barn is just a little project with which I can chill and just code.
 # Documentation
-[HERE!!](https://barn-lang.github.io/barn-docs/)
+You can find barn documentation at [/documentation](https://barn-lang.github.io/barn-docs/documentation.html)
 # Syntax
 ## Hello World
 [01-hello-world.ba](./examples/01-hello-world.ba)
@@ -70,3 +57,14 @@ fun main() {
 	println(user_name)
 }
 ```
+# Extensions
+## Visual Studio Code
+[Here!](./extensions/vscode/), copy **barn-lang** folder to $HOME/.vscode/extensions/ for unix or there where you installed visual studio code
+## Vim
+[Here!](./extensions/vim/) Put file barn.vim to .vim/syntax/barn.vim and add in your .vimrc file this `autocmd BufRead,BufNewFile *.barn set filetype=barn`
+# Documentation
+[HERE!!](https://barn-lang.github.io/barn-docs/)
+# Bugs
+If you found a bug immediately call me about it, you can create [Github Issue](), write to me on Discord Solindek#9808 or on my [website contact page](https://solindedk.ct8.pl/)
+
+
