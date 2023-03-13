@@ -2,17 +2,17 @@
 # Barn
 # About
 It's a simple programming language written in Go that is compiled to C.
-Syntax is very easy and complex, Barn can call C. Barn is very optimilized
-and fast, it was written with idea to be the most fastes as he can and the 
-most easiest to use as he can.
-# Dependeces
+Syntax is very easy and complex, Barn can call C. Barn is very optimized
+and fast, it was written with idea to be the most fastest and the 
+most easiest to use.
+# Dependencies
 - GoLang compiler
 - Bash/Bash
 - GCC
 # Author
 [Owner (SolindekDev)](https://github.com/solindekdev/)
 # Bugs
-If you found a bug immediately call me about it, you can create [Github Issue](), write to me on Discord Solindek#4773 or on my [website contact page](https://solindek.tech/contact.html)
+If you find a bug, immediately call me about it, you can create [Github Issue](), write to me on Discord Solindek#4773 or on my [website contact page](https://solindek.tech/contact.html)
 # Extensions
 ## Visual Studio Code
 [Here!](./extensions/vscode/), copy **barn-lang** folder to $HOME/.vscode/extensions/ for unix or there where you installed visual studio code
