@@ -1,11 +1,10 @@
-#### Barn is in experimental version (BETA)
-
 <p align="center">
   <img src="https://cdn.discordapp.com/icons/1028291656862142466/45ac54896f82c18ddf408e5c35739789.png?size=256" />
 </p>
 
 # Barn
 # About
+#### Barn is in experimental version (BETA)
 **Barn** It's a simple programming language written in GoLang that is compiled to C++.
 Syntax is very easy, Barn can call C/C++ functions so doing some bindings won't be hard. Barn is very optimilized
 and fast, it was written with idea to be the most fastes as he can, and the 
