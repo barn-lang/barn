@@ -1,7 +1,7 @@
 #### Barn is in experimental version (BETA)
 
 <p align="center">
-  <img src="[http://some_place.com/image.png](https://cdn.discordapp.com/icons/1028291656862142466/45ac54896f82c18ddf408e5c35739789.png?size=256)" />
+  <img src="https://cdn.discordapp.com/icons/1028291656862142466/45ac54896f82c18ddf408e5c35739789.png?size=256" />
 </p>
 
 # Barn
