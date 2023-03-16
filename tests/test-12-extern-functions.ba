@@ -1,0 +1,5 @@
+extern fun puts(cstr msg)
+
+fun main() {
+    puts("Hello")
+}

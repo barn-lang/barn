@@ -262,7 +262,7 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 			}
 		}
 	} else if parser.curr_token.kind == STRING {
-		if expected_type == BARN_STR {
+		if expected_type == BARN_STR || expected_type == BARN_CSTR {
 			return parser.curr_token.value
 		} else {
 			barn_error_show_with_line(
@@ -303,6 +303,8 @@ func skip_token(parser *Parser, count int) {
 func is_keyword(value_token string) bool {
 	switch value_token {
 	case "fun":
+		return true
+	case "extern":
 		return true
 	case "@import_c":
 		return true
@@ -405,6 +407,8 @@ func is_token_represent_type(value_token string) BarnTypes {
 
 	case "string":
 		return BARN_STR
+	case "cstr":
+		return BARN_CSTR
 	case "bool":
 		return BARN_BOOL
 	case "auto":
@@ -537,6 +541,95 @@ func append_node_ptr(parser *Parser, node *NodeAST) {
 	}
 }
 
+func barn_syntax_error_with_exit(parser *Parser, message string) {
+	barn_error_show_with_line(
+		SYNTAX_ERROR, message,
+		parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+		true, parser.curr_token.line)
+	os.Exit(1)
+}
+
+func parser_function_declaration_extern(parser *Parser) {
+	// Check is this outside of function block
+	if parser.is_function_opened == true {
+		barn_syntax_error_with_exit(parser, "Can't use `extern` inside a function body")
+	}
+
+	// Check is next token a `fun` keyword, if not give there a solid error
+	if is_next_token_kind_safe(parser, IDENTIFIER) == false {
+		barn_syntax_error_with_exit(parser, "Expected `fun` keyword after `extern`")
+	} else if parser.curr_token.value != "fun" {
+		barn_syntax_error_with_exit(parser, "Expected `fun` keyword after `extern`")
+	}
+
+	// Get function name
+	is_next_token_kind(parser, IDENTIFIER)
+	function_name := parser.curr_token.value
+
+	// Is next token '(' rather yes then parse function arguments
+	is_next_token_kind(parser, OPENPARENT)
+	function_args := parse_function_args(parser)
+
+	// Is next token a ')' then skip a token by one
+	if parser.curr_token.kind == CLOSEPARENT {
+		skip_token(parser, 1)
+	}
+
+	// Get the function type return
+	var function_type_return BarnTypes = BARN_TYPE_NONE
+	if parser.curr_token.kind == ARROW {
+		skip_token(parser, 1)
+		return_type := is_token_represent_type(parser.curr_token.value)
+		if return_type == -1 {
+			barn_error_show_with_line(
+				SYNTAX_ERROR, fmt.Sprintf("Unknown return type `%s`", parser.curr_token.value),
+				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+				true, parser.curr_token.line)
+			os.Exit(1)
+		} else {
+			function_type_return = return_type
+			skip_token(parser, 1)
+		}
+	}
+
+	// Create new ast node
+	var function_node NodeAST
+	function_node.node_kind 	  = FUNCTION_DECLARATION
+	function_node.node_kind_str   = "FunctionDeclaration"
+	function_node.function_name   = function_name
+	function_node.function_args   = function_args
+	function_node.function_return = function_type_return
+	function_node.function_body   = []*NodeAST{}
+	function_node.function_extern = true
+
+	append_node(parser, function_node)
+	parser.functions = append(parser.functions, &function_node)
+	parser.is_function_opened = false
+	skip_token(parser, -1)
+
+	// Set args as local variables
+	// for i := 0; i < len(function_node.function_args); i++ {
+	// 	arg := function_node.function_args[i]
+	// 	variable_node := NodeAST{}
+	// 	variable_node.node_kind = VARIABLE_DECLARATION
+	// 	variable_node.variable_used = false
+	// 	variable_node.node_kind_str = "VariableDeclaration"
+	// 	variable_node.variable_name = arg.name
+	// 	variable_node.variable_type = arg.type_arg
+	// 	variable_node.variable_value = ""
+	// 	variable_node.variable_is_arg = true
+
+	// 	if variable_node.variable_name[0] == '_' {
+	// 		variable_node.variable_used = true
+	// 	} else {
+	// 		variable_node.variable_used = false
+	// 	}
+
+	// 	append_node(parser, variable_node)
+	// 	parser.local_variables = append(parser.local_variables, &variable_node)
+	// }
+}
+
 // Function for parsing function declarations in
 // code
 func parse_function_declaration(parser *Parser) {
@@ -631,7 +724,7 @@ func parse_function_declaration(parser *Parser) {
 				}
 			} else {
 				barn_error_show_with_line(
-					SYNTAX_ERROR, "Expected `OPENBRACE` `{` after function declaration",
+					SYNTAX_ERROR, "Expected `OPENPARENT` `(` after function declaration",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
 					true, parser.curr_token.line)
 				os.Exit(1)
@@ -697,6 +790,14 @@ func change_token_to_barn_type(parser *Parser, tk *Token) (BarnTypes, bool) {
 	return BARN_TYPE_NONE, false
 }
 
+func is_type_string(expected BarnTypes, got BarnTypes) bool {
+	if expected == BARN_CSTR || expected == BARN_STR {
+		return got == BARN_CSTR || got == BARN_STR
+	}
+
+	return false
+}
+
 // Function for parsing function calls
 func parse_function_call(parser *Parser, function_name string) {
 	error_when_we_arent_in_function(parser)
@@ -722,7 +823,8 @@ func parse_function_call(parser *Parser, function_name string) {
 			} else if parser.curr_token.kind == STRING || parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == IDENTIFIER || parser.curr_token.kind == CHAR {
 				tk_barn_type, is_var := change_token_to_barn_type(parser, parser.curr_token)
 				if tk_barn_type == mentioned_function.function_args[argument_count].type_arg ||
-				   mentioned_function.function_args[argument_count].type_arg == BARN_ANY {
+				   mentioned_function.function_args[argument_count].type_arg == BARN_ANY ||
+				   is_type_string(mentioned_function.function_args[argument_count].type_arg, tk_barn_type) {
 					arguments_to_node = append(arguments_to_node, ArgsFunctionCall{
 						mentioned_function.function_args[argument_count].name,
 						mentioned_function.function_args[argument_count].type_arg,
@@ -895,7 +997,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 											if pass_argument_value.is_var == true {
 												to_ret += pass_argument_value.value
 											} else {
-												if pass_argument_value.type_arg == BARN_STR {
+												if pass_argument_value.type_arg == BARN_STR || pass_argument_value.type_arg == BARN_CSTR {
 													to_ret += "\""
 													to_ret += pass_argument_value.value
 													to_ret += "\""
@@ -1088,7 +1190,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 										if pass_argument_value.is_var == true {
 											to_ret += pass_argument_value.value
 										} else {
-											if pass_argument_value.type_arg == BARN_STR {
+											if pass_argument_value.type_arg == BARN_STR || pass_argument_value.type_arg == BARN_CSTR {
 												to_ret += "\""
 												to_ret += pass_argument_value.value
 												to_ret += "\""
@@ -1147,8 +1249,12 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 			}
 		}
 	} else if parser.curr_token.kind == STRING {
-		if expected_type == BARN_STR || expected_type == BARN_AUTO {
-			return false, parser.curr_token.value, BARN_STR
+		if expected_type == BARN_STR || expected_type == BARN_CSTR || expected_type == BARN_AUTO {
+			if expected_type == BARN_CSTR {
+				return false, parser.curr_token.value, BARN_CSTR
+			} else {
+				return false, parser.curr_token.value, BARN_STR
+			}
 		} else {
 			barn_error_show_with_line(
 				SYNTAX_ERROR, fmt.Sprintf("Variable type is `string` not `%s`", expected_type.as_string()),
@@ -1290,7 +1396,7 @@ func parse_const(parser *Parser) {
 							append_node(parser, variable_node)
 							parser.global_variables = append(parser.global_variables, &variable_node)
 
-							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_CSTR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
 								skip_token(parser, 0)
 							} else {
 								skip_token(parser, -1)
@@ -1357,7 +1463,7 @@ func parse_let(parser *Parser) {
 
 							// fmt.Printf("Variable name: `%s`, Variable type: `%s`, Variable value: `%s`\n", variable_name, variable_type.as_string(), variable_value)
 
-							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_CSTR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
 								skip_token(parser, 0)
 							} else {
 								skip_token(parser, -1)
@@ -1469,7 +1575,7 @@ func parse_let(parser *Parser) {
 							append_node(parser, variable_node)
 							parser.global_variables = append(parser.global_variables, &variable_node)
 
-							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+							if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_CSTR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
 								skip_token(parser, 0)
 							} else {
 								skip_token(parser, -1)
@@ -1560,7 +1666,7 @@ func parse_variable_asn(parser *Parser, variable_name string) {
 		variable.variable_used = true
 		is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
-		if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+		if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_CSTR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
 			skip_token(parser, 0)
 		} else {
 			skip_token(parser, -1)
@@ -1605,7 +1711,7 @@ func parse_variable_plus_asn(parser *Parser, variable_name string) {
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
-			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_CSTR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
 				skip_token(parser, 0)
 			} else {
 				skip_token(parser, -1)
@@ -1655,7 +1761,7 @@ func parse_variable_minus_asn(parser *Parser, variable_name string) {
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
-			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+			if is_function_call_value || variable_type_real == BARN_STR ||variable_type_real == BARN_CSTR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
 				skip_token(parser, 0)
 			} else {
 				skip_token(parser, -1)
@@ -1705,7 +1811,7 @@ func parse_variable_mul_asn(parser *Parser, variable_name string) {
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
-			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_CSTR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
 				skip_token(parser, 0)
 			} else {
 				skip_token(parser, -1)
@@ -1755,7 +1861,7 @@ func parse_variable_div_asn(parser *Parser, variable_name string) {
 		if is_type_number(variable.variable_type) {
 			is_function_call_value, value, variable_type_real := parse_variable_value(parser, variable.variable_type)
 
-			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
+			if is_function_call_value || variable_type_real == BARN_STR || variable_type_real == BARN_CSTR || variable_type_real == BARN_BOOL || variable_type_real == BARN_I8 {
 				skip_token(parser, 0)
 			} else {
 				skip_token(parser, -1)
@@ -2312,6 +2418,8 @@ func parse_identifier(parser *Parser) {
 		switch parser.curr_token.value {
 		case "fun":
 			parse_function_declaration(parser)
+		case "extern":
+			parser_function_declaration_extern(parser)
 		case "@import_c":
 			parse_import_c(parser)
 		case "@import":
@@ -2375,7 +2483,7 @@ func parse_identifier(parser *Parser) {
 			}
 		} else {
 			barn_error_show_with_line(
-				SYNTAX_ERROR, fmt.Sprintf("This `IDENTIFIER` can be used only in function", parser.curr_token.value),
+				SYNTAX_ERROR, "This `IDENTIFIER` can be used only in function",
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
 				true, parser.curr_token.line)
 			os.Exit(1)

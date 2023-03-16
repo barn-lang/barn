@@ -88,6 +88,8 @@ func barn_types_to_cxx_types(barn_type BarnTypes) string {
 		return "double"
 	case BARN_STR:
 		return "std::string"
+	case BARN_CSTR:
+		return "char*"
 	case BARN_BOOL:
 		return "bool"
 	case -1:
@@ -242,7 +244,7 @@ func generate_variable_declaration(node *NodeAST, codegen *Codegen) string {
 			is_value_correct_overflow(node.last_node_token, variable.variable_type, strings.Split(variable.variable_value, "	")[1]))
 	} else {
 		if variable.variable_is_arg == false {
-			if variable.variable_type == BARN_STR {
+			if variable.variable_type == BARN_STR || variable.variable_type == BARN_CSTR {
 				to_ret += fmt.Sprintf("%s %s = \"%s\"",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,
@@ -318,7 +320,7 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 					if pass_argument_value.is_var == true {
 						codegen.cxx_code += pass_argument_value.value
 					} else {
-						if pass_argument_value.type_arg == BARN_STR {
+						if pass_argument_value.type_arg == BARN_STR || pass_argument_value.type_arg == BARN_CSTR {
 							codegen.cxx_code += "\""
 							codegen.cxx_code += pass_argument_value.value
 							codegen.cxx_code += "\""
@@ -356,7 +358,7 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 				strings.Split(variable.variable_value, "	")[1])
 		} else {
 			if variable.variable_is_arg == false {
-				if variable.variable_type == BARN_STR {
+				if variable.variable_type == BARN_STR || variable.variable_type == BARN_CSTR {
 					codegen.cxx_code += fmt.Sprintf("%s %s = \"%s\";\n",
 						barn_types_to_cxx_types(variable.variable_type),
 						variable.variable_name,
@@ -479,7 +481,11 @@ func codegen_c(codegen *Codegen) {
 			if codegen.parser.nodes[i].function_name == "main" {
 				codegen.cxx_code += "int main("
 			} else {
-				codegen.cxx_code += fmt.Sprintf("__BARN_FUNCTION__ %s %s(", barn_types_to_cxx_types(codegen.parser.nodes[i].function_return), codegen.parser.nodes[i].function_name)
+				if codegen.parser.nodes[i].function_extern {
+					codegen.cxx_code += fmt.Sprintf("__BARN_FUNCTION__ extern \"C\" %s %s(", barn_types_to_cxx_types(codegen.parser.nodes[i].function_return), codegen.parser.nodes[i].function_name)
+				} else {
+					codegen.cxx_code += fmt.Sprintf("__BARN_FUNCTION__ %s %s(", barn_types_to_cxx_types(codegen.parser.nodes[i].function_return), codegen.parser.nodes[i].function_name)
+				}
 			}
 
 			for j := 0; j < len(codegen.parser.nodes[i].function_args); j++ {
@@ -496,14 +502,17 @@ func codegen_c(codegen *Codegen) {
 						codegen.parser.nodes[i].function_args[j].name)
 				}
 			}
-			codegen.cxx_code += ") {\n"
-			codegen.tab += 1
-			for j := 0; j < len(codegen.parser.nodes[i].function_body); j++ {
-				generate_code_cxx_function_body_nodes(codegen.parser.nodes[i].function_body[j], codegen)
+			if codegen.parser.nodes[i].function_extern == false {
+				codegen.cxx_code += ") {\n"
+				codegen.tab += 1
+				for j := 0; j < len(codegen.parser.nodes[i].function_body); j++ {
+					generate_code_cxx_function_body_nodes(codegen.parser.nodes[i].function_body[j], codegen)
+				}
+				codegen.tab -= 1
+				codegen.cxx_code += "}\n\n"
+			} else {
+				codegen.cxx_code += ");\n\n"
 			}
-			codegen.tab -= 1
-			codegen.cxx_code += "}\n\n"
-
 		} else if codegen.parser.nodes[i].node_kind == IMPORT_C {
 			if strings.HasPrefix(codegen.parser.nodes[i].import_c_header, "./") {
 				codegen.cxx_header += fmt.Sprintf("#include \"%s\"\n", codegen.parser.nodes[i].import_c_header)
@@ -515,7 +524,7 @@ func codegen_c(codegen *Codegen) {
 			if variable.variable_constant == true {
 				codegen.cxx_code += "__BARN_GLOBAL_VARIABLE__ const "
 			}
-			if variable.variable_type == BARN_STR {
+			if variable.variable_type == BARN_STR || variable.variable_type == BARN_CSTR {
 				codegen.cxx_code += fmt.Sprintf("%s %s = \"%s\";\n",
 					barn_types_to_cxx_types(variable.variable_type),
 					variable.variable_name,

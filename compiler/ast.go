@@ -23,23 +23,24 @@ type BarnTypes int
 
 const (
 	BARN_U8  BarnTypes = iota // Unsigned char 
-	BARN_U16  // Unsigned short
-	BARN_U32  // Unsigned int
-	BARN_U64  // Unsigned long 
+	BARN_U16   // Unsigned short
+	BARN_U32   // Unsigned int
+	BARN_U64   // Unsigned long 
 
-	BARN_I8   // Char
-	BARN_I16  // Short
-	BARN_I32  // Int
-	BARN_I64  // Long
+	BARN_I8    // Char
+	BARN_I16   // Short
+	BARN_I32   // Int
+	BARN_I64   // Long
 	
-	BARN_F32  // Float
-	BARN_F64  // Double
+	BARN_F32   // Float
+	BARN_F64   // Double
 
-	BARN_STR  // String
-	BARN_BOOL // Bool
+	BARN_STR   // String
+	BARN_CSTR  // String
+	BARN_BOOL  // Bool
 	
-	BARN_AUTO // Auto
-	BARN_ANY  // Any
+	BARN_AUTO  // Auto
+	BARN_ANY   // Any
 	BARN_TYPE_NONE = -1
 )
 
@@ -109,6 +110,7 @@ type NodeAST struct {
 	function_args   []ArgsFunctionDeclaration
 	function_return BarnTypes
 	function_body   []*NodeAST
+	function_extern bool
 
 	/* Last token of expression */
 	last_node_token *Token
@@ -187,6 +189,8 @@ func (barn_type BarnTypes) as_string() string {
 		return "char"
 	case BARN_STR:
 		return "string"
+	case BARN_CSTR:
+		return "cstr"
 	case BARN_AUTO:
 		return "auto"
 	case BARN_TYPE_NONE:

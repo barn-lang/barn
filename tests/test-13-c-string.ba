@@ -1,0 +1,4 @@
+fun main() {
+    let _real_string: cstr = "This is an char* string yeah"
+    __code__("printf(\"%s\", _real_string);")
+}
