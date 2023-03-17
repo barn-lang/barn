@@ -36,6 +36,26 @@ fun main() {
     example_function(i1, str1, b1, c1, f1)
 }
 ```
+## Fizz Buzz in Barn
+[31-fizz-buzz-in-barn.ba](./examples/31-fizz-buzz-in-barn.ba)
+```kotlin
+@import "std.ba"
+
+fun main() {
+    for let i: int = 0; i != 1000; i++ {
+        if (i % 15) == 0 {
+            println("FizzBuzz\t")
+        } elif (i % 3) == 0 {
+            println("Fizz\t")
+        } elif (i % 5) == 0 {
+            println("Buzz\t")
+        } else {
+            printnum(i)
+            println("\t")
+        }
+    }
+}
+```
 ## If statements
 [19-if-condition.ba](./examples/19-if-condition.ba)
 ```kotlin
