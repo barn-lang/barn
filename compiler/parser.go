@@ -606,28 +606,6 @@ func parser_function_declaration_extern(parser *Parser) {
 	parser.functions = append(parser.functions, &function_node)
 	parser.is_function_opened = false
 	skip_token(parser, -1)
-
-	// Set args as local variables
-	// for i := 0; i < len(function_node.function_args); i++ {
-	// 	arg := function_node.function_args[i]
-	// 	variable_node := NodeAST{}
-	// 	variable_node.node_kind = VARIABLE_DECLARATION
-	// 	variable_node.variable_used = false
-	// 	variable_node.node_kind_str = "VariableDeclaration"
-	// 	variable_node.variable_name = arg.name
-	// 	variable_node.variable_type = arg.type_arg
-	// 	variable_node.variable_value = ""
-	// 	variable_node.variable_is_arg = true
-
-	// 	if variable_node.variable_name[0] == '_' {
-	// 		variable_node.variable_used = true
-	// 	} else {
-	// 		variable_node.variable_used = false
-	// 	}
-
-	// 	append_node(parser, variable_node)
-	// 	parser.local_variables = append(parser.local_variables, &variable_node)
-	// }
 }
 
 // Function for parsing function declarations in
@@ -800,7 +778,9 @@ func is_type_string(expected BarnTypes, got BarnTypes) bool {
 
 // Function for parsing function calls
 func parse_function_call(parser *Parser, function_name string) {
-	error_when_we_arent_in_function(parser)
+	if function_name != "__code__" {
+		error_when_we_arent_in_function(parser)
+	}
 	mentioned_function := find_function(parser, function_name)
 
 	if mentioned_function == nil {
@@ -2448,46 +2428,56 @@ func parse_identifier(parser *Parser) {
 			parse_enum(parser)
 		}
 	} else {
-		if parser.is_function_opened == true {
-			skip_token(parser, 1)
-			if parser.curr_token.kind == OPENPARENT {
-				// Function calls
-				parse_function_call(parser, id)
-			} else if parser.curr_token.kind == ASN {
-				// Variable assigment
-				parse_variable_asn(parser, id)
-			} else if parser.curr_token.kind == PLUSASN {
-				// Variable plus assigment
-				parse_variable_plus_asn(parser, id)
-			} else if parser.curr_token.kind == MINUSASN {
-				// Variable minus assigment
-				parse_variable_minus_asn(parser, id)
-			} else if parser.curr_token.kind == MULASN {
-				// Variable mul assigment
-				parse_variable_mul_asn(parser, id)
-			} else if parser.curr_token.kind == DIVASN {
-				// Variable div assigment
-				parse_variable_div_asn(parser, id)
-			} else if parser.curr_token.kind == INCREMENTATION {
-				// Variable div assigment
-				parse_incrementation(parser, id)
-			} else if parser.curr_token.kind == DECREMENTATION {
-				// Variable div assigment
-				parse_decrementation(parser, id)
-			} else {
+		if parser.is_function_opened == false {
+			if id != "__code__" {
 				barn_error_show_with_line(
-					SYNTAX_ERROR, fmt.Sprintf("Unexpected use of token `%s` after `IDENTIFIER`", parser.curr_token.value),
+					SYNTAX_ERROR, "This `IDENTIFIER` can be used only in function",
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
 					true, parser.curr_token.line)
 				os.Exit(1)
 			}
+		}
+
+		// if parser.is_function_opened == true {
+		skip_token(parser, 1)
+		if parser.curr_token.kind == OPENPARENT {
+			// Function calls
+			parse_function_call(parser, id)
+		} else if parser.curr_token.kind == ASN {
+			// Variable assigment
+			parse_variable_asn(parser, id)
+		} else if parser.curr_token.kind == PLUSASN {
+			// Variable plus assigment
+			parse_variable_plus_asn(parser, id)
+		} else if parser.curr_token.kind == MINUSASN {
+			// Variable minus assigment
+			parse_variable_minus_asn(parser, id)
+		} else if parser.curr_token.kind == MULASN {
+			// Variable mul assigment
+			parse_variable_mul_asn(parser, id)
+		} else if parser.curr_token.kind == DIVASN {
+			// Variable div assigment
+			parse_variable_div_asn(parser, id)
+		} else if parser.curr_token.kind == INCREMENTATION {
+			// Variable div assigment
+			parse_incrementation(parser, id)
+		} else if parser.curr_token.kind == DECREMENTATION {
+			// Variable div assigment
+			parse_decrementation(parser, id)
 		} else {
 			barn_error_show_with_line(
-				SYNTAX_ERROR, "This `IDENTIFIER` can be used only in function",
+				SYNTAX_ERROR, fmt.Sprintf("Unexpected use of token `%s` after `IDENTIFIER`", parser.curr_token.value),
 				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
 				true, parser.curr_token.line)
 			os.Exit(1)
 		}
+		// } else {
+		// 	barn_error_show_with_line(
+		// 		SYNTAX_ERROR, "This `IDENTIFIER` can be used only in function",
+		// 		parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+		// 		true, parser.curr_token.line)
+		// 	os.Exit(1)
+		// }
 	}
 }
 

@@ -1,0 +1,3 @@
+__code__("extern \"C\"") fun main() {
+    
+}

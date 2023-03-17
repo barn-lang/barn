@@ -547,6 +547,12 @@ func codegen_c(codegen *Codegen) {
 					variable.variable_name,
 					is_value_correct_overflow(variable.last_node_token, variable.variable_type, variable.variable_value))
 			}
+		} else if codegen.parser.nodes[i].node_kind == FUNCTION_CALL && 
+				  codegen.parser.nodes[i].call_name == "__code__" {
+			codegen.cxx_code += fmt.Sprintf("/* __code__ %s */\n", codegen.parser.lex.filename)
+			codegen.cxx_code += codegen.parser.nodes[i].call_args[0].value
+			codegen.cxx_code += "\n"
+			codegen.cxx_code += "/* __code__ end */\n"
 		}
 	}
 }

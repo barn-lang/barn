@@ -2,9 +2,9 @@
 
 
 
-__BARN_FUNCTION__ extern void puts(char* msg);
-
+/* __code__ ./tests/test-14-extern-c-flag.ba */
+extern "C"
+/* __code__ end */
 int main() {
-	puts("Hello");
 }
 
