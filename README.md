@@ -5,10 +5,9 @@
 # Barn
 # About
 #### Barn is in experimental version (BETA)
-**Barn** It's a simple programming language written in GoLang that is compiled to C++.
-Syntax is very easy, Barn can call C/C++ functions so doing some bindings won't be hard. Barn is very optimilized
-and fast, it was written with idea to be the most fastes as he can, and the 
-most easiest to use. Barn is just a little project with which I can chill and just code.
+**Barn** is a simple programming language written in GoLang and compiled to C++.
+Syntax is very simple, and Barn can call C/C++ functions natively so creating new bindings should be easy. Barn is optimized
+and fast, it was written with the goal of being as fast and easy to use as possible. Barn is just a little project with which I can chill and just code.
 # Documentation
 You can find barn documentation at [/documentation](https://barn-lang.github.io/barn-docs/documentation.html)
 # Syntax
@@ -83,9 +82,9 @@ fun main() {
 ```
 # Extensions
 ## Visual Studio Code
-[Here!](./extensions/vscode/), copy **barn-lang** folder to $HOME/.vscode/extensions/ for unix or there where you installed visual studio code
+[Here!](./extensions/vscode/), copy **barn-lang** folder to where you installed visual studio code (usually $HOME/.vscode/extensions/)
 ## Vim
-[Here!](./extensions/vim/) Put file barn.vim to .vim/syntax/barn.vim and add in your .vimrc file this `autocmd BufRead,BufNewFile *.barn set filetype=barn`
+[Here!](./extensions/vim/) move barn.vim into .vim/syntax/ and add the following line  to ~/.vimrc `autocmd BufRead,BufNewFile *.barn set filetype=barn`
 # Documentation
 [HERE!!](https://barn-lang.github.io/barn-docs/)
 # Bugs
