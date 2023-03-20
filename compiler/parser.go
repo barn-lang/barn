@@ -2599,10 +2599,12 @@ func parser_start(lex *Lexer, args *ArgsParser) *Parser {
 
 	// Find function named "main" otherwise report and barn_error 
 	// which is an PARSER_ERROR
-	main_function_node := find_function(&parser, "main")
-	if main_function_node == nil {
-		barn_error_show(PARSER_ERROR, fmt.Sprintf("Expected definition of function named \"main\" without there isn't any entry point, for the program to run"))
-		os.Exit(1)
+	if parser.args.is_flag("--no-main") == false {
+		main_function_node := find_function(&parser, "main")
+		if main_function_node == nil {
+			barn_error_show(PARSER_ERROR, fmt.Sprintf("Expected definition of function named \"main\" without there isn't any entry point, for the program to run"))
+			os.Exit(1)
+		}
 	}
 
 	if parser.args.is_flag("--w-disable-unused") == false {

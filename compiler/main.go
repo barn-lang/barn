@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"log"
 )
 
 func version() {
@@ -39,6 +40,9 @@ func help() {
 	fmt.Printf("    > %s--tokens%s show all tokens from lexer (for debug purposes)\n", get_color(Cyan), get_color(Reset))
 	fmt.Printf("    > %s--time%s show lexer, parser and codegen process time\n", get_color(Cyan), get_color(Reset))
 	fmt.Printf("    > %s--cflags%s argument that can add c flags to compilation\n", get_color(Cyan), get_color(Reset))
+	fmt.Printf("    > %s--no-main%s don't show error about no main function\n", get_color(Cyan), get_color(Reset))
+	fmt.Printf("    > %s--no-stdlib%s don't include barn_header.hxx\n", get_color(Cyan), get_color(Reset))
+	fmt.Printf("    > %s--no-delete-cout%s don't delete generated source code\n", get_color(Cyan), get_color(Reset))
 }
 
 func main() {
@@ -111,6 +115,13 @@ func main() {
 				if (exit_code != 0) {
 					barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
 					fmt.Print(stderr)
+				}
+			}
+
+			if args.is_flag("--no-delete-cout") == false {
+				e := os.Remove("./c_out.cxx")
+				if e != nil {
+					log.Fatal(e)
 				}
 			}
 		}

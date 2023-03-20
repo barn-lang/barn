@@ -466,16 +466,23 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 }
 
 func codegen_c(codegen *Codegen) {
-	codegen.cxx_header += "#include \"" + get_barn_libs_directory() + "std-cxx/barn_header.hxx" + "\"\n\n"
-	content, err := ioutil.ReadFile("./lib/std-c/barn-std.cxx")
-	if err != nil {
-		content, err = ioutil.ReadFile(get_barn_libs_directory() + "std-cxx/barn-std.cxx")
+	if codegen.parser.args.is_flag("--no-stdlib") == false {
+		codegen.cxx_header += "#include \"" + get_barn_libs_directory() + "std-cxx/barn_header.hxx" + "\"\n\n"
+		content, err := ioutil.ReadFile("./lib/std-c/barn-std.cxx")
 		if err != nil {
-			fmt.Println(get_barn_libs_directory() + "std-c/barn-std.cxx" + " is not found")
+			content, err = ioutil.ReadFile(get_barn_libs_directory() + "std-cxx/barn-std.cxx")
+			if err != nil {
+				fmt.Println(get_barn_libs_directory() + "std-c/barn-std.cxx" + " is not found")
+			}
 		}
+		codegen.cxx_header += string(content)
+		codegen.cxx_header += "\n"
+	} else {
+		codegen.cxx_header += `#define __BARN_FUNCTION__
+#define __BARN_GLOBAL_VARIABLE__
+#define __use__(x) {x;}`
 	}
-	codegen.cxx_header += string(content)
-	codegen.cxx_header += "\n"
+
 	for i := 0; i < len(codegen.parser.nodes); i++ {
 		if codegen.parser.nodes[i].node_kind == FUNCTION_DECLARATION {
 			if codegen.parser.nodes[i].function_name == "main" {
