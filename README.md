@@ -6,8 +6,7 @@
 # About
 #### Barn is in experimental version (BETA)
 **Barn** is a simple programming language written in GoLang and compiled to C++.
-Syntax is very simple, and Barn can call C/C++ functions natively so creating new bindings should be easy. Barn is optimized
-and fast, it was written with the goal of being as fast and easy to use as possible. Barn is just a little project with which I can chill and just code.
+Syntax is very simple, and Barn can call C/C++ functions natively so creating new bindings should be easy. Barn was written with the goal of being as fast and easy to use as possible. Barn is just a little project with which I can chill and just code.
 # Documentation
 You can find barn documentation at [/documentation](https://barn-lang.github.io/barn-docs/documentation.html)
 # Syntax
