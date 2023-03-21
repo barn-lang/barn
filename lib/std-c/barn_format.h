@@ -15,41 +15,30 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef __BARN_FORMAT_HXX__
-#define __BARN_FORMAT_HXX__
+#ifndef __BARN_FORMAT_h__
+#define __BARN_FORMAT_h__
 
 #include <stdarg.h>
 
-__builtin_va_list __barn_va_arg__;
+static __builtin_va_list __barn_va_arg__;
 
 /* Start and end format */
-#define __barn_start_format() {                                    \
+#define __barn_start_format()                                      \
             __builtin_va_start(__barn_va_arg__, __format_start__); \
-};
 
-#define __barn_end_format() {                   \
+#define __barn_end_format()                     \
             __builtin_va_end(__barn_va_arg__);  \
-};
 
-/* Get values */
-#define __barn_format_get_value_string() {                 \
-            __builtin_va_arg(__barn_va_arg__, std::string)  \
-};
+#define __barn_format_get_value_string()              \
+            __builtin_va_arg(__barn_va_arg__, char*)  \
 
-#define __barn_format_get_value_cstr() {                   \
-            __builtin_va_arg(__barn_va_arg__, char*)        \
-};
-
-#define __barn_format_get_value_int()    {         \
+#define __barn_format_get_value_int()              \
             __builtin_va_arg(__barn_va_arg__, int) \
-};
 
-#define __barn_format_get_value_long()    {         \
+#define __barn_format_get_value_long()              \
             __builtin_va_arg(__barn_va_arg__, long) \
-};
 
-#define __barn_format_get_value_double()  {           \
+#define __barn_format_get_value_double()              \
             __builtin_va_arg(__barn_va_arg__, double) \
-};
 
-#endif /* __BARN_FORMAT_HXX__ */
+#endif /* __BARN_FORMAT_h__ */

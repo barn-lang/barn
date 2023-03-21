@@ -24,7 +24,7 @@
 
 // Function for comparing string
 fun string_compare(string s1, string s2) -> bool {
-	__code__("return (bool)s1.compare(s2);")
+	__code__("return ((bool)((strcmp(s1, s2) == 0) == 1 ? 1 : 0));")
 
 	__use__(s1)
 	__use__(s2)
@@ -32,61 +32,52 @@ fun string_compare(string s1, string s2) -> bool {
 
 // Function for comparing string used in if
 fun __barn_string_compare(string s1, string s2) -> bool {
-	__code__("return (bool)s1.compare(s2);")
+	__code__("return ((bool)(string_compare(s1, s2)));")
 
 	__use__(s1)
 	__use__(s2)
 }
 
 // Function for getting string length
-fun string_length(string s) -> int {
-	__code__("return s.size();")
+fun string_length(string s) -> int {	
+	__code__("return ((int)(strlen(s)));")
 
-	__use__(s)
-}
-
-// Function for reversing string
-fun string_reverse(string s) {
-	__code__("return std::reverse(s.begin(), s.end());")
 	__use__(s)
 }
 
 // Function for changing number to string
-fun iota(int num) -> string {
-	__code__("return std::to_string(num);")
+fun iota(int num, int base) -> string {
+	__code__("return iota(num, base);")
+
 	__use__(num)
+	__use__(base)
 }
 
 // Function for getting user input from console
 fun input() -> string {
-	__code__("
-		std::string str;
-		std::cin >> str;
-		return str;
-	")
+	__code__("char c;")
+	__code__("char* str = (char*)malloc(2048);")
+	__code__("while((c = getchar()) != '\n') {")
+	__code__("	strncat(str, &c, 1);")
+	__code__("}")
+	__code__("return str;")
 }
 
 // Function just for printing
 fun print(string s) {
-	__code__("std::cout << s;")
+	__code__("printf(\"%s\", s);")
 	__use__(s)
 }
 
 // Function just for printing with newline after it
 fun println(string s) {
-	__code__("std::cout << s << std::endl;")
-	__use__(s)
-}
-
-// Just a alias of println
-fun puts(string s) {
-	__code__("std::cout << s << std::endl;")
+	__code__("printf(\"%s\n\", s);")
 	__use__(s)
 }
 
 // Function for printing numbers
 fun printnum(int num) {
-	__code__("std::cout << num;")
+	__code__("printf(\"%d\", num);")
 	__use__(num)
 }
 
@@ -109,7 +100,7 @@ fun fmt_print(string __format_start__, ...) {
 			__code__("curr_char = __format_start__[i];")
 
 			if curr_char == 's' {
-				let __str: cstr = __barn_format_get_value_cstr()
+				let __str: string = __barn_format_get_value_string()
 				print(__str)
 			} elif curr_char == 'd' {
 

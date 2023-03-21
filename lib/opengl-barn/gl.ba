@@ -11,7 +11,7 @@ fun init_gl(string window_title, int y_size, int x_size) -> int {
 	__code__("glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);")
 	__code__("glutInitWindowPosition(-1,-1);")
 	__code__("glutInitWindowSize(y_size, x_size);")
-	__code__("glutCreateWindow(window_title.c_str());")
+	__code__("glutCreateWindow(window_title);")
     return 1
 }
 

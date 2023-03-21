@@ -106,4 +106,4 @@ dkms.conf
 
 # Barn addons
 barn
-c_out.cxx
+c_out.c

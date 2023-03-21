@@ -1,3 +1,5 @@
+// This file is compiling with flag "--no-stdlib"
+
 extern fun puts(cstr msg)
 
 fun main() {

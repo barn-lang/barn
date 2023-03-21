@@ -41,7 +41,7 @@ func help() {
 	fmt.Printf("    > %s--time%s show lexer, parser and codegen process time\n", get_color(Cyan), get_color(Reset))
 	fmt.Printf("    > %s--cflags%s argument that can add c flags to compilation\n", get_color(Cyan), get_color(Reset))
 	fmt.Printf("    > %s--no-main%s don't show error about no main function\n", get_color(Cyan), get_color(Reset))
-	fmt.Printf("    > %s--no-stdlib%s don't include barn_header.hxx\n", get_color(Cyan), get_color(Reset))
+	fmt.Printf("    > %s--no-stdlib%s don't include barn_header.h\n", get_color(Cyan), get_color(Reset))
 	fmt.Printf("    > %s--no-delete-cout%s don't delete generated source code\n", get_color(Cyan), get_color(Reset))
 }
 
@@ -92,34 +92,34 @@ func main() {
 
 			if args.is_flag("--cflags") || args.is_flag("-cf") {
 				if args.is_flag("--cflags") {
-					cflags := "./c_out.cxx " + args.get_flag_by_index(args.get_flag_index("--cflags") + 1)
+					cflags := "./c_out.c " + args.get_flag_by_index(args.get_flag_index("--cflags") + 1)
 					splited_cflags := strings.Split(cflags, " ")
 
-					_, stderr, exit_code := run_command("g++", splited_cflags...)
+					_, stderr, exit_code := run_command("gcc", splited_cflags...)
 					if (exit_code != 0) {
-						barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
+						barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.c` failed due to: ")
 						fmt.Print(stderr)
 					}
 				} else {
-					cflags := "./c_out.cxx " + args.get_flag_by_index(args.get_flag_index("-cf") + 1)
+					cflags := "./c_out.c " + args.get_flag_by_index(args.get_flag_index("-cf") + 1)
 					splited_cflags := strings.Split(cflags, " ")
 
-					_, stderr, exit_code := run_command("g++", splited_cflags...)
+					_, stderr, exit_code := run_command("gcc", splited_cflags...)
 					if (exit_code != 0) {
-						barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
+						barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.c` failed due to: ")
 						fmt.Print(stderr)
 					}
 				}
 			} else {
-				_, stderr, exit_code := run_command("g++", "./c_out.cxx")
+				_, stderr, exit_code := run_command("gcc", "./c_out.c")
 				if (exit_code != 0) {
-					barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.cxx` failed due to: ")
+					barn_error_show(COMPILER_ERROR, "Compiling file named `c_out.c` failed due to: ")
 					fmt.Print(stderr)
 				}
 			}
 
 			if args.is_flag("--no-delete-cout") == false {
-				e := os.Remove("./c_out.cxx")
+				e := os.Remove("./c_out.c")
 				if e != nil {
 					log.Fatal(e)
 				}

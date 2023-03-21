@@ -26,7 +26,7 @@ fun os_current_system() -> string {
 	__code__("#elif defined (__unix__)") // Unix
 		__code__("struct utsname __buf = { 0 };")
 		__code__("uname(&__buf);")
-		__code__("return std::string(__buf.sysname);")
+		__code__("return strdup(__buf.sysname);")
 	__code__("#elif defined (_WIN32)") // Windows
 		return "Windows"
 	__code__("#endif")
@@ -34,15 +34,15 @@ fun os_current_system() -> string {
 
 fun os_file_exists(string filename) -> bool {
 	__code__("#if defined (__APPLE__)")
-		__code__("std::cout << \"os_file_exists(string filename) is not implemented for ios\" << std::endl;")
+		__code__("printf(\"os_file_exists(string filename) is not implemented for ios\")")
 		__code__("return false;")
 	__code__("#elif defined (__unix__)")
 		__code__("struct stat __buf;")
-		__code__("return (bool)(stat (filename.c_str(), &__buf) == 0);")
+		__code__("return (bool)(stat (filename, &__buf) == 0);")
 	__code__("#elif defined (_WIN32)")
 		__code__("return (bool)(GetFileAttributesA(filename) == 0xFFFFFFFF);")
 	__code__("#else")
-		__code__("std::cout << \"os_file_exists(string filename) is not implemented for your system\" << std::endl;")
+		__code__("printf(\"os_file_exists(string filename) is not implemented for your system\")")
 		__code__("return false;")
 	__code__("#endif")
 
@@ -51,26 +51,35 @@ fun os_file_exists(string filename) -> bool {
 }
 
 fun os_read_file(string filename) -> string {
-	__code__("std::string value;")
-	__code__("std::ifstream file(filename);")
-	__code__("char ac;")
-	__code__("if (file.is_open()) {")
-		__code__("while (file) {")
-			__code__("ac = file.get();")
-			__code__("value.append(1, ac);")
-		__code__("}")
+	__code__("FILE* f = fopen(filename, \"r\");")
+	__code__("if (f == NULL)")
+	__code__("	return strdup(\"\");")
+    __code__("long size;")
+    __code__("int flen = 0;")
+    __code__("char* buf = \"\";")
+    __code__("fseek(f, 0, SEEK_END);")
+    __code__("flen = ftell(f) + 1;")
+    __code__("buf = malloc(flen * sizeof(char));")
+    __code__("fseek(f, 0, SEEK_SET);")
+    __code__("size = fread(buf, 1, flen, f);")
+	__code__("if (size != flen - 1) {")
+	__code__("	fclose(f);")
+    __code__("    return buf;")
 	__code__("}")
-	__code__("file.close();")
-	__code__("return value;")
+	__code__("fclose(f);")
+    __code__("return buf;")
 
 	// Give it __use__ so there wouldn't be any warnings from os.ba
 	__use__(filename)
 }
 
 fun os_write_file(string filename, string value) -> bool {
-	__code__("std::ofstream file(filename);")
-	__code__("file << value;")
-	__code__("file.close();")
+	__code__("FILE* f = fopen(filename, \"w\");")
+	__code__("if (f == NULL)")
+	__code__("	return false;")
+	__code__("int success = fprintf(f, \"%s\", value);")
+	__code__("if (success != 0)")
+	__code__("	return false;")
 	return true
 
 	// Give it __use__ so there wouldn't be any warnings from os.ba

@@ -15,18 +15,15 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef __BARN_HEADER_HXX__
-#define __BARN_HEADER_HXX__
+#ifndef __BARN_HEADER_h__
+#define __BARN_HEADER_h__
 
-#include <iostream>
-#include <fstream>
-
-#include <string>
-#include <compare>
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
-#include <algorithm>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <math.h>
 
 #if defined(__unix__)
     #include <sys/types.h>
@@ -41,4 +38,4 @@
 #define __BARN_GLOBAL_VARIABLE__
 #define __use__(x) {x;}
 
-#endif /* __BARN_HEADER_HXX__ */
+#endif /* __BARN_HEADER_h__ */

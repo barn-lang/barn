@@ -7,9 +7,9 @@ fun test_printf(string __format_start__, ...) {
 	// We expect that the first format is string
 	println(__format_start__)
 	
-	let get_first_format: cstr = __barn_format_get_value_cstr()
+	let get_first_format: string = __barn_format_get_value_string()
 	println(get_first_format)
-	get_first_format = __barn_format_get_value_cstr()
+	get_first_format = __barn_format_get_value_string()
 	println(get_first_format)
 }
 
