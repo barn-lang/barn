@@ -1,7 +1,26 @@
-/* Official Barn Standard library file */
-/* Copyright Solindek (C) 2022 */
+/*
+ *  This file is part of Barn standard library which is globally
+ *  available in barn-lang github repository
+*/
 
-// TODO: add println so it works
+/*
+ *   Copyright (C) 2022-2023 Barn-Lang Organization
+ * 
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ * 
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ * 
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+@import "fmt.ba"
 
 // Function for comparing string
 fun string_compare(string s1, string s2) -> bool {
@@ -75,4 +94,38 @@ fun printnum(int num) {
 fun printbool(bool to_print_bool) {
 	if (to_print_bool == true) { println("true") } else { println("false") }
 	__use__(to_print_bool)
+}
+
+fun fmt_print(string __format_start__, ...) {
+	__barn_start_format()
+
+	let strlength: i32 = string_length(__format_start__)
+	for let i: i32 = 0; i < strlength; i++ {
+		let curr_char: char = ' '
+		__code__("curr_char = __format_start__[i];")
+
+		if curr_char == '%' {
+			i++
+			__code__("curr_char = __format_start__[i];")
+
+			if curr_char == 's' {
+				let __str: cstr = __barn_format_get_value_cstr()
+				print(__str)
+			} elif curr_char == 'd' {
+
+			} elif curr_char == 'x' {
+
+			} elif curr_char == 'o' {
+				
+			} elif curr_char == 'b' {
+				
+			} elif curr_char == 'f' {
+				
+			} elif curr_char == 'l' {
+				
+			}
+		} else {
+			__code__("printf(\"%c\", curr_char);")
+		}
+	}
 }

@@ -23,24 +23,25 @@ type BarnTypes int
 
 const (
 	BARN_U8  BarnTypes = iota // Unsigned char 
-	BARN_U16   // Unsigned short
-	BARN_U32   // Unsigned int
-	BARN_U64   // Unsigned long 
+	BARN_U16    // Unsigned short
+	BARN_U32    // Unsigned int
+	BARN_U64    // Unsigned long 
 
-	BARN_I8    // Char
-	BARN_I16   // Short
-	BARN_I32   // Int
-	BARN_I64   // Long
+	BARN_I8     // Char
+	BARN_I16    // Short
+	BARN_I32    // Int
+	BARN_I64    // Long
 	
-	BARN_F32   // Float
-	BARN_F64   // Double
+	BARN_F32    // Float
+	BARN_F64    // Double
 
-	BARN_STR   // String
-	BARN_CSTR  // String
-	BARN_BOOL  // Bool
+	BARN_STR    // String
+	BARN_CSTR   // String
+	BARN_BOOL   // Bool
 	
-	BARN_AUTO  // Auto
-	BARN_ANY   // Any
+	BARN_AUTO   // Auto
+	BARN_ANY    // Any
+	BARN_FORMAT // Format
 	BARN_TYPE_NONE = -1
 )
 
@@ -181,10 +182,24 @@ func (barn_type BarnTypes) as_string() string {
 	switch barn_type {
 	case BARN_BOOL:
 		return "bool"
+	case BARN_I16:
+		return "i16"
 	case BARN_I32:
 		return "int"
+	case BARN_I64:
+		return "i64"
+	case BARN_U8:
+		return "u8"
+	case BARN_U16:
+		return "u16"
+	case BARN_U32:
+		return "u32"
+	case BARN_U64:
+		return "u64"
 	case BARN_F32:
 		return "float"
+	case BARN_F64:
+		return "double"
 	case BARN_I8:
 		return "char"
 	case BARN_STR:
@@ -193,6 +208,10 @@ func (barn_type BarnTypes) as_string() string {
 		return "cstr"
 	case BARN_AUTO:
 		return "auto"
+	case BARN_ANY:
+		return "any"
+	case BARN_FORMAT:
+		return "format"
 	case BARN_TYPE_NONE:
 		return "none"
 	}

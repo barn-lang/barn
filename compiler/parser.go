@@ -462,6 +462,13 @@ func parse_function_args(parser *Parser) []ArgsFunctionDeclaration {
 							skip_token(parser, 1)
 							continue
 						}
+					} else if parser.curr_token.kind == TRIPLEDOT {
+						var arg ArgsFunctionDeclaration
+						arg.name = ""
+						arg.type_arg = BARN_FORMAT
+						to_return = append(to_return, arg)
+						skip_token(parser, 1)
+						break
 					} else {
 						barn_error_show_with_line(
 							SYNTAX_ERROR, "Expected `IDENTIFIER` that represents type",
@@ -626,6 +633,7 @@ func parse_function_declaration(parser *Parser) {
 
 				var variable_return BarnTypes = BARN_TYPE_NONE
 				var is_ok bool = false
+
 				if parser.curr_token.kind == OPENBRACE {
 					is_ok = true
 				} else if parser.curr_token.kind == ARROW {
@@ -675,23 +683,38 @@ func parse_function_declaration(parser *Parser) {
 					// Set args as local variables
 					for i := 0; i < len(function_node.function_args); i++ {
 						arg := function_node.function_args[i]
-						variable_node := NodeAST{}
-						variable_node.node_kind = VARIABLE_DECLARATION
-						variable_node.variable_used = false
-						variable_node.node_kind_str = "VariableDeclaration"
-						variable_node.variable_name = arg.name
-						variable_node.variable_type = arg.type_arg
-						variable_node.variable_value = ""
-						variable_node.variable_is_arg = true
 
-						if variable_node.variable_name[0] == '_' {
-							variable_node.variable_used = true
+						if arg.type_arg == BARN_FORMAT {
+							format_node := NodeAST{}
+							format_node.node_kind = VARIABLE_DECLARATION
+							format_node.variable_used = true
+							format_node.node_kind_str = "VariableDeclaration"
+							format_node.variable_name = "__barn_format__"
+							format_node.variable_type = BARN_I64
+							format_node.variable_value = "-3103189512491"
+							format_node.variable_is_arg = true
+	
+							append_node(parser, format_node)
+							parser.local_variables = append(parser.local_variables, &format_node)
 						} else {
+							variable_node := NodeAST{}
+							variable_node.node_kind = VARIABLE_DECLARATION
 							variable_node.variable_used = false
+							variable_node.node_kind_str = "VariableDeclaration"
+							variable_node.variable_name = arg.name
+							variable_node.variable_type = arg.type_arg
+							variable_node.variable_value = ""
+							variable_node.variable_is_arg = true
+	
+							if variable_node.variable_name[0] == '_' {
+								variable_node.variable_used = true
+							} else {
+								variable_node.variable_used = false
+							}
+	
+							append_node(parser, variable_node)
+							parser.local_variables = append(parser.local_variables, &variable_node)
 						}
-
-						append_node(parser, variable_node)
-						parser.local_variables = append(parser.local_variables, &variable_node)
 					}
 				} else {
 					barn_error_show_with_line(
@@ -791,10 +814,12 @@ func parse_function_call(parser *Parser, function_name string) {
 		os.Exit(1)
 	} else {
 		argument_count := 0
+		argument_format := false
 		arguments_to_node := []ArgsFunctionCall{}
 		skip_token(parser, 1)
 		for parser.curr_token.kind == STRING || parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == IDENTIFIER || parser.curr_token.kind == COMMA || parser.curr_token.kind == CHAR {
-			if argument_count == len(mentioned_function.function_args) {
+			if argument_count == len(mentioned_function.function_args) && 
+			   mentioned_function.function_args[argument_count].type_arg != BARN_FORMAT {
 				barn_error_show_with_line(
 					SYNTAX_ERROR, fmt.Sprintf("Too many arguments have been passed, expected only %d to call function `%s`", len(mentioned_function.function_args), function_name),
 					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
@@ -802,6 +827,26 @@ func parse_function_call(parser *Parser, function_name string) {
 				os.Exit(1)
 			} else if parser.curr_token.kind == STRING || parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == IDENTIFIER || parser.curr_token.kind == CHAR {
 				tk_barn_type, is_var := change_token_to_barn_type(parser, parser.curr_token)
+				if mentioned_function.function_args[argument_count].type_arg == BARN_FORMAT {
+					argument_format = true
+					arguments_to_node = append(arguments_to_node, ArgsFunctionCall{
+						"__empty_var_name__",
+						tk_barn_type,
+						parser.curr_token.value,
+						is_var})
+
+					skip_token(parser, 1)
+					if parser.curr_token.kind == COMMA {
+						// barn_error_show_with_line(
+						// 	SYNTAX_ERROR, "Expected use of comma in this place",
+						// 	parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+						// 	true, parser.curr_token.line)
+						// os.Exit(1)
+						skip_token(parser, 1)
+					}
+					continue
+				}
+
 				if tk_barn_type == mentioned_function.function_args[argument_count].type_arg ||
 				   mentioned_function.function_args[argument_count].type_arg == BARN_ANY ||
 				   is_type_string(mentioned_function.function_args[argument_count].type_arg, tk_barn_type) {
@@ -850,7 +895,8 @@ func parse_function_call(parser *Parser, function_name string) {
 				os.Exit(1)
 			}
 		}
-		if argument_count == len(mentioned_function.function_args) {
+
+		if argument_format == true {
 			if parser.curr_token.kind == CLOSEPARENT {
 				function_call_node := NodeAST{}
 				function_call_node.node_kind = FUNCTION_CALL
@@ -868,11 +914,30 @@ func parse_function_call(parser *Parser, function_name string) {
 				os.Exit(1)
 			}
 		} else {
-			barn_error_show_with_line(
-				SYNTAX_ERROR, fmt.Sprintf("Too few arguments have been passed, expected %d arguments to call function `%s`", len(mentioned_function.function_args), function_name),
-				parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
-				true, parser.curr_token.line)
-			os.Exit(1)
+			if argument_count == len(mentioned_function.function_args) {
+				if parser.curr_token.kind == CLOSEPARENT {
+					function_call_node := NodeAST{}
+					function_call_node.node_kind = FUNCTION_CALL
+					function_call_node.node_kind_str = "FunctionCall"
+	
+					function_call_node.call_args = arguments_to_node
+					function_call_node.call_name = mentioned_function.function_name
+					function_call_node.call_func = mentioned_function
+					append_node(parser, function_call_node)
+				} else {
+					barn_error_show_with_line(
+						SYNTAX_ERROR, "At the end of function call expected `)`",
+						parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+						true, parser.curr_token.line)
+					os.Exit(1)
+				}
+			} else {
+				barn_error_show_with_line(
+					SYNTAX_ERROR, fmt.Sprintf("Too few arguments have been passed, expected %d arguments to call function `%s`", len(mentioned_function.function_args), function_name),
+					parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
+					true, parser.curr_token.line)
+				os.Exit(1)
+			}
 		}
 	}
 }
@@ -921,6 +986,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 					if parser.curr_token.kind == OPENPARENT {
 						mentioned_function := find_function(parser, function_name)
 						if mentioned_function == nil {
+							skip_token(parser, -1)
 							barn_error_show_with_line(
 								UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct function name", parser.curr_token.value),
 								parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
@@ -1114,6 +1180,7 @@ func parse_variable_value(parser *Parser, expected_type BarnTypes) (bool, string
 				if parser.curr_token.kind == OPENPARENT {
 					mentioned_function := find_function(parser, function_name)
 					if mentioned_function == nil {
+						skip_token(parser, -1)
 						barn_error_show_with_line(
 							UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct function name", parser.curr_token.value),
 							parser.curr_token.filename, parser.curr_token.row, parser.curr_token.col-1,
@@ -1918,9 +1985,13 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 					os.Exit(1)
 				}
 			}
-		} else if (parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT) && expected_value {
+		} else if (parser.curr_token.kind == INT || parser.curr_token.kind == FLOAT || parser.curr_token.kind == CHAR) && expected_value {
 			if last_type_lhs == BARN_TYPE_NONE || (is_type_number(last_type_lhs)) {
-				to_ret += parser.curr_token.value
+				if parser.curr_token.kind == CHAR {
+					to_ret += fmt.Sprintf("'%s'", parser.curr_token.value)
+				} else {
+					to_ret += parser.curr_token.value
+				}
 				expected_symbol = true
 				expected_value = false
 				skip_token(parser, 1)
@@ -1939,6 +2010,7 @@ func parse_condition_statements(parser *Parser, end_kind int) string {
 		} else if (parser.curr_token.kind == IDENTIFIER) && expected_value {
 			if find_var := find_variable_both(parser, parser.curr_token.value); find_var != nil {
 				if last_type_lhs == BARN_TYPE_NONE || last_type_lhs == find_var.variable_type {
+					find_var.variable_used = true
 					to_ret += parser.curr_token.value
 					expected_symbol = true
 					expected_value = false
@@ -2529,6 +2601,77 @@ func init_functions_lib(parser *Parser) {
 	__use__node__.function_return = BARN_TYPE_NONE
 
 	parser.functions = append(parser.functions, &__use__node__)
+
+	/* BARN_FORMAT */
+	__barn_start_format_node__ := NodeAST{}
+	__barn_start_format_node__args := []ArgsFunctionDeclaration{}
+
+	__barn_start_format_node__.function_args = __barn_start_format_node__args
+	__barn_start_format_node__.function_body = nil
+	__barn_start_format_node__.function_name = "__barn_start_format"
+	__barn_start_format_node__.function_return = BARN_TYPE_NONE
+
+	parser.functions = append(parser.functions, &__barn_start_format_node__)
+
+	__barn_end_format_node__ := NodeAST{}
+	__barn_end_format_node__args := []ArgsFunctionDeclaration{}
+
+	__barn_end_format_node__.function_args = __barn_end_format_node__args
+	__barn_end_format_node__.function_body = nil
+	__barn_end_format_node__.function_name = "__barn_end_format"
+	__barn_end_format_node__.function_return = BARN_TYPE_NONE
+
+	parser.functions = append(parser.functions, &__barn_end_format_node__)
+
+	__barn_format_get_value_string_node__ := NodeAST{}
+	__barn_format_get_value_string_node__args := []ArgsFunctionDeclaration{}
+
+	__barn_format_get_value_string_node__.function_args = __barn_format_get_value_string_node__args
+	__barn_format_get_value_string_node__.function_body = nil
+	__barn_format_get_value_string_node__.function_name = "__barn_format_get_value_string"
+	__barn_format_get_value_string_node__.function_return = BARN_STR
+
+	parser.functions = append(parser.functions, &__barn_format_get_value_string_node__)
+
+	__barn_format_get_value_cstr_node__ := NodeAST{}
+	__barn_format_get_value_cstr_node__args := []ArgsFunctionDeclaration{}
+
+	__barn_format_get_value_cstr_node__.function_args = __barn_format_get_value_cstr_node__args
+	__barn_format_get_value_cstr_node__.function_body = nil
+	__barn_format_get_value_cstr_node__.function_name = "__barn_format_get_value_cstr"
+	__barn_format_get_value_cstr_node__.function_return = BARN_CSTR
+
+	parser.functions = append(parser.functions, &__barn_format_get_value_cstr_node__)
+
+	__barn_format_get_value_int_node__ := NodeAST{}
+	__barn_format_get_value_int_node__args := []ArgsFunctionDeclaration{}
+
+	__barn_format_get_value_int_node__.function_args = __barn_format_get_value_int_node__args
+	__barn_format_get_value_int_node__.function_body = nil
+	__barn_format_get_value_int_node__.function_name = "__barn_format_get_value_int"
+	__barn_format_get_value_int_node__.function_return = BARN_I32
+
+	parser.functions = append(parser.functions, &__barn_format_get_value_int_node__)
+
+	__barn_format_get_value_long_node__ := NodeAST{}
+	__barn_format_get_value_long_node__args := []ArgsFunctionDeclaration{}
+
+	__barn_format_get_value_long_node__.function_args = __barn_format_get_value_long_node__args
+	__barn_format_get_value_long_node__.function_body = nil
+	__barn_format_get_value_long_node__.function_name = "__barn_format_get_value_long"
+	__barn_format_get_value_long_node__.function_return = BARN_I64
+
+	parser.functions = append(parser.functions, &__barn_format_get_value_long_node__)
+
+	__barn_format_get_value_double_node__ := NodeAST{}
+	__barn_format_get_value_double_node__args := []ArgsFunctionDeclaration{}
+
+	__barn_format_get_value_double_node__.function_args = __barn_format_get_value_double_node__args
+	__barn_format_get_value_double_node__.function_body = nil
+	__barn_format_get_value_double_node__.function_name = "__barn_format_get_value_double"
+	__barn_format_get_value_double_node__.function_return = BARN_F64
+
+	parser.functions = append(parser.functions, &__barn_format_get_value_double_node__)
 }
 
 func parser_start(lex *Lexer, args *ArgsParser) *Parser {

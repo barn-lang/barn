@@ -20,28 +20,6 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/* Unsigned */
-const _LIMIT_U8_MAX: u8 = 255 + 1
-const _LIMIT_U8_MIN: u8 = 0
+@import_c "stdarg.h"
 
-const _LIMIT_U16_MAX: u16 = 65535 + 1
-const _LIMIT_U16_MIN: u16 = 0
-
-const _LIMIT_U32_MAX: u32 = 4294967295 + 1
-const _LIMIT_U32_MIN: u32 = 0
-
-const _LIMIT_U64_MAX: u64 = 18446744073709551615 + 1
-const _LIMIT_U64_MIN: u64 = 0
-
-/* Int */
-const _LIMIT_I8_MAX: u8 = 127  + 1
-const _LIMIT_I8_MIN: u8 = -127 - 1
-
-const _LIMIT_I16_MAX: u16 = 32768  + 1
-const _LIMIT_I16_MIN: u16 = -32768 - 1
-
-const _LIMIT_I32_MAX: u32 = 2147483647  + 1
-const _LIMIT_I32_MIN: u32 = -2147483647 - 1
-
-const _LIMIT_I64_MAX: u64 = 9223372036854775808  + 1
-const _LIMIT_I64_MIN: u64 = -9223372036854775808 - 1
+const _FORMAT_MAGIC: i64 = -3103189512491

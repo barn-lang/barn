@@ -67,7 +67,7 @@ func get_next_char(lex *Lexer) byte {
 	return lex.data[lex.index+1]
 }
 
-// Function for skiping characters in lexer
+// Function for skipping characters in lexer
 func advance(lex *Lexer, count int) {
 	lex.index += count
 	lex.curr_char = lex.data[lex.index]
@@ -291,10 +291,25 @@ func creator_char(lex *Lexer) {
 func creator_float(lex *Lexer) {
 	if lex.last_token != nil {
 		if lex.last_token.kind == NONE {
-			lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
-				".", lex.filename,
-				lex.col, lex.row, DOT))
-			lex.is_space = false
+			if lex.next_char == '.' {
+				is_symbol, value_symbol, kind_symbol := detect_symbol(lex)
+				if is_symbol {
+					lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
+						value_symbol, lex.filename,
+						lex.col, lex.row, kind_symbol))
+					lex.is_space = false
+				} else {
+					barn_error_show_with_line(
+						SYNTAX_ERROR, fmt.Sprintf("Unknown use of `%c` (%d)", lex.curr_char, int(lex.curr_char)),
+						lex.filename, lex.row, lex.col-1, true, lex.data_lines[0][lex.row-1])
+					os.Exit(1)
+				}
+			} else {
+				lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
+					".", lex.filename,
+					lex.col, lex.row, DOT))
+				lex.is_space = false
+			}
 		} else {
 			if lex.last_token.kind == INT && lex.is_space == false {
 				buf := []byte(lex.last_token.value) // Create buffer with type []byte
@@ -308,17 +323,47 @@ func creator_float(lex *Lexer) {
 					lex.filename, lex.row, lex.col-1, true, lex.data_lines[0][lex.row-1])
 				os.Exit(1)
 			} else {
-				lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
-					".", lex.filename,
-					lex.col, lex.row, DOT))
-				lex.is_space = false
+				if lex.next_char == '.' {
+					is_symbol, value_symbol, kind_symbol := detect_symbol(lex)
+					if is_symbol {
+						lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
+							value_symbol, lex.filename,
+							lex.col, lex.row, kind_symbol))
+						lex.is_space = false
+					} else {
+						barn_error_show_with_line(
+							SYNTAX_ERROR, fmt.Sprintf("Unknown use of `%c` (%d)", lex.curr_char, int(lex.curr_char)),
+							lex.filename, lex.row, lex.col-1, true, lex.data_lines[0][lex.row-1])
+						os.Exit(1)
+					}
+				} else {
+					lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
+						".", lex.filename,
+						lex.col, lex.row, DOT))
+					lex.is_space = false
+				}
 			}
 		}
 	} else {
-		lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
-			".", lex.filename,
-			lex.col, lex.row, DOT))
-		lex.is_space = false
+		if lex.next_char == '.' {
+			is_symbol, value_symbol, kind_symbol := detect_symbol(lex)
+			if is_symbol {
+				lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
+					value_symbol, lex.filename,
+					lex.col, lex.row, kind_symbol))
+				lex.is_space = false
+			} else {
+				barn_error_show_with_line(
+					SYNTAX_ERROR, fmt.Sprintf("Unknown use of `%c` (%d)", lex.curr_char, int(lex.curr_char)),
+					lex.filename, lex.row, lex.col-1, true, lex.data_lines[0][lex.row-1])
+				os.Exit(1)
+			}
+		} else {
+			lex.tokens = append(lex.tokens, create_token(lex.data_lines[0][lex.row - 1], lex.filename_count,
+				".", lex.filename,
+				lex.col, lex.row, DOT))
+			lex.is_space = false
+		}
 	}
 }
 
@@ -355,6 +400,18 @@ func detect_symbol(lex *Lexer) (bool, string, int) {
 	case ':':
 		return true, ":", COLON
 	case '.':
+		if lex.next_char == '.' {
+			advance(lex, 1)
+			if lex.next_char == '.' {
+				advance(lex, 1)
+				return true, "...", TRIPLEDOT
+			} else {
+				barn_error_show_with_line(
+					SYNTAX_ERROR, fmt.Sprintf("Expected '.' after \"..\""),
+					lex.filename, lex.row, lex.col-1, true, lex.data_lines[0][lex.row-1])
+				os.Exit(1)
+			}
+		}
 		return true, ".", DOT
 	case ';':
 		return true, ";", SEMICOL
@@ -365,10 +422,7 @@ func detect_symbol(lex *Lexer) (bool, string, int) {
 			advance(lex, 1)
 			return true, "||", OROR
 		}
-		// barn_error_show_with_line(
-		// 	SYNTAX_ERROR, fmt.Sprintf("Expected '|' after '%c'", lex.curr_char),
-		// 	lex.filename, lex.row, lex.col-1, true, lex.data_lines[0][lex.row-1])
-		// os.Exit(1)
+
 		return true, "|", CONDITIONBLOCK
 	case '&':
 		if lex.next_char == '&' {

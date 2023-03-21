@@ -466,6 +466,9 @@ func generate_code_cxx_function_body_nodes(node *NodeAST, codegen *Codegen) {
 }
 
 func codegen_c(codegen *Codegen) {
+	codegen.cxx_header += "#include \"" + get_barn_libs_directory() + "std-cxx/barn_format.hxx" + "\"\n\n"
+	codegen.cxx_header += "\n"
+
 	if codegen.parser.args.is_flag("--no-stdlib") == false {
 		codegen.cxx_header += "#include \"" + get_barn_libs_directory() + "std-cxx/barn_header.hxx" + "\"\n\n"
 		content, err := ioutil.ReadFile("./lib/std-c/barn-std.cxx")
@@ -496,17 +499,21 @@ func codegen_c(codegen *Codegen) {
 			}
 
 			for j := 0; j < len(codegen.parser.nodes[i].function_args); j++ {
-				c_type := barn_types_to_cxx_types(codegen.parser.nodes[i].function_args[j].type_arg)
-				if j+1 == len(codegen.parser.nodes[i].function_args) {
-					codegen.cxx_code += fmt.Sprintf(
-						"%s %s",
-						c_type,
-						codegen.parser.nodes[i].function_args[j].name)
+				if codegen.parser.nodes[i].function_args[j].type_arg == BARN_FORMAT {
+					codegen.cxx_code += "..."
 				} else {
-					codegen.cxx_code += fmt.Sprintf(
-						"%s %s, ",
-						c_type,
-						codegen.parser.nodes[i].function_args[j].name)
+					c_type := barn_types_to_cxx_types(codegen.parser.nodes[i].function_args[j].type_arg)
+					if j+1 == len(codegen.parser.nodes[i].function_args) {
+						codegen.cxx_code += fmt.Sprintf(
+							"%s %s",
+							c_type,
+							codegen.parser.nodes[i].function_args[j].name)
+					} else {
+						codegen.cxx_code += fmt.Sprintf(
+							"%s %s, ",
+							c_type,
+							codegen.parser.nodes[i].function_args[j].name)
+					}
 				}
 			}
 			if codegen.parser.nodes[i].function_extern == false {

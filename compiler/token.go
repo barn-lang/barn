@@ -75,6 +75,9 @@ const (
 
 	/* Arrows */
 	ARROW // "->"
+	
+	/* Other */
+	TRIPLEDOT  // "..."
 )
 
 type Token struct {
@@ -165,6 +168,8 @@ func kind_to_str(kind int) string {
 		return "MOD"
 	case ARROW:
 		return "ARROW"
+    case TRIPLEDOT:
+        return "TRIPLEDOT"
 	}
 
 	return "NONE"

@@ -1,4 +1,22 @@
-#pragma once
+/*
+ *   Copyright (C) 2022-2023 Barn-Lang Organization
+ * 
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ * 
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ * 
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#ifndef __BARN_HEADER_HXX__
+#define __BARN_HEADER_HXX__
 
 #include <iostream>
 #include <fstream>
@@ -19,10 +37,8 @@
     #include <windows.h>
 #endif
 
+#define __BARN_FUNCTION__
+#define __BARN_GLOBAL_VARIABLE__
+#define __use__(x) {x;}
 
-
-// int __barn_string_length(char* str);
-// bool __barn_string_compare(char* str1, char* str2);
-
-// OpenGL binding stuff
-// __BARN_FUNCTION__ void display_func();
+#endif /* __BARN_HEADER_HXX__ */
