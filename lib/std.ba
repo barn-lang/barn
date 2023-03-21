@@ -103,17 +103,23 @@ fun fmt_print(string __format_start__, ...) {
 				let __str: string = __barn_format_get_value_string()
 				print(__str)
 			} elif curr_char == 'd' {
-
+				let __decimal: i32 = __barn_format_get_value_int()
+				__code__("printf(\"%d\", __decimal);")
 			} elif curr_char == 'x' {
-
+				let __hexadecimal: i32 = __barn_format_get_value_int()
+				__code__("printf(\"%x\", __hexadecimal);")
 			} elif curr_char == 'o' {
-				
+				let __octal: i32 = __barn_format_get_value_int()
+				__code__("printf(\"%o\", __octal);")
 			} elif curr_char == 'b' {
-				
+				let __binary: i32 = __barn_format_get_value_int()
+				__code__("printf(\"%b\", __binary);")
 			} elif curr_char == 'f' {
-				
+				let __double: f64 = __barn_format_get_value_double()
+				__code__("printf(\"%lf\", __double);")
 			} elif curr_char == 'l' {
-				
+				let __long: i64 = __barn_format_get_value_double()
+				__code__("printf(\"%l\", __long);")
 			}
 		} else {
 			__code__("printf(\"%c\", curr_char);")
