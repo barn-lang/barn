@@ -18,8 +18,6 @@
 #ifndef __BARN_FORMAT_h__
 #define __BARN_FORMAT_h__
 
-#include <stdarg.h>
-
 static __builtin_va_list __barn_va_arg__;
 
 /* Start and end format */

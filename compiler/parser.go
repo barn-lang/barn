@@ -2691,7 +2691,7 @@ func init_functions_lib(parser *Parser) {
 	parser.global_variables = append(parser.global_variables, &barn_current_file_constant)
 }
 
-func parser_start(lex *Lexer, args *ArgsParser, string main_file) *Parser {
+func parser_start(lex *Lexer, args *ArgsParser, main_file string) *Parser {
 	var parser Parser
 	parser.lex = lex
 	parser.args = args

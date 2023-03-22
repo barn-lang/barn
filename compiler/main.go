@@ -66,7 +66,7 @@ func main() {
 				}
 			}
 
-			parser := parser_start(lexer, &args)
+			parser := parser_start(lexer, &args, args.filename)
 
 			// Recognize codegen type
 			codegen_type := C
