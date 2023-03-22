@@ -40,6 +40,7 @@ type Parser struct {
 	if_statement_node         *NodeAST
 	is_while_statement_opened int
 	is_for_statement_opened   int
+	main_file                 string
 }
 
 func is_type_number(is_type BarnTypes) bool {
@@ -240,7 +241,6 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 			} else {
 				skip_token(parser, -1)
 				find_var := find_variable_both(parser, parser.curr_token.value)
-				find_var.variable_used = true
 				if find_var == nil {
 					barn_error_show_with_line(
 						UNDEFINED_ERROR, fmt.Sprintf("`%s` is undefined, expected correct variable name", parser.curr_token.value),
@@ -249,7 +249,8 @@ func parse_value(parser *Parser, expected_type BarnTypes) string {
 					os.Exit(1)
 				} else {
 					if expected_type == find_var.variable_type {
-						skip_token(parser, 1)
+						find_var.variable_used = true
+						// skip_token(parser, 1)
 						return to_ret_2
 					} else {
 						barn_error_show_with_line(
@@ -2554,6 +2555,8 @@ func parse_identifier(parser *Parser) {
 }
 
 func init_functions_lib(parser *Parser) {
+
+
 	exit__node__ := NodeAST{}
 
 	exit__node__args := []ArgsFunctionDeclaration{}
@@ -2672,12 +2675,27 @@ func init_functions_lib(parser *Parser) {
 	__barn_format_get_value_double_node__.function_return = BARN_F64
 
 	parser.functions = append(parser.functions, &__barn_format_get_value_double_node__)
+
+	barn_current_file_constant := NodeAST{}
+	barn_current_file_constant.last_node_token = &Token{}
+	barn_current_file_constant.node_kind = VARIABLE_DECLARATION
+	barn_current_file_constant.node_kind_str = "VariableDeclaration"
+	barn_current_file_constant.variable_name = "__BARN_CURRENT_COMPILED_FILE__"
+	barn_current_file_constant.variable_type = BARN_STR
+	barn_current_file_constant.variable_value = parser.main_file
+	barn_current_file_constant.variable_fn_call_value = false
+	barn_current_file_constant.variable_constant = true
+	barn_current_file_constant.variable_used = true
+	
+	append_node(parser, barn_current_file_constant)
+	parser.global_variables = append(parser.global_variables, &barn_current_file_constant)
 }
 
-func parser_start(lex *Lexer, args *ArgsParser) *Parser {
+func parser_start(lex *Lexer, args *ArgsParser, string main_file) *Parser {
 	var parser Parser
 	parser.lex = lex
 	parser.args = args
+	parser.main_file = main_file
 	init_functions_lib(&parser)
 	for parser.index = 0; parser.index < len(lex.tokens); parser.index++ {
 		skip_token(&parser, 0)

@@ -118,7 +118,7 @@ fun fmt_print(string __format_start__, ...) {
 				let __double: f64 = __barn_format_get_value_double()
 				__code__("printf(\"%lf\", __double);")
 			} elif curr_char == 'l' {
-				let __long: i64 = __barn_format_get_value_double()
+				let __long: i64 = __barn_format_get_value_long()
 				__code__("printf(\"%l\", __long);")
 			}
 		} else {

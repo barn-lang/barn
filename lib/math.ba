@@ -1,0 +1,94 @@
+/*
+ *  This file is part of Barn standard library which is globally
+ *  available in barn-lang github repository
+*/
+
+/*
+ *   Copyright (C) 2022-2023 Barn-Lang Organization
+ * 
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ * 
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ * 
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+/* 
+ * ==========================
+ *      Constant numbers 
+ * ==========================
+*/
+
+/* ---   Euler    --- */
+const _MATH_EULER: f64       = 2.71828182845904523536028747135266250  // Euler
+
+/* --- Logarithms --- */
+const _MATH_LOG2 : f64       = 1.44269504088896340735992468100189214  // Log2
+const _MATH_LOG10: f64       = 0.43429448190325182765112891891660508  // Log10
+
+/* ---  PI Number  --- */
+const _MATH_PI   : f64       = 3.14159265358979323846264338327950288  // PI
+const _MATH_PI_2 : f64       = 1.57079632679489661923132169163975144  // PI / 2
+const _MATH_PI_4 : f64       = 0.78539816339744830961566084581987572  // PI / 4
+
+/* 
+ * ==========================
+ *    Essential functions
+ * ==========================
+*/
+
+/* ---   Floor   --- */
+
+fun floor64(f64 __floor_num) -> i64 {
+
+}
+
+fun floor32(f32 __floor_num) -> i32 {
+
+}
+
+fun floor(f32 __floor_num) -> i32 { 
+    return floor32(__floor_num) 
+}
+
+/* ---    Sqrt   --- */
+
+fun sqrt64(f64 __sqrt_num) -> f64 {}
+
+fun sqrt32(f32 __sqrt_num) -> f32 {}
+
+fun sqrt(f32 __sqrt_num) -> f32 {
+    return sqrt32(__sqrt_num)
+}
+
+/* --- Min & Max --- */
+
+fun minf(f64 __first_min, f64 __second_min) -> f64 {
+
+}
+
+fun min(i64 __first_min, i64 __second_min) -> i64 {
+    
+}
+
+fun maxf(f64 __first_max, f64 __second_max) -> f64 {
+
+}
+
+fun max(i64 __first_max, i64 __second_max) -> i64 {
+    
+}
+
+/*
+ *
+ * TODO: add more function to this library like:
+ *        - cos, sin, log, log10, acos, atan
+ *
+*/

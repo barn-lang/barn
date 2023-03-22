@@ -1,0 +1,5 @@
+@import "assert.ba"
+
+fun main() {
+    assert("'2 == 4' failed.")
+}
