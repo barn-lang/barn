@@ -1,0 +1,9 @@
+fun test_arguments(i64 num, f32 num2) {
+    __use__(num)
+    __use__(num2)
+}
+
+fun main() {
+    // They need to cast to i64 and f32
+    test_arguments(32, 32)
+}

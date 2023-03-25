@@ -31,15 +31,19 @@ type Parser struct {
 	lex        *Lexer
 
 	is_function_opened        bool
-	actual_function           *NodeAST
+
 	functions                 []*NodeAST
 	local_variables           []*NodeAST
 	global_variables          []*NodeAST
-	statement_open            int
-	last_statement_opened     string
+	structures                []*NodeAST
+	actual_function           *NodeAST
 	if_statement_node         *NodeAST
+
+	statement_open            int
 	is_while_statement_opened int
 	is_for_statement_opened   int
+
+	last_statement_opened     string
 	main_file                 string
 }
 
@@ -331,7 +335,7 @@ func is_keyword(value_token string) bool {
 		return true
 	case "for":
 		return true
-	case "enum":
+	case "struct":
 		return true
 	}
 
@@ -414,6 +418,7 @@ func is_token_represent_type(value_token string) BarnTypes {
 		return BARN_BOOL
 	case "auto":
 		return BARN_AUTO
+
  	}
 
 	return BARN_TYPE_NONE
@@ -850,7 +855,8 @@ func parse_function_call(parser *Parser, function_name string) {
 
 				if tk_barn_type == mentioned_function.function_args[argument_count].type_arg ||
 				   mentioned_function.function_args[argument_count].type_arg == BARN_ANY ||
-				   is_type_string(mentioned_function.function_args[argument_count].type_arg, tk_barn_type) {
+				   is_type_string(mentioned_function.function_args[argument_count].type_arg, tk_barn_type) ||
+				   is_type_number(tk_barn_type) {
 					arguments_to_node = append(arguments_to_node, ArgsFunctionCall{
 						mentioned_function.function_args[argument_count].name,
 						mentioned_function.function_args[argument_count].type_arg,
@@ -2405,8 +2411,155 @@ func parse_for(parser *Parser) {
 	}
 }
 
-func parse_enum(parser *Parser) {
-	// TODO: implement enums
+func find_structure(parser *Parser, name string) *NodeAST {
+	for i := 0; i < len(parser.structures); i++ {
+		if parser.structures[i].structure_name == name {
+			return parser.structures[i]
+		}
+	}
+
+	return nil
+}
+
+func find_field(parser *Parser, fields []StructureField, name string) bool {
+	for i := 0; i < len(fields); i++ {
+		if fields[i].field_name == name {
+			return true
+		}
+	}
+
+	return false
+}
+
+func is_name_free_global_variables(parser *Parser, name string) bool {
+	if find_variable_global(parser, name) == nil {
+		return false
+	} else {
+		return true
+	}
+}
+
+func is_name_free_structures(parser *Parser, name string) bool {
+	if find_structure(parser, name) == nil {
+		return false
+	} else {
+		return true
+	}
+}
+
+func is_name_free_functions(parser *Parser, name string) bool {
+	if find_function(parser, name) == nil {
+		return false
+	} else {
+		return true
+	}
+}
+
+func parse_structure_fields(parser *Parser) []StructureField {
+	to_ret := []StructureField{}
+	skip_token(parser, 1)
+
+	expect_name  := true
+	expect_colon := false
+	expect_type  := false
+	expect_comma := false
+
+	for parser.curr_token.kind != CLOSEBRACE {
+		// fmt.Println(parser.curr_token.value)
+		if expect_name == true {
+			if parser.curr_token.kind != IDENTIFIER {
+				barn_syntax_error_with_exit(parser, "Expected IDENTIFIER that will indicate structure field name")
+			}
+
+			if find_field(parser, to_ret, parser.curr_token.value) {
+				barn_syntax_error_with_exit(parser, fmt.Sprintf("Field with name `%s` is already defined in this structure"))
+			}
+
+			to_ret = append(to_ret, StructureField{parser.curr_token.value, BARN_TYPE_NONE})
+			expect_colon = true
+			expect_name  = false
+			skip_token(parser, 1)
+			continue
+		} else if expect_colon == true { 
+			expect_type  = true
+			expect_colon = false
+			skip_token(parser, 1)
+			continue
+		} else if expect_type == true {
+			if parser.curr_token.kind != IDENTIFIER {
+				barn_syntax_error_with_exit(parser, "Expected IDENTIFIER that will indicate structure field type")
+			}
+
+			field_type := is_token_represent_type(parser.curr_token.value)
+			if field_type == BARN_TYPE_NONE {
+				barn_syntax_error_with_exit(parser, fmt.Sprintf("Unknown type named `%s`", parser.curr_token.value))
+			}
+			to_ret[len(to_ret) - 1].field_type = field_type
+
+			expect_comma = true
+			expect_type  = false
+			skip_token(parser, 1)
+			continue
+		} else if expect_comma == true {
+			expect_name  = true
+			expect_comma = false
+			skip_token(parser, 1)
+			continue
+		}
+	}
+	
+	for i := 0; i < len(to_ret); i++ {
+		fmt.Printf("field_name: %s, field_type: %s\n", to_ret[i].field_name, to_ret[i].field_type.as_string())
+	}
+
+	return to_ret
+}
+
+func parse_struct(parser *Parser) {
+	// Error when we are in function
+	if parser.is_function_opened == true {
+		barn_syntax_error_with_exit(parser, "Can't use `struct` inside a function body")
+	}
+
+	// Collect structure name
+	skip_token(parser, 1)
+	if parser.curr_token.kind != IDENTIFIER {
+		barn_syntax_error_with_exit(parser, "Expected IDENTIFIER that will indicate structure name")
+	}
+
+	structure_name := parser.curr_token.value
+	if is_name_free_functions(parser, structure_name) || is_name_free_global_variables(parser, structure_name) ||
+	   is_name_free_structures(parser, structure_name) {
+		barn_syntax_error_with_exit(parser, fmt.Sprintf("`%s` is already in use", structure_name))
+	}
+
+	// Is next token {
+	skip_token(parser, 1)
+	if parser.curr_token.kind != OPENBRACE {
+		barn_syntax_error_with_exit(parser, "Expected '{'")
+	} 
+
+	structure_fields := []StructureField{}
+
+	// Skip to next token and if it's } then just leave here 
+	// an empty structure if not, parse structure fields
+	skip_token(parser, 1)
+	if parser.curr_token.kind != CLOSEBRACE {
+		skip_token(parser, -1) // Go back to OPENBRACE
+		structure_fields = parse_structure_fields(parser)
+	} 
+
+	// Create a structure node
+	structure_node := NodeAST{}
+	structure_node.node_kind = STRUCTURE_DECLARATION
+	structure_node.node_kind_str = "StructureDeclaration"
+	structure_node.structure_name = structure_name
+	structure_node.structure_fields = structure_fields
+	structure_node.last_node_token = parser.curr_token
+
+	append_node(parser, structure_node)
+	parser.structures = append(parser.structures, &structure_node)
+	fmt.Printf("declared structure named %s with %d fields\n", structure_name, len(structure_fields))
 }
 
 func parse_incrementation(parser *Parser, variable_name string) {
@@ -2497,8 +2650,8 @@ func parse_identifier(parser *Parser) {
 			parse_break(parser)
 		case "for":
 			parse_for(parser)
-		case "enum":
-			parse_enum(parser)
+		case "struct":
+			parse_struct(parser)
 		}
 	} else {
 		if parser.is_function_opened == false {

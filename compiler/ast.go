@@ -79,6 +79,9 @@ const (
 
 	/* End statement */
 	END_STATEMENT
+
+	/* Structure declaration */
+	STRUCTURE_DECLARATION
 )
 
 const (
@@ -92,6 +95,11 @@ const (
 type ArgsFunctionDeclaration struct {
 	name     string
 	type_arg BarnTypes
+}
+
+type StructureField struct {
+	field_name string
+	field_type BarnTypes
 }
 
 type ArgsFunctionCall struct {
@@ -172,6 +180,9 @@ type NodeAST struct {
 	for_var_declaration *NodeAST
 	for_condition       string
 	for_var_operation   *NodeAST
+
+	structure_name     string
+	structure_fields   []StructureField
 }
 
 func (n *NodeAST) show() {

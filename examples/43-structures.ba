@@ -1,0 +1,11 @@
+@import "std.ba"
+
+struct Person {
+	name: string,
+	age: i16
+}
+
+fun main() {
+	let me: Person = new Person{ "My name", 60 }
+	fmt_print("name: %s, age: %d", me.name, me.age)
+}
