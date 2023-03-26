@@ -62,13 +62,8 @@ func args_parser_start() ArgsParser {
 		arg := os.Args[i]
 
 		if arg[0] == '-' {
-			if arg[1] == '-' {
-				return_value.flags = append(return_value.flags, arg)
-				return_value.flags_len++
-			} else {
-				return_value.flags = append(return_value.flags, arg)
-				return_value.flags_len++
-			}
+			return_value.flags = append(return_value.flags, arg)
+			return_value.flags_len++
 		} else {
 			if return_value.is_filename == false {
 				return_value.is_filename = true
