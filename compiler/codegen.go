@@ -102,11 +102,7 @@ func barn_types_to_c_types(barn_type BarnTypes) string {
 }
 
 func gen_tab(tabs int) string {
-	to_ret := ""
-	for i := 0; i < tabs; i++ {
-		to_ret += "	"
-	}
-	return to_ret
+	return Strings.repeat("    ", tabs)
 }
 
 func convert_types_to_bits(types BarnTypes) int {
@@ -153,7 +149,7 @@ func is_number(value string) bool {
 
 func is_value_correct_overflow(curr_token *Token, types BarnTypes, value string) string {
 	if types == BARN_U8 || types == BARN_U16 || types == BARN_U32 || types == BARN_U64 {
-		if is_number(value) == false {
+		if !is_number(value) {
 			return value
 		}
 
@@ -178,7 +174,7 @@ func is_value_correct_overflow(curr_token *Token, types BarnTypes, value string)
 
 		return value
 	} else if types == BARN_I8 || types == BARN_I16 || types == BARN_I32 || types == BARN_I64 {
-		if is_number(value) == false {
+		if !is_number(value){
 			return value
 		}
 		
@@ -203,7 +199,7 @@ func is_value_correct_overflow(curr_token *Token, types BarnTypes, value string)
 
 		return value
 	} else if types == BARN_F32 || types == BARN_F64 {
-		if is_number(value) == false {
+		if !is_number(value) {
 			return value
 		}
 
@@ -459,7 +455,7 @@ func generate_code_c_function_body_nodes(node *NodeAST, codegen *Codegen) {
 	} else {
 		barn_error_show(
 			COMPILER_ERROR,
-			fmt.Sprintf("Generating with c don't support %s nodes, try diffrent compiling method like nasm or fasm",
+			fmt.Sprintf("Generating with C don't support %s nodes, try a different compiling method like nasm or fasm",
 				node.node_kind_str))
 		os.Exit(1)
 	}
@@ -469,7 +465,7 @@ func codegen_c(codegen *Codegen) {
 	codegen.c_header += "#include \"" + get_barn_libs_directory() + "std-c/barn_format.h" + "\"\n\n"
 	codegen.c_header += "\n"
 
-	if codegen.parser.args.is_flag("--no-stdlib") == false {
+	if !codegen.parser.args.is_flag("--no-stdlib") {
 		codegen.c_header += "#include \"" + get_barn_libs_directory() + "std-c/barn_header.h" + "\"\n\n"
 		content, err := ioutil.ReadFile("./lib/std-c/barn-std.c")
 		if err != nil {
