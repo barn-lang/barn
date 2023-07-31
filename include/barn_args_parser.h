@@ -31,9 +31,15 @@ typedef struct __barn_args_parser_t {
     bool is_filename;
     char* filename;
     
-    barn_array_t flags;
+    barn_array_t* flags;
 } barn_args_parser_t;
 
 barn_args_parser_t* barn_args_parser_start(int argc, char** argv);
+
+char* barn_get_flag_by_index(barn_args_parser_t* args_parser, int index);
+
+int barn_get_flag_index(barn_args_parser_t* args_parser, char* flag);
+
+bool barn_is_flag(barn_args_parser_t* args_parser, char* flag);
 
 #endif /* __BARN_ARGS_PARSER__ */

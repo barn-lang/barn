@@ -18,23 +18,14 @@
  *
 */
 
+#ifndef __BARN_IO__
+#define __BARN_IO__
+
 #include <barn_core.h>
-
-#include <barn_args_parser.h>
 #include <barn_array.h>
-#include <barn_error.h>
-#include <barn_debug.h>
-#include <barn_main.h>
 
-int
-main(int argc, char** argv)
-{
-    barn_args_parser_t* args_parser = barn_args_parser_start(argc, argv);
+bool barn_io_file_exists(const char* filename);
 
-    if (args_parser->is_filename == true)
-    {
-        
-    }
+char* barn_read_whole_file(const char* filename);
 
-    return EXIT_SUCCESS;
-}
+#endif /* __BARN_IO__ */

@@ -18,23 +18,22 @@
  *
 */
 
-#include <barn_core.h>
-
-#include <barn_args_parser.h>
 #include <barn_array.h>
-#include <barn_error.h>
-#include <barn_debug.h>
-#include <barn_main.h>
+#include <barn_core.h>
+#include <barn_io.h>
 
-int
-main(int argc, char** argv)
+bool 
+barn_io_file_exists(const char* filename)
 {
-    barn_args_parser_t* args_parser = barn_args_parser_start(argc, argv);
+    FILE* f = fopen(filename, "r");
 
-    if (args_parser->is_filename == true)
-    {
-        
-    }
+    bool f_is = f == NULL 
+                    ;
 
-    return EXIT_SUCCESS;
+}
+
+char* 
+barn_read_whole_file(const char* filename)
+{
+
 }

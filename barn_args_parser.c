@@ -22,6 +22,7 @@
 
 #include <barn_args_parser.h>
 #include <barn_string.h>
+#include <barn_array.h>
 #include <barn_error.h>
 
 barn_args_parser_t* 
@@ -32,13 +33,15 @@ barn_args_parser_start(int argc, char** argv)
     args_parser->argc = argc;
     args_parser->argv = argv;
 
+    args_parser->flags = barn_create_array(sizeof(char*));
+
     for (int i = 0; i < args_parser->argc; i++)
     {
         char* arg = args_parser->argv[i];
 
         if (arg[0] == '-')
         {
-            // Append this argument to flags
+            barn_append_element_to_array(args_parser->flags, arg);
         }
         else 
         {
@@ -56,4 +59,36 @@ barn_args_parser_start(int argc, char** argv)
     }
 
     return args_parser;
+}
+
+char* 
+barn_get_flag_by_index(barn_args_parser_t* args_parser, int index)
+{
+    if (index < 0) 
+        return NULL;
+
+    if (index > args_parser->flags->length)
+        return NULL;
+
+    return (char*)barn_get_element_from_array(args_parser->flags, index);
+}
+
+int 
+barn_get_flag_index(barn_args_parser_t* args_parser, char* flag)
+{
+    for (int i = 0; i < args_parser->flags->length; i++)
+        if (barn_get_element_from_array(args_parser->flags, i) == flag)
+            return i;
+
+    return -1;
+}
+
+bool 
+barn_is_flag(barn_args_parser_t* args_parser, char* flag)
+{
+    int index = barn_get_flag_index(args_parser, flag);
+
+    return index == -1 
+                ? true 
+                : false;
 }
