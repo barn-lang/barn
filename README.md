@@ -4,7 +4,7 @@
 
 # REWRITE OF BARN!!!
 [READ MORE HERE](https://barn-lang.github.io/barn-docs/news/news-rewriting-whole-compiler-and-reactivaiton-of-barn-project.html)
-In barnc folder there is full new barn compiler not made yet!
+Old Go compiler is in barngo repository
 
 # Barn
 # About
