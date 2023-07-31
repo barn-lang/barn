@@ -2,6 +2,10 @@
   <img src="https://cdn.discordapp.com/icons/1028291656862142466/45ac54896f82c18ddf408e5c35739789.png?size=256" />
 </p>
 
+# REWRITE OF BARN!!!
+[READ MORE HERE](https://barn-lang.github.io/barn-docs/news/news-rewriting-whole-compiler-and-reactivaiton-of-barn-project.html)
+In barnc folder there is full new barn compiler not made yet!
+
 # Barn
 # About
 #### Barn is in experimental version (BETA)
