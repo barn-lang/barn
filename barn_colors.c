@@ -36,7 +36,7 @@ char*
 barn_get_bold_color_as_str_code(barn_colors_t color)
 {
     char buf[25];
-    sprintf(buf, "\x1b[0;%dm", (int)color);
+    sprintf(buf, "\x1b[1;%dm", (int)color);
 
     return barn_duplicate_string(buf);
 }

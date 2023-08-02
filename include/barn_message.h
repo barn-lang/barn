@@ -18,18 +18,13 @@
  *
 */
 
-#ifndef __BARN_IO__
-#define __BARN_IO__
+#ifndef __BARN_MESSAGE__
+#define __BARN_MESSAGE__
 
-#include <barn_core.h>
-#include <barn_array.h>
+void barn_version_message();
 
-bool barn_file_exists(const char* filename);
+void barn_no_flags_message(char** argv);
 
-size_t barn_get_file_size(FILE* f);
+void barn_help_message();
 
-char* barn_read_whole_file(const char* filename);
-
-char* barn_get_current_architecture();
-
-#endif /* __BARN_IO__ */
+#endif /* __BARN_MESSAGE__ */

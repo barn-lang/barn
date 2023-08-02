@@ -33,9 +33,11 @@ barn_args_parser_start(int argc, char** argv)
     args_parser->argc = argc;
     args_parser->argv = argv;
 
+    args_parser->is_filename = false;
+
     args_parser->flags = barn_create_array(sizeof(char*));
 
-    for (int i = 0; i < args_parser->argc; i++)
+    for (int i = 1; i < args_parser->argc; i++)
     {
         char* arg = args_parser->argv[i];
 
