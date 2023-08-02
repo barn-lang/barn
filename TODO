@@ -1,0 +1,7 @@
+- [ ] Lexer
+- [ ] Parser
+- [ ] Typechecker
+- [ ] Codegen
+- [ ] Implement every thing from barngo
+- [ ] Implement structs
+- [ ] Implement pointers

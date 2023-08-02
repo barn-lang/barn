@@ -22,5 +22,37 @@
 #define __BARN_LEXER__
 
 #include <barn_core.h>
+#include <barn_string.h>
+#include <barn_args_parser.h>
+#include <barn_array.h>
+#include <barn_tokens.h>
+
+typedef struct __barn_lexer_t {
+    const char*  filename;
+    const char*  file_content;
+
+    barn_args_parser_t* args_parser;
+
+    barn_array_t* tokens;
+    barn_array_t* file_lines;
+
+    barn_token_t* last_token;
+
+    char curr_char;
+    char next_char;
+
+    int index;
+    int col;
+    int row;
+
+    bool is_char;
+    bool is_space;
+    bool is_string;
+    bool is_comment_inline;
+    bool is_comment_multiline;
+    bool is_neg_value_possible;
+} barn_lexer_t;
+
+barn_lexer_t* barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser);
 
 #endif /* __BARN_LEXER__ */

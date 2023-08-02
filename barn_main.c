@@ -21,6 +21,7 @@
 #include <barn_core.h>
 
 #include <barn_args_parser.h>
+#include <barn_time_comp.h>
 #include <barn_message.h>
 #include <barn_colors.h>
 #include <barn_array.h>
@@ -28,6 +29,8 @@
 #include <barn_debug.h>
 #include <barn_main.h>
 #include <barn_io.h>
+#include <barn_lexer.h>
+#include <barn_tokens.h>
 
 void 
 barn_no_filename_action(char** argv, barn_args_parser_t* args_parser)
@@ -62,6 +65,23 @@ barn_filename_action(barn_args_parser_t* args_parser)
             args_parser->filename);
         exit(1);
     }
+
+    barn_time_compilation_t* time_comp = barn_start_time_compilation(args_parser);
+
+    char* file_content = barn_read_whole_file(args_parser->filename);
+
+    // Lexer
+    barn_lexer_t* lexer = barn_start_lexer(file_content, args_parser);
+    barn_token_print(barn_create_token("123.456", "main.ba", "print(123.456)", 6, 2, BARN_TOKEN_FLOAT));
+
+    // Parser
+
+    // Typechecker
+
+    // Codegen
+
+    barn_end_time_compilation(time_comp);
+    barn_print_time_compilation(time_comp);
 }
 
 int
@@ -75,4 +95,4 @@ main(int argc, char** argv)
     barn_filename_action(args_parser);
 
     return EXIT_SUCCESS;
-}
+} 

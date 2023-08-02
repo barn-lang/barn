@@ -21,6 +21,7 @@
 #ifndef __BARN_CORE__
 #define __BARN_CORE__
 
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -28,6 +29,8 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdbool.h>
+
+#include <sys/time.h>
 
 #include <barn_debug.h>
 #include <barn_error.h>

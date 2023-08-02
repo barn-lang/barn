@@ -18,13 +18,23 @@
  *
 */
 
+#ifndef __BARN_TIME_COMP__
+#define __BARN_TIME_COMP__
+
 #include <barn_core.h>
 
-#include <barn_lexer.h>
-#include <barn_array.h>
+#include <barn_args_parser.h>
+#include <time.h>
 
-barn_lexer_t* 
-barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
-{
-    return NULL;
-}
+typedef struct __barn_time_compilation_t {
+    struct timeval start_time; 
+    struct timeval end_time; 
+} barn_time_compilation_t;
+
+barn_time_compilation_t* barn_start_time_compilation(barn_args_parser_t* args_parser);
+
+void barn_end_time_compilation(barn_time_compilation_t* time_comp);
+
+void barn_print_time_compilation(barn_time_compilation_t* time_comp);
+
+#endif /* __BARN_TIME_COMP__ */
