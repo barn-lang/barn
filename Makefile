@@ -23,3 +23,7 @@ $(BUILD_DIR):
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+install:
+	sudo cp ./barn /bin/
+	sudo cp ./barn /usr/bin/
