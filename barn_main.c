@@ -72,7 +72,6 @@ barn_filename_action(barn_args_parser_t* args_parser)
 
     // Lexer
     barn_lexer_t* lexer = barn_start_lexer(file_content, args_parser);
-    barn_token_print(barn_create_token("123.456", "main.ba", "print(123.456)", 6, 2, BARN_TOKEN_FLOAT));
 
     // Parser
 

@@ -23,6 +23,7 @@
 #include <barn_colors.h>
 #include <barn_debug.h>
 #include <barn_error.h>
+#include <barn_lexer.h>
 
 const char* barn_error_codes_string[BARN_ERROR_CODES_LENGTH] = {
     [BARN_ARGUMENT_ERROR ] = "ArgumentError",
@@ -45,22 +46,25 @@ barn_error_code_to_string(barn_error_types_t error_type)
 }
 
 void
-barn_error_show_with_line(barn_error_types_t error_type, char* message, char* filename, 
-                          int row, int col, bool is_line, char* line)
+barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, char* filename, 
+                          int row, int col, bool is_line, char* line, char* fmt, ...)
 {
+    va_list list;
+    va_start(list, fmt);
+
+    char buf[512];
+    vsnprintf(buf, 512, fmt, list);
+
     printf("%s%s%s: %s:%d:%d: %s\n",
 		barn_get_bold_color_as_str_code(BARN_COLOR_RED),
 		barn_error_code_to_string(error_type),
 		barn_get_color_as_str_code(BARN_COLOR_RESET),
-		filename,
-		row,
-		col,
-		message);
+		filename, row, col, buf);
 
-	if (is_line == false)
+	if (is_line == false && lexer == NULL)
         return;
 
-    if (row != 1) 
+    if (row != 0) 
         printf("%s%d %s| %s...%s\n", 
             barn_get_color_as_str_code(BARN_COLOR_GREEN), row-1, barn_get_color_as_str_code(BARN_COLOR_GRAY), 
             barn_get_color_as_str_code(BARN_COLOR_GRAY), barn_get_color_as_str_code(BARN_COLOR_RESET));
@@ -68,25 +72,41 @@ barn_error_show_with_line(barn_error_types_t error_type, char* message, char* fi
     printf("%s%d %s| %s", 
             barn_get_color_as_str_code(BARN_COLOR_GREEN), row, 
             barn_get_color_as_str_code(BARN_COLOR_GRAY), barn_get_color_as_str_code(BARN_COLOR_GRAY));
-
+    
     for (int i = 0; i < strlen(line); i++)
     {
         if (i == col)
             printf("%s", barn_get_color_as_str_code(BARN_COLOR_GREEN));
 
         if (line[i] == ' ' || line[i] == '(' || line[i] == '|' || line[i] == ')' || line[i] == '{' || 
-            line[i] == '}' || line[i] == '[' || line[i] == ']' || line[i] == ']' || line[i] == ':')
+            line[i] == '}' || line[i] == '[' || line[i] == ']' || line[i] == ']' || line[i] == ':' ||
+            line[i] == '"' || line[i] == '\'')
             printf("%s", barn_get_color_as_str_code(BARN_COLOR_GRAY));
 
         printf("%c", line[i]);
     }
 
-    printf("%s\n", barn_get_color_as_str_code(BARN_COLOR_GRAY));
-    printf("%s%d %s| %s...%s\n\n", 
-        barn_get_color_as_str_code(BARN_COLOR_GREEN), row+1, 
-        barn_get_color_as_str_code(BARN_COLOR_GRAY), 
-        barn_get_color_as_str_code(BARN_COLOR_GRAY), 
-        barn_get_color_as_str_code(BARN_COLOR_RESET));
+    if (lexer->file_lines->length <= (row + 1))
+    {
+        printf("%s\n", barn_get_color_as_str_code(BARN_COLOR_GRAY));
+        printf("%s%d %s| %s...%s\n\n", 
+            barn_get_color_as_str_code(BARN_COLOR_GREEN), row+1, 
+            barn_get_color_as_str_code(BARN_COLOR_GRAY), 
+            barn_get_color_as_str_code(BARN_COLOR_GRAY), 
+            barn_get_color_as_str_code(BARN_COLOR_RESET));
+    }
+    else
+    {
+        printf("%s\n", barn_get_color_as_str_code(BARN_COLOR_GRAY));
+        printf("%s%d %s| %s%s%s\n\n", 
+            barn_get_color_as_str_code(BARN_COLOR_GREEN), row+1, 
+            barn_get_color_as_str_code(BARN_COLOR_GRAY), 
+            barn_get_color_as_str_code(BARN_COLOR_GRAY), 
+            barn_get_element_from_array(lexer->file_lines, row+1),
+            barn_get_color_as_str_code(BARN_COLOR_RESET));
+    }
+
+    va_end(list);
 }
 
 void

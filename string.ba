@@ -1,0 +1,2 @@
+   let char_var: auto = 'lol'
+   println("Hello World")

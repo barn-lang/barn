@@ -36,10 +36,12 @@ typedef enum __barn_error_types_t {
 	BARN_OVERFLOW_ERROR,
 } barn_error_types_t;
 
+typedef struct __barn_lexer_t barn_lexer_t;
+
 const char* barn_error_code_to_string(barn_error_types_t error_type);
 
-void barn_error_show_with_line(barn_error_types_t error_type, char* message, char* filename, 
-							   int row, int col, bool is_line, char* line);
+void barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, char* filename, 
+                          	   int row, int col, bool is_line, char* line, char* fmt, ...);
 
 void barn_error_show(barn_error_types_t error_type, char* message, ...);
 

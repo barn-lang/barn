@@ -55,4 +55,10 @@ typedef struct __barn_lexer_t {
 
 barn_lexer_t* barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser);
 
+void barn_lexer_store_file_lines(barn_lexer_t* lexer);
+
+void barn_lexer_main(barn_lexer_t* lexer);
+
+void barn_lexer_show_all_tokens(barn_lexer_t* lexer);
+
 #endif /* __BARN_LEXER__ */

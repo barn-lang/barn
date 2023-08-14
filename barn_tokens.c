@@ -21,6 +21,7 @@
 #include <barn_core.h>
 
 #include <barn_tokens.h>
+#include <barn_string.h>
 
 const char* 
 barn_token_kind_to_string(barn_token_kind_t kind)
@@ -113,7 +114,7 @@ barn_create_token(char* value, char* filename, char* line,
 {
     barn_token_t* token = (barn_token_t*)malloc(sizeof(barn_token_t));
 
-    token->value    = value;
+    token->value    = barn_duplicate_string(value);
     token->filename = filename;
     token->line     = line;
     token->col      = col;
