@@ -33,6 +33,16 @@ barn_duplicate_string(char* str)
     return dup_string;
 }
 
+char* 
+barn_create_allocated_string()
+{
+    char* str = (char*)malloc(sizeof(char) * 1);
+    BARN_NO_NULL(str);
+
+    str[0] = '\0';
+    return str;
+}
+
 void
 barn_append_char_to_allocated_string(char* str, char c)
 {
@@ -43,4 +53,17 @@ barn_append_char_to_allocated_string(char* str, char c)
 
     str[str_length + 0] = c;
     str[str_length + 1] = '\0';
+}
+
+char* 
+barn_create_string_from_char(char c)
+{
+    printf("aha\n");
+    char* str = (char*)calloc(3, sizeof(char));
+    BARN_NO_NULL(str);
+    printf("aha\n");
+    str[0] = c;
+    str[1] = 0;
+    
+    return str;
 }

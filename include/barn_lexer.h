@@ -50,7 +50,6 @@ typedef struct __barn_lexer_t {
     bool is_string;
     bool is_comment_inline;
     bool is_comment_multiline;
-    bool is_neg_value_possible;
 } barn_lexer_t;
 
 barn_lexer_t* barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser);

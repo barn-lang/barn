@@ -25,4 +25,10 @@
 
 char* barn_duplicate_string(char* str);
 
+char* barn_create_allocated_string();
+
+char* barn_create_string_from_char(char c);
+
+void barn_append_char_to_allocated_string(char* str, char c);
+
 #endif /* __BARN_STRING__ */
