@@ -72,6 +72,7 @@ barn_filename_action(barn_args_parser_t* args_parser)
 
     // Lexer
     barn_lexer_t* lexer = barn_start_lexer(file_content, args_parser);
+    BARN_USE(lexer);
 
     // Parser
 

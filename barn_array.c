@@ -126,3 +126,29 @@ barn_delete_element_from_array(barn_array_t* array, size_t index)
 
     return 0;
 }
+
+/* Returns 0 on success -1 on error */
+int 
+barn_delete_last_element_from_array(barn_array_t* array)
+{
+    if (array == NULL || array->length == 0 || array->ptr == NULL) {
+        return -1; // Invalid input or empty array
+    }
+
+    size_t new_length = array->length - 1;
+    void** new_ptr = realloc(array->ptr, new_length * sizeof(void*));
+    if (new_ptr == NULL) {
+        return -1; // Memory allocation error
+    }
+
+    // If the size of the elements varies, we need to manually free the last element
+    if (array->size_of_element > 0) {
+        void* last_element = array->ptr[array->length - 1];
+        free(last_element);
+    }
+
+    array->ptr = new_ptr;
+    array->length = new_length;
+
+    return 0; // Success
+}

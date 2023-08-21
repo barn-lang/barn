@@ -58,10 +58,9 @@ barn_append_char_to_allocated_string(char* str, char c)
 char* 
 barn_create_string_from_char(char c)
 {
-    printf("aha\n");
     char* str = (char*)calloc(3, sizeof(char));
     BARN_NO_NULL(str);
-    printf("aha\n");
+
     str[0] = c;
     str[1] = 0;
     

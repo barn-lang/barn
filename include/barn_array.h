@@ -41,4 +41,7 @@ int barn_append_element_to_array(barn_array_t* array, void* element);
 /* Returns 0 on success -1 on error */
 int barn_delete_element_from_array(barn_array_t* array, size_t index);
 
+/* Returns 0 on success -1 on error */
+int barn_delete_last_element_from_array(barn_array_t* array);
+
 #endif /* __BARN_ARRAY__ */

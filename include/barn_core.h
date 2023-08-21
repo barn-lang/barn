@@ -60,4 +60,6 @@
     }                                                                                        \
 })
 
+#define BARN_USE(x) ({ (void*)(x); })
+
 #endif /* __BARN_CORE__ */

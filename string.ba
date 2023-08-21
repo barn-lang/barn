@@ -1,2 +1,23 @@
-10
-03891023900
+// Identifiers
+fun main
+
+// Numbers
+100
+
+// Floats
+4.50
+
+// Negative numbers
+-69.2137
+
+// String 
+"hello"
+
+// Symbols 
++ +=
+- -=
+* *=
+/ /=
+->
+
+/* Multiline comment */

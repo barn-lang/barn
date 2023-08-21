@@ -47,6 +47,9 @@ barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
     lexer->is_comment_inline     = 0;
     lexer->is_comment_multiline  = 0;
 
+    lexer->row = 0;
+    lexer->col = 0;
+
     barn_lexer_store_file_lines(lexer);
     barn_lexer_main(lexer);
     barn_lexer_show_all_tokens(lexer);
@@ -115,7 +118,7 @@ barn_lexer_advance(barn_lexer_t* lexer, int count)
 void 
 barn_lexer_new_line(barn_lexer_t* lexer)
 {
-    lexer->row += 1;
+    lexer->row ++;
     lexer->col = 0;
     lexer->is_space = true;
     lexer->is_comment_inline = false; 
@@ -424,21 +427,14 @@ barn_lexer_create_number_no_space(barn_lexer_t* lexer, char* current_line)
     else if (lexer->last_token->kind == BARN_TOKEN_DOT) 
     {
         barn_append_char_to_allocated_string(lexer->last_token->value, lexer->curr_char);
-        lexer->last_token->kind = BARN_TOKEN_IDENTIFIER;
+        lexer->last_token->kind = BARN_TOKEN_FLOAT;
     }
     else if (lexer->last_token->kind == BARN_TOKEN_MINUS)
     {
-        /* Delete last token from tokens array */
-        barn_delete_element_from_array(lexer->tokens, lexer->tokens->length - 1);
-
-        char* neg_value = barn_create_allocated_string();
-        barn_append_char_to_allocated_string(neg_value, '-');
+        char* neg_value = lexer->last_token->value;
         barn_append_char_to_allocated_string(neg_value, lexer->curr_char);
 
-        barn_token_t* token = barn_create_token(neg_value, (char*)lexer->filename, 
-                                               current_line, lexer->col, lexer->row, BARN_TOKEN_INT);
-
-        barn_append_element_to_array(lexer->tokens, token);
+        lexer->last_token->kind = BARN_TOKEN_INT;
     } 
     else
     {
@@ -446,7 +442,6 @@ barn_lexer_create_number_no_space(barn_lexer_t* lexer, char* current_line)
                                             current_line, lexer->col, lexer->row, BARN_TOKEN_INT);
 
         barn_append_element_to_array(lexer->tokens, token);
-        lexer->is_space = false;
     }
     
     lexer->is_space = false;
@@ -461,7 +456,7 @@ barn_lexer_create_number(barn_lexer_t* lexer)
     if (barn_lexer_create_number_last_token_null(lexer, current_line))
         return;
 
-    if (barn_lexer_create_identifier_no_space(lexer, current_line))
+    if (barn_lexer_create_number_no_space(lexer, current_line))
         return;
 
     barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
@@ -469,6 +464,339 @@ barn_lexer_create_number(barn_lexer_t* lexer)
 
     barn_append_element_to_array(lexer->tokens, token);
     lexer->is_space = false;
+}
+
+bool 
+barn_lexer_create_float_last_token_no_null(barn_lexer_t* lexer, char* current_line)
+{
+    if (lexer->last_token == NULL)
+        return false;
+
+    if (lexer->last_token->kind == BARN_TOKEN_INT && lexer->is_space == false)
+    {
+        barn_append_char_to_allocated_string(lexer->last_token->value, lexer->curr_char);
+        lexer->last_token->kind = BARN_TOKEN_FLOAT;
+    }
+    else if (lexer->last_token->kind == BARN_TOKEN_FLOAT && lexer->is_space == false)
+    {
+        barn_error_show_with_line(lexer,
+            BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
+            barn_get_element_from_array(lexer->file_lines, lexer->row),
+            "can't add another '.' to float");
+        exit(1);
+    } 
+    else 
+    {
+        if (lexer->next_char == '.')
+        {
+            /* TODO: Call barn_lexer_detect_symbol function and create
+            * a new symbol token */
+            barn_lexer_symbol_t symbol = barn_lexer_create_symbol(lexer);
+
+            if (symbol.symbol_kind != BARN_TOKEN_NONE)
+            {
+                char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row);
+                barn_token_t* token = barn_create_token(barn_duplicate_string(symbol.symbol_value), (char*)lexer->filename, 
+                                                        current_line, lexer->col, lexer->row, symbol.symbol_kind);
+
+                barn_append_element_to_array(lexer->tokens, token);
+            }
+        }
+        else
+        {
+            barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
+                                                    current_line, lexer->col, lexer->row, BARN_TOKEN_DOT);
+
+            barn_append_element_to_array(lexer->tokens, token);
+        }
+    }
+
+    lexer->is_space = false;
+    return true;
+}
+
+void
+barn_lexer_create_float_number(barn_lexer_t* lexer)
+{
+    char* current_line = barn_get_element_from_array(lexer->file_lines, lexer->row);
+
+    if (barn_lexer_create_float_last_token_no_null(lexer, current_line))
+        return;
+
+    if (lexer->next_char == '.')
+    {
+        /* TODO: Call barn_lexer_detect_symbol function and create
+         * a new symbol token */
+        barn_lexer_symbol_t symbol = barn_lexer_create_symbol(lexer);
+
+        if (symbol.symbol_kind != BARN_TOKEN_NONE)
+        {
+            char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row);
+            barn_token_t* token = barn_create_token(barn_duplicate_string(symbol.symbol_value), (char*)lexer->filename, 
+                                                    current_line, lexer->col, lexer->row, symbol.symbol_kind);
+
+            barn_append_element_to_array(lexer->tokens, token);
+        }
+    }
+    else
+    {
+        barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
+                                                current_line, lexer->col, lexer->row, BARN_TOKEN_DOT);
+
+        barn_append_element_to_array(lexer->tokens, token);
+        lexer->is_space = false; 
+    }
+}
+
+barn_lexer_symbol_t
+barn_lexer_create_symbol(barn_lexer_t* lexer)
+{
+    barn_lexer_symbol_t symbol = {
+        .symbol_value = "none",
+        .symbol_kind  = BARN_TOKEN_NONE
+    };
+
+    switch (lexer->curr_char)
+    {
+        case '(':
+        {
+            symbol.symbol_value = "(";
+            symbol.symbol_kind  = BARN_TOKEN_OPENPARENT;
+            return symbol;
+        }
+        case ')':
+        {
+            symbol.symbol_value = ")";
+            symbol.symbol_kind  = BARN_TOKEN_CLOSEPARENT;
+            return symbol;
+        }
+        case '[':
+        {
+            symbol.symbol_value = "[";
+            symbol.symbol_kind  = BARN_TOKEN_OPENBRACKET;
+            return symbol;
+        }
+        case ']':
+        {
+            symbol.symbol_value = "]";
+            symbol.symbol_kind  = BARN_TOKEN_CLOSEBRACKET;
+            return symbol;
+        }
+        case '{':
+        {
+            symbol.symbol_value = "{";
+            symbol.symbol_kind  = BARN_TOKEN_OPENBRACE;
+            return symbol;
+        }
+        case '}':
+        {
+            symbol.symbol_value = "}";
+            symbol.symbol_kind  = BARN_TOKEN_CLOSEBRACE;
+            return symbol;
+        }
+        case '.':
+        {
+            if (lexer->next_char == '.')
+            {
+                barn_lexer_advance(lexer, 1);
+                if (lexer->next_char == '.')
+                {
+                    barn_lexer_advance(lexer, 1);
+                    symbol.symbol_value = "...";
+                    symbol.symbol_kind  = BARN_TOKEN_TRIPLEDOT;
+                    return symbol;    
+                }
+                else
+                {
+                    barn_error_show_with_line(lexer,
+                        BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
+                        barn_get_element_from_array(lexer->file_lines, lexer->row),
+                        "expected '.' after '..' to create TRIPLEDOT token");
+                    exit(1);
+                }
+            }
+
+            return symbol;
+        }
+        case ';':
+        {
+            symbol.symbol_value = ";";
+            symbol.symbol_kind  = BARN_TOKEN_SEMICOL;
+            return symbol;
+        }
+        case '%':
+        {
+            symbol.symbol_value = "%";
+            symbol.symbol_kind  = BARN_TOKEN_MOD;
+            return symbol;
+        }
+        case '|':
+        {
+            if (lexer->next_char == '|')
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "||";
+                symbol.symbol_kind  = BARN_TOKEN_OROR;
+                return symbol;
+            }
+
+            barn_error_show_with_line(lexer,
+                BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
+                barn_get_element_from_array(lexer->file_lines, lexer->row),
+                "expected '||' to create OR token");
+            exit(1);
+        }
+        case '&':
+        {
+            if (lexer->next_char == '&')
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "&&";
+                symbol.symbol_kind  = BARN_TOKEN_OROR;
+                return symbol;
+            }
+
+            barn_error_show_with_line(lexer,
+                BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
+                barn_get_element_from_array(lexer->file_lines, lexer->row),
+                "expected '&&' to create OR token");
+            exit(1);
+        }
+        case '!':
+        {
+            if (lexer->next_char == '=')
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "!=";
+                symbol.symbol_kind  = BARN_TOKEN_NEQ;
+                return symbol;
+            }
+            
+            symbol.symbol_value = "!";
+            symbol.symbol_kind  = BARN_TOKEN_BANG;
+            return symbol;
+        }
+        case '+':
+        {        
+            if (lexer->next_char == '=')
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "+=";
+                symbol.symbol_kind  = BARN_TOKEN_PLUSASN;
+                return symbol;
+            } 
+            else if (lexer->next_char == '+')
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "++";
+                symbol.symbol_kind  = BARN_TOKEN_INCREMENTATION;
+                return symbol;
+            }
+
+            symbol.symbol_value = "+";
+            symbol.symbol_kind  = BARN_TOKEN_PLUS;
+            return symbol;
+        }
+        case '-':
+        {
+            if (lexer->next_char == '=')
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "-=";
+                symbol.symbol_kind  = BARN_TOKEN_MINUSASN;
+                return symbol;
+            } 
+            else if (lexer->next_char == '>')
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "->";
+                symbol.symbol_kind  = BARN_TOKEN_ARROW;
+                return symbol;
+            } 
+            else if (lexer->next_char == '-')
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "--";
+                symbol.symbol_kind  = BARN_TOKEN_DECREMENTATION;
+                return symbol;
+            }
+
+            symbol.symbol_value = "-";
+            symbol.symbol_kind  = BARN_TOKEN_MINUS;
+            return symbol;
+        }
+        case '*':
+        {
+            if (lexer->next_char == '=') 
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "*=";
+                symbol.symbol_kind  = BARN_TOKEN_MULASN;
+                return symbol;
+            }
+
+            symbol.symbol_value = "*";
+            symbol.symbol_kind  = BARN_TOKEN_MUL;
+            return symbol;
+        }
+        case '/':
+        {
+            if (lexer->next_char == '=') 
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "/=";
+                symbol.symbol_kind  = BARN_TOKEN_DIVASN;
+                return symbol;
+            }
+
+            symbol.symbol_value = "/";
+            symbol.symbol_kind  = BARN_TOKEN_DIV;
+            return symbol;
+        }
+        case '>':
+        {
+            if (lexer->next_char == '=') 
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = ">=";
+                symbol.symbol_kind  = BARN_TOKEN_GTE;
+                return symbol;
+            }
+
+            symbol.symbol_value = ">";
+            symbol.symbol_kind  = BARN_TOKEN_GT;
+            return symbol;
+        }
+        case '<':
+        {
+            if (lexer->next_char == '=') 
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "<=";
+                symbol.symbol_kind  = BARN_TOKEN_LTE;
+                return symbol;
+            }
+
+            symbol.symbol_value = "<";
+            symbol.symbol_kind  = BARN_TOKEN_LT;
+            return symbol;
+        }
+        case '=':
+        {
+            if (lexer->next_char == '=') 
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "==";
+                symbol.symbol_kind  = BARN_TOKEN_EQ;
+                return symbol;
+            }
+
+            symbol.symbol_value = "=";
+            symbol.symbol_kind  = BARN_TOKEN_ASN;
+            return symbol;
+        }
+	}
+    return symbol;
 }
 
 void 
@@ -505,6 +833,31 @@ barn_lexer_main(barn_lexer_t* lexer)
             barn_lexer_create_identifier(lexer);
         else if (barn_lexer_is_char_number(lexer))
             barn_lexer_create_number(lexer);
+        else if (lexer->curr_char == '.')
+            barn_lexer_create_float_number(lexer);
+        else
+        {
+            barn_lexer_symbol_t symbol = barn_lexer_create_symbol(lexer);
+
+            if (symbol.symbol_kind != BARN_TOKEN_NONE)
+            {
+                char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row);
+                barn_token_t* token = barn_create_token(barn_duplicate_string(symbol.symbol_value), (char*)lexer->filename, 
+                                                        current_line, lexer->col, lexer->row, symbol.symbol_kind);
+
+                barn_append_element_to_array(lexer->tokens, token);
+                lexer->is_space = false;
+            }
+            else
+            {
+                barn_error_show_with_line(lexer,
+                    BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
+                    barn_get_element_from_array(lexer->file_lines, lexer->row),
+                    "unknown use of character: \'%c\' (%d)", 
+                        lexer->curr_char, lexer->curr_char);
+                exit(1);
+            }
+        }
     }
 }
 
