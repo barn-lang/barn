@@ -37,11 +37,11 @@ barn_file_exists(const char* filename)
     return f_is;
 }
 
-size_t 
+int64_t 
 barn_get_file_size(FILE* f)
 {
     fseek(f, 0, SEEK_END);
-    long int res = ftell(f);
+    int64_t res = ftell(f);
     fseek(f, 0, SEEK_SET);
 
     return res;
@@ -50,15 +50,21 @@ barn_get_file_size(FILE* f)
 char* 
 barn_read_whole_file(const char* filename)
 {
-    FILE* f = fopen(filename, "r");
+    FILE* f = fopen(filename, "rb");
+    BARN_NO_NULL(f);
 
-    size_t file_size = barn_get_file_size(f);
-    char*  buffer    = malloc((sizeof(unsigned char) * file_size));
+    int64_t file_size  = barn_get_file_size(f);
+    char* buffer     = calloc(sizeof(char), file_size + 1);
+    BARN_NO_NULL(buffer);
 
-    for (size_t i = 0; i < file_size; i++) 
-        buffer[i] = fgetc(f);
+    /* Return value of fread need to be equal to
+     * file_size because that's how it works lol */
+    assert(
+        fread(buffer, 1, file_size, f) == file_size);
 
+    buffer[file_size + 1] = '\0';
     fclose(f);
+
     return buffer;
 }
 

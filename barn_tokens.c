@@ -112,7 +112,7 @@ barn_token_t*
 barn_create_token(char* value, char* filename, char* line, 
                   int col, int row, barn_token_kind_t kind)
 {
-    barn_token_t* token = (barn_token_t*)malloc(sizeof(barn_token_t));
+    barn_token_t* token = (barn_token_t*)calloc(1, sizeof(barn_token_t));
 
     token->value    = barn_duplicate_string(value);
     token->filename = filename;

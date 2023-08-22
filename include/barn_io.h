@@ -26,7 +26,7 @@
 
 bool barn_file_exists(const char* filename);
 
-size_t barn_get_file_size(FILE* f);
+int64_t barn_get_file_size(FILE* f);
 
 char* barn_read_whole_file(const char* filename);
 

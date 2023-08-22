@@ -29,6 +29,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #include <sys/time.h>
 
@@ -40,10 +41,10 @@
 #endif /* __BARN_SHOW_DEBUG__ */
 
 #ifdef __BARN_SHOW_DEBUG__
-# define BARN_CALL(func) ({                              \
-     __typeof__(func) tmp = func;                        \
-     barn_debug_entry(#func, __FILE_NAME__, __LINE__);   \
-     tmp;                                                \
+# define BARN_CALL(func) ({                             \
+    __typeof__(func)* tmp = func;                       \
+     barn_debug_entry(#func, __FILE_NAME__, __LINE__);  \
+    &tmp;                                               \
  })
 #else
 # define BARN_CALL(func) ({                          \

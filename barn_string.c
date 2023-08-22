@@ -25,7 +25,7 @@
 char* 
 barn_duplicate_string(char* str)
 {
-    char* dup_string = (char*)malloc(sizeof(char) * strlen(str));
+    char* dup_string = (char*)calloc(sizeof(char), strlen(str));
 
     BARN_NO_NULL(dup_string);
     strcpy(dup_string, str);
@@ -36,7 +36,7 @@ barn_duplicate_string(char* str)
 char* 
 barn_create_allocated_string()
 {
-    char* str = (char*)malloc(sizeof(char) * 1);
+    char* str = (char*)calloc(sizeof(char), 1);
     BARN_NO_NULL(str);
 
     str[0] = '\0';

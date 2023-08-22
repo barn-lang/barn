@@ -31,7 +31,7 @@ barn_start_time_compilation(barn_args_parser_t* args_parser)
         barn_is_flag(args_parser, "-t") == false)
         return NULL;
 
-    barn_time_compilation_t* time_comp = (barn_time_compilation_t*)malloc(sizeof(barn_time_compilation_t));
+    barn_time_compilation_t* time_comp = (barn_time_compilation_t*)calloc(sizeof(barn_time_compilation_t), 1);
 
     /* Get start time */
     gettimeofday(&time_comp->start_time, NULL);

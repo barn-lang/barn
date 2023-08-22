@@ -28,7 +28,7 @@
 barn_args_parser_t* 
 barn_args_parser_start(int argc, char** argv)
 {
-    barn_args_parser_t* args_parser = (barn_args_parser_t*)malloc(sizeof(barn_args_parser_t));
+    barn_args_parser_t* args_parser = (barn_args_parser_t*)calloc(1, sizeof(barn_args_parser_t));
 
     args_parser->argc = argc;
     args_parser->argv = argv;

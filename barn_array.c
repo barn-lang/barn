@@ -41,7 +41,7 @@ barn_create_array(size_t size_of_element)
 
     /* Initialize array fields with default 
      * values */
-    barn_array_t* array = (barn_array_t*)malloc(sizeof(barn_array_t));
+    barn_array_t* array = (barn_array_t*)calloc(1, sizeof(barn_array_t));
     BARN_NO_NULL(array);
 
     array->size_of_element = size_of_element;

@@ -27,7 +27,7 @@
 barn_lexer_t* 
 barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
 {
-    barn_lexer_t* lexer = (barn_lexer_t*)malloc(sizeof(barn_lexer_t));
+    barn_lexer_t* lexer = (barn_lexer_t*)calloc(1, sizeof(barn_lexer_t));
 
     lexer->file_content = file_content;
     lexer->filename     = args_parser->filename;
@@ -52,7 +52,7 @@ barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
 
     barn_lexer_store_file_lines(lexer);
     barn_lexer_main(lexer);
-    barn_lexer_show_all_tokens(lexer);
+    // barn_lexer_show_all_tokens(lexer);   
 
     return lexer;
 }
@@ -68,21 +68,21 @@ barn_lexer_store_file_lines(barn_lexer_t* lexer)
     /* Crete first line */
     barn_append_element_to_array(lexer->file_lines, barn_create_allocated_string());
 
-    for (int i = 0; i < length; i++)
+    for (int i = 0; i < length - 1; i++)
     {
         char curr_char = lexer->file_content[i];
 
         if (curr_char == '\n' && i != length - 1)
             barn_append_element_to_array(lexer->file_lines, barn_create_allocated_string());
-        else
+        else 
         {
-            if (i == length - 1)
-                return;
-
             char* last_line = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
             barn_append_char_to_allocated_string(last_line, curr_char);
         }
     }
+
+    char* last_line = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
+    barn_append_char_to_allocated_string(last_line, lexer->file_content[length]);
 }
 
 char 
@@ -805,7 +805,7 @@ barn_lexer_main(barn_lexer_t* lexer)
     for (lexer->index = 0; lexer->index < strlen(lexer->file_content); lexer->index++)
     {
         barn_lexer_advance(lexer, 0);
-    
+
         if (lexer->curr_char == '\n')
             barn_lexer_new_line(lexer);
         else if (lexer->curr_char == '\r')
