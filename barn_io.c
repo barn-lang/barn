@@ -47,6 +47,20 @@ barn_get_file_size(FILE* f)
     return res;
 }
 
+int64_t
+barn_get_file_amount_of_lines(FILE* f)
+{
+    int64_t lines = 0;
+    char ch;
+    
+    while ((ch = fgetc(f)) != EOF)
+        if (ch == '\n')
+            lines++;
+    
+    fseek(f, 0, SEEK_SET);
+    return lines;
+}
+
 char* 
 barn_read_whole_file(const char* filename)
 {

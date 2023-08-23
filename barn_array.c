@@ -152,3 +152,30 @@ barn_delete_last_element_from_array(barn_array_t* array)
 
     return 0; // Success
 }
+
+void
+barn_resize_array(barn_array_t* array, size_t n)
+{
+    BARN_NO_NULL(array);
+
+    if (n == array->length)
+        return;
+
+    void** new_ptr = (void**)realloc(array->ptr, n * sizeof(void*));
+    BARN_NO_NULL(new_ptr);
+    array->ptr = new_ptr;
+
+    if (n < array->length) 
+    {
+        for (size_t i = n; i < array->length; i++) 
+            if (array->size_of_element > 0) 
+                free(array->ptr[i]);
+    } 
+    else 
+    {
+        for (size_t i = array->length; i < n; i++) 
+            array->ptr[i] = NULL;
+    }
+
+    array->length = n;
+}

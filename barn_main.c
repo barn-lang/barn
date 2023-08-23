@@ -59,6 +59,7 @@ barn_no_filename_action(char** argv, barn_args_parser_t* args_parser)
 void
 barn_filename_action(barn_args_parser_t* args_parser)
 {
+    barn_debug_entry("barn_file_exists", __FILE__, __LINE__);
     if (barn_file_exists(args_parser->filename) == false)
     {
         barn_error_show(BARN_FILE_ERROR, "file named '%s' doesn't exists",
@@ -66,11 +67,14 @@ barn_filename_action(barn_args_parser_t* args_parser)
         exit(1);
     }
 
+    barn_debug_entry("barn_start_time_compilation", __FILE__, __LINE__);
     barn_time_compilation_t* time_comp = barn_start_time_compilation(args_parser);
 
+    barn_debug_entry("barn_read_whole_file", __FILE__, __LINE__);
     char* file_content = barn_read_whole_file(args_parser->filename);
 
     // Lexer
+    barn_debug_entry("barn_start_lexer", __FILE__, __LINE__);
     barn_lexer_t* lexer = barn_start_lexer(file_content, args_parser);
     BARN_USE(lexer);
 
@@ -87,11 +91,13 @@ barn_filename_action(barn_args_parser_t* args_parser)
 int
 main(int argc, char** argv)
 {
+    barn_debug_entry("barn_args_parser_start", __FILE__, __LINE__);
     barn_args_parser_t* args_parser = barn_args_parser_start(argc, argv);
 
     if (args_parser->is_filename == false)
         barn_no_filename_action(argv, args_parser);
 
+    barn_debug_entry("barn_filename_action", __FILE__, __LINE__);
     barn_filename_action(args_parser);
 
     return EXIT_SUCCESS;

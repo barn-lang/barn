@@ -32,4 +32,6 @@ char* barn_read_whole_file(const char* filename);
 
 char* barn_get_current_architecture();
 
+int64_t barn_get_file_amount_of_lines(FILE* f);
+
 #endif /* __BARN_IO__ */

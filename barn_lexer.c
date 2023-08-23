@@ -23,6 +23,7 @@
 #include <barn_lexer.h>
 #include <barn_array.h>
 #include <barn_string.h>
+#include <barn_io.h>
 
 barn_lexer_t* 
 barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
@@ -34,7 +35,7 @@ barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
 
     lexer->args_parser = args_parser;
     lexer->tokens      = barn_create_array(sizeof(barn_token_t*));
-    lexer->file_lines  = barn_create_array(sizeof(barn_token_t*));
+    lexer->file_lines  = barn_create_array(sizeof(char*));
     lexer->last_token  = NULL;
 
     lexer->curr_char = '\0';
@@ -47,45 +48,99 @@ barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
     lexer->is_comment_inline     = 0;
     lexer->is_comment_multiline  = 0;
 
-    lexer->row = 0;
+    lexer->row = 1;
     lexer->col = 0;
 
-    barn_lexer_store_file_lines(lexer);
+    barn_debug_entry("barn_lexer_store_file_lines", __FILE__, __LINE__);
+    barn_lexer_store_file_lines(lexer, lexer->filename);
+    barn_debug_entry("barn_lexer_main", __FILE__, __LINE__);
     barn_lexer_main(lexer);
+    barn_debug_entry("barn_lexer_show_all_tokens", __FILE__, __LINE__);
     // barn_lexer_show_all_tokens(lexer);   
 
     return lexer;
 }
 
-void 
-barn_lexer_store_file_lines(barn_lexer_t* lexer)
+#define MAX_LINE_LENGTH (1024 * 32)
+
+void
+barn_lexer_store_file_lines(barn_lexer_t* lexer, const char* filename)
 {
-    size_t length = strlen(lexer->file_content);
+    FILE* f = fopen(filename, "rb");
+    BARN_NO_NULL(f);
 
-    if (length == 0)
-        return;
+    /* Get file line amount */
+    int64_t line_count = barn_get_file_amount_of_lines(f);
 
-    /* Crete first line */
-    barn_append_element_to_array(lexer->file_lines, barn_create_allocated_string());
+    char line_buffer[MAX_LINE_LENGTH];
+    char current_char;
 
-    for (int i = 0; i < length - 1; i++)
+    int line_index = 0;
+    int char_index = 0;
+
+    while ((current_char = fgetc(f)) != EOF) 
     {
-        char curr_char = lexer->file_content[i];
+        if (current_char == '\n') 
+        {
+            line_buffer[char_index] = '\0';
 
-        if (curr_char == '\n' && i != length - 1)
-            barn_append_element_to_array(lexer->file_lines, barn_create_allocated_string());
+            char* line_copy = barn_duplicate_string(line_buffer);
+            BARN_NO_NULL(line_copy);
+
+            barn_append_element_to_array(lexer->file_lines, line_copy);
+            line_index += 1;
+            char_index =  0;
+        } 
         else 
         {
-            char*  last_line     = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
-            char** last_line_ptr = &last_line;
-            barn_append_char_to_allocated_string(last_line_ptr, curr_char);
+            if (char_index < MAX_LINE_LENGTH - 1) 
+            {
+                line_buffer[char_index] = current_char;
+                char_index++;
+            } 
+            else
+                barn_error_show(BARN_OVERFLOW_ERROR, "%d line is too long (1024 * 32 limit), skipping excess characters", line_index);
         }
     }
 
-    char*  last_line     = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
-    char** last_line_ptr = &last_line;
-    barn_append_char_to_allocated_string(last_line_ptr, lexer->file_content[length]);
+    fclose(f);
 }
+
+// void 
+// barn_lexer_store_file_lines(barn_lexer_t* lexer)
+// {
+    // barn_debug_entry("strlen", __FILE__, __LINE__);
+    // size_t length = strlen(lexer->file_content);
+
+    // if (length == 0)
+    //     return;
+
+    // /* Crete first line */
+    // barn_append_element_to_array(lexer->file_lines, barn_create_allocated_string());
+
+    // for (int i = 0; i < length - 1; i++)
+    // {
+    //     char curr_char = lexer->file_content[i];
+    //     printf("%c", curr_char);
+
+    //     if (curr_char == '\n' && i != length - 1)
+    //     {
+    //         barn_append_element_to_array(lexer->file_lines, barn_create_allocated_string());
+    //     }
+    //     else 
+    //     {
+    //         char*  last_line     = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
+    //         char** last_line_ptr = &last_line;
+    //         printf("on line %d\n", lexer->file_lines->length);
+    //         barn_debug_entry("barn_append_char_to_allocated_string 1", __FILE__, __LINE__);
+    //         barn_append_char_to_allocated_string(last_line_ptr, curr_char);
+    //     }
+    // }
+
+    // char*  last_line     = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
+    // char** last_line_ptr = &last_line;
+    // barn_append_char_to_allocated_string(last_line_ptr, lexer->file_content[length]);
+// }
 
 char 
 barn_lexer_get_next_char(barn_lexer_t* lexer)

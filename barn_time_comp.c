@@ -63,7 +63,7 @@ barn_print_time_compilation(barn_time_compilation_t* time_comp)
     if (time_comp == NULL) 
         return;
 
-    printf("Compilation time took: %s%fms%s\n",
+    printf("Compilation time took: %s%fs%s\n",
         barn_get_bold_color_as_str_code(BARN_COLOR_GREEN),
         barn_elapsed_time_convert_to_ms(time_comp),
         barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
