@@ -23,23 +23,29 @@
 void 
 barn_debug_success(const char* msg, const char* filename, int line)
 {
+#ifdef __BARN_SHOW_DEBUG__
     printf("\x1b[0;32mSUCCESS:\x1b[0;0m ");
     printf("%s in %d: ", filename, line);
     printf("%s\n", msg);
+#endif /* __BARN_SHOW_DEBUG__ */
 }
 
 void 
 barn_debug_error(const char* msg, const char* filename, int line)
 {
+#ifdef __BARN_SHOW_DEBUG__
     printf("\x1b[0;31mERROR:\x1b[0;0m ");
     printf("%s in %d: ", filename, line);
     printf("%s\n", msg);
+#endif /* __BARN_SHOW_DEBUG__ */
 }
 
 void 
 barn_debug_entry(const char* func, const char* filename, int line)
 {
+#ifdef __BARN_SHOW_DEBUG__
     printf("\x1b[0;34mENTRY:\x1b[0;0m ");
     printf("%s in %d: ", filename, line);
     printf("%s\n", func);
+#endif /* __BARN_SHOW_DEBUG__ */
 }

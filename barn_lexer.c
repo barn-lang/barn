@@ -272,7 +272,7 @@ barn_lexer_create_string(barn_lexer_t* lexer)
     barn_token_t* token = barn_create_token(barn_create_allocated_string(), (char*)lexer->filename, 
                                             current_line, lexer->col, lexer->row, BARN_TOKEN_STRING);
 
-    barn_append_element_to_array(lexer->tokens, token);
+    BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
     // printf("%s\n", token->value);
 }
 
@@ -373,7 +373,7 @@ barn_lexer_create_char(barn_lexer_t* lexer)
     barn_token_t* token = barn_create_token(value_of_char, (char*)lexer->filename, current_line,
                                             lexer->col, lexer->row, BARN_TOKEN_CHAR);
 
-    barn_append_element_to_array(lexer->tokens, token);
+    BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
     lexer->is_space = false;
 }
 
@@ -410,7 +410,7 @@ barn_lexer_create_identifier_last_token_null(barn_lexer_t* lexer, char* current_
     barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
                                             current_line, lexer->col, lexer->row, BARN_TOKEN_IDENTIFIER);
 
-    barn_append_element_to_array(lexer->tokens, token);
+    BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
     lexer->is_space = false;
 
     return true;
@@ -433,7 +433,7 @@ barn_lexer_create_identifier_no_space(barn_lexer_t* lexer, char* current_line)
         barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
                                                 current_line, lexer->col, lexer->row, BARN_TOKEN_IDENTIFIER);
 
-        barn_append_element_to_array(lexer->tokens, token);
+        BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
         lexer->is_space = false;
     }
 
@@ -454,7 +454,7 @@ barn_lexer_create_identifier(barn_lexer_t* lexer)
     barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
                                             current_line, lexer->col, lexer->row, BARN_TOKEN_IDENTIFIER);
 
-    barn_append_element_to_array(lexer->tokens, token);
+    BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
     lexer->is_space = false;
 }
 
@@ -467,7 +467,7 @@ barn_lexer_create_number_last_token_null(barn_lexer_t* lexer, char* current_line
     barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
                                             current_line, lexer->col, lexer->row, BARN_TOKEN_INT);
 
-    barn_append_element_to_array(lexer->tokens, token);
+    BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
     lexer->is_space = false;
 
     return true; 
@@ -501,7 +501,7 @@ barn_lexer_create_number_no_space(barn_lexer_t* lexer, char* current_line)
         barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
                                             current_line, lexer->col, lexer->row, BARN_TOKEN_INT);
 
-        barn_append_element_to_array(lexer->tokens, token);
+        BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
     }
     
     lexer->is_space = false;
@@ -522,7 +522,7 @@ barn_lexer_create_number(barn_lexer_t* lexer)
     barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
                                             current_line, lexer->col, lexer->row, BARN_TOKEN_INT);
 
-    barn_append_element_to_array(lexer->tokens, token);
+    BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
     lexer->is_space = false;
 }
 
@@ -560,7 +560,7 @@ barn_lexer_create_float_last_token_no_null(barn_lexer_t* lexer, char* current_li
                 barn_token_t* token = barn_create_token(barn_duplicate_string(symbol.symbol_value), (char*)lexer->filename, 
                                                         current_line, lexer->col, lexer->row, symbol.symbol_kind);
 
-                barn_append_element_to_array(lexer->tokens, token);
+                BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
             }
         }
         else
@@ -568,7 +568,7 @@ barn_lexer_create_float_last_token_no_null(barn_lexer_t* lexer, char* current_li
             barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
                                                     current_line, lexer->col, lexer->row, BARN_TOKEN_DOT);
 
-            barn_append_element_to_array(lexer->tokens, token);
+            BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
         }
     }
 
@@ -596,7 +596,7 @@ barn_lexer_create_float_number(barn_lexer_t* lexer)
             barn_token_t* token = barn_create_token(barn_duplicate_string(symbol.symbol_value), (char*)lexer->filename, 
                                                     current_line, lexer->col, lexer->row, symbol.symbol_kind);
 
-            barn_append_element_to_array(lexer->tokens, token);
+            BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
         }
     }
     else
@@ -604,7 +604,7 @@ barn_lexer_create_float_number(barn_lexer_t* lexer)
         barn_token_t* token = barn_create_token(barn_create_string_from_char(lexer->curr_char), (char*)lexer->filename, 
                                                 current_line, lexer->col, lexer->row, BARN_TOKEN_DOT);
 
-        barn_append_element_to_array(lexer->tokens, token);
+        BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
         lexer->is_space = false; 
     }
 }
@@ -919,7 +919,7 @@ barn_lexer_main(barn_lexer_t* lexer)
                 barn_token_t* token = barn_create_token(barn_duplicate_string(symbol.symbol_value), (char*)lexer->filename, 
                                                         current_line, lexer->col, lexer->row, symbol.symbol_kind);
 
-                barn_append_element_to_array(lexer->tokens, token);
+                BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
                 lexer->is_space = false;
             }
             else

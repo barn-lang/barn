@@ -37,7 +37,7 @@
 #include <barn_error.h>
 
 #ifndef __BARN_SHOW_DEBUG__
-# define __BARN_SHOW_DEBUG__ (0x0001)
+// # define __BARN_SHOW_DEBUG__ (0x0001)
 #endif /* __BARN_SHOW_DEBUG__ */
 
 #ifdef __BARN_SHOW_DEBUG__
@@ -60,6 +60,18 @@
         exit(1);                                                                             \
     }                                                                                        \
 })
+
+typedef char barn_error_or_t;
+
+#define BARN_TRY(func) ({                                                          \
+    barn_error_or_t ret = func;                                                    \
+    if (ret == -1)                                                                 \
+    {                                                                              \
+        barn_error_show(BARN_COMPILER_ERROR, "function: %s, returned error (-1)",  \
+            #func, __FILE_NAME__, __PRETTY_FUNCTION__, __LINE__);                  \
+        exit(1);                                                                   \
+    }                                                                              \
+})                                                                                 \
 
 #define BARN_USE(x) ({ (void*)(x); })
 

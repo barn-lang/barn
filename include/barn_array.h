@@ -35,13 +35,9 @@ barn_array_t* barn_destroy_array(barn_array_t* array);
 
 void* barn_get_element_from_array(barn_array_t* array, size_t index);
 
-/* Returns 0 on success -1 on error */
-int barn_append_element_to_array(barn_array_t* array, void* element);
-
-/* Returns 0 on success -1 on error */
-int barn_delete_element_from_array(barn_array_t* array, size_t index);
-
-/* Returns 0 on success -1 on error */
-int barn_delete_last_element_from_array(barn_array_t* array);
+barn_error_or_t barn_append_element_to_array(barn_array_t* array, void* element);
+barn_error_or_t barn_delete_element_from_array(barn_array_t* array, size_t index);
+barn_error_or_t barn_delete_last_element_from_array(barn_array_t* array);
+barn_error_or_t barn_resize_array(barn_array_t* array, size_t n);
 
 #endif /* __BARN_ARRAY__ */

@@ -43,7 +43,7 @@ barn_args_parser_start(int argc, char** argv)
 
         if (arg[0] == '-')
         {
-            barn_append_element_to_array(args_parser->flags, arg);
+            BARN_TRY(barn_append_element_to_array(args_parser->flags, arg));
         }
         else 
         {
