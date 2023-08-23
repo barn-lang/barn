@@ -1,5 +1,5 @@
 @import "std.ba"
 
 fun main() {
-    println("Hello, World with newline with out writting it to string that easy pfff")
+    println("IT FUCKING WORKS LOLOLOL FUCK CORRUPTED BUFFERS IN C")
 }

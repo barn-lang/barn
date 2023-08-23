@@ -62,7 +62,7 @@ barn_read_whole_file(const char* filename)
     assert(
         fread(buffer, 1, file_size, f) == file_size);
 
-    buffer[file_size + 1] = '\0';
+    buffer[file_size] = '\0';
     fclose(f);
 
     return buffer;

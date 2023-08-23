@@ -42,7 +42,7 @@
 
 #ifdef __BARN_SHOW_DEBUG__
 # define BARN_CALL(func) ({                             \
-    __typeof__(func)* tmp = func;                       \
+    __typeof__(func) tmp = func;                        \
      barn_debug_entry(#func, __FILE_NAME__, __LINE__);  \
     &tmp;                                               \
  })

@@ -76,13 +76,15 @@ barn_lexer_store_file_lines(barn_lexer_t* lexer)
             barn_append_element_to_array(lexer->file_lines, barn_create_allocated_string());
         else 
         {
-            char* last_line = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
-            barn_append_char_to_allocated_string(last_line, curr_char);
+            char*  last_line     = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
+            char** last_line_ptr = &last_line;
+            barn_append_char_to_allocated_string(last_line_ptr, curr_char);
         }
     }
 
-    char* last_line = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
-    barn_append_char_to_allocated_string(last_line, lexer->file_content[length]);
+    char*  last_line     = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
+    char** last_line_ptr = &last_line;
+    barn_append_char_to_allocated_string(last_line_ptr, lexer->file_content[length]);
 }
 
 char 
@@ -129,7 +131,7 @@ barn_lexer_space(barn_lexer_t* lexer)
 {
     if (lexer->is_string == true)
     {
-        char* last_tok_value = lexer->last_token->value;
+        char** last_tok_value = &lexer->last_token->value;
         barn_append_char_to_allocated_string(last_tok_value, ' ');
     }
     
@@ -141,7 +143,7 @@ barn_lexer_comment_inline(barn_lexer_t* lexer)
 {
     if (lexer->is_string == true)
     {
-        char* last_tok_value = lexer->last_token->value;
+        char** last_tok_value = &lexer->last_token->value;
         barn_append_char_to_allocated_string(last_tok_value, '/');
     }
     else
@@ -156,7 +158,7 @@ barn_lexer_comment_multiline_open(barn_lexer_t* lexer)
 {
     if (lexer->is_string == true)
     {
-        char* last_tok_value = lexer->last_token->value;
+        char** last_tok_value = &lexer->last_token->value;
         barn_append_char_to_allocated_string(last_tok_value, '/');
         return;
     }
@@ -178,7 +180,7 @@ barn_lexer_comment_multiline_close(barn_lexer_t* lexer)
 {
     if (lexer->is_string == true)
     {
-        char* last_tok_value = lexer->last_token->value;
+        char** last_tok_value = &lexer->last_token->value;
         barn_append_char_to_allocated_string(last_tok_value, '*');
         return;
     }
@@ -212,16 +214,17 @@ barn_lexer_create_string(barn_lexer_t* lexer)
     lexer->is_string = true;
 
     char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row);
-    barn_token_t* token = barn_create_token("", (char*)lexer->filename, current_line,
-                                            lexer->col, lexer->row, BARN_TOKEN_STRING);
+    barn_token_t* token = barn_create_token(barn_create_allocated_string(), (char*)lexer->filename, 
+                                            current_line, lexer->col, lexer->row, BARN_TOKEN_STRING);
 
     barn_append_element_to_array(lexer->tokens, token);
+    // printf("%s\n", token->value);
 }
 
 void 
 barn_lexer_add_char_to_string(barn_lexer_t* lexer)
 {
-    char* last_tok_value = lexer->last_token->value;
+    char** last_tok_value = &lexer->last_token->value;
 
     if (lexer->curr_char != '\\')
     {
@@ -367,7 +370,8 @@ barn_lexer_create_identifier_no_space(barn_lexer_t* lexer, char* current_line)
     if (lexer->last_token->kind == BARN_TOKEN_IDENTIFIER)
     {
         /* Append current char to last token value (hope it's allocated lol) */
-        barn_append_char_to_allocated_string(lexer->last_token->value, lexer->curr_char);
+        char** last_token_val = &lexer->last_token->value;
+        barn_append_char_to_allocated_string(last_token_val, lexer->curr_char);
     }
     else
     {
@@ -417,22 +421,23 @@ barn_lexer_create_number_last_token_null(barn_lexer_t* lexer, char* current_line
 bool
 barn_lexer_create_number_no_space(barn_lexer_t* lexer, char* current_line)
 {
+    char** last_token_val = &lexer->last_token->value;
+
     if (lexer->is_space == true)
         return false;
 
     if (lexer->last_token->kind == BARN_TOKEN_INT        || 
         lexer->last_token->kind == BARN_TOKEN_FLOAT      ||
         lexer->last_token->kind == BARN_TOKEN_IDENTIFIER)
-        barn_append_char_to_allocated_string(lexer->last_token->value, lexer->curr_char);
+        barn_append_char_to_allocated_string(last_token_val, lexer->curr_char);
     else if (lexer->last_token->kind == BARN_TOKEN_DOT) 
     {
-        barn_append_char_to_allocated_string(lexer->last_token->value, lexer->curr_char);
+        barn_append_char_to_allocated_string(last_token_val, lexer->curr_char);
         lexer->last_token->kind = BARN_TOKEN_FLOAT;
     }
     else if (lexer->last_token->kind == BARN_TOKEN_MINUS)
     {
-        char* neg_value = lexer->last_token->value;
-        barn_append_char_to_allocated_string(neg_value, lexer->curr_char);
+        barn_append_char_to_allocated_string(last_token_val, lexer->curr_char);
 
         lexer->last_token->kind = BARN_TOKEN_INT;
     } 
@@ -474,7 +479,8 @@ barn_lexer_create_float_last_token_no_null(barn_lexer_t* lexer, char* current_li
 
     if (lexer->last_token->kind == BARN_TOKEN_INT && lexer->is_space == false)
     {
-        barn_append_char_to_allocated_string(lexer->last_token->value, lexer->curr_char);
+        char** last_token_val = &lexer->last_token->value;
+        barn_append_char_to_allocated_string(last_token_val, lexer->curr_char);
         lexer->last_token->kind = BARN_TOKEN_FLOAT;
     }
     else if (lexer->last_token->kind == BARN_TOKEN_FLOAT && lexer->is_space == false)
@@ -622,6 +628,18 @@ barn_lexer_create_symbol(barn_lexer_t* lexer)
         {
             symbol.symbol_value = ";";
             symbol.symbol_kind  = BARN_TOKEN_SEMICOL;
+            return symbol;
+        }
+        case ':':
+        {
+            symbol.symbol_value = ":";
+            symbol.symbol_kind  = BARN_TOKEN_COLON;
+            return symbol;
+        }
+        case ',':
+        {
+            symbol.symbol_value = ",";
+            symbol.symbol_kind  = BARN_TOKEN_COMMA;
             return symbol;
         }
         case '%':
@@ -805,12 +823,13 @@ barn_lexer_main(barn_lexer_t* lexer)
     for (lexer->index = 0; lexer->index < strlen(lexer->file_content); lexer->index++)
     {
         barn_lexer_advance(lexer, 0);
+        // printf("%c %d\n", lexer->curr_char, lexer->curr_char);
 
         if (lexer->curr_char == '\n')
             barn_lexer_new_line(lexer);
         else if (lexer->curr_char == '\r')
             continue;
-        else if (lexer->curr_char == ' ')
+        else if (lexer->curr_char == ' ' || lexer->curr_char == 9) // 9 == "CHARACTER TABULATION" (U+0009)
             barn_lexer_space(lexer);
         else if (lexer->curr_char == '/' && lexer->next_char == '/')
             barn_lexer_comment_inline(lexer);

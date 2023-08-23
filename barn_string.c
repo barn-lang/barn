@@ -25,7 +25,7 @@
 char* 
 barn_duplicate_string(char* str)
 {
-    char* dup_string = (char*)calloc(sizeof(char), strlen(str));
+    char* dup_string = (char*)calloc(strlen(str) + 1, sizeof(char));
 
     BARN_NO_NULL(dup_string);
     strcpy(dup_string, str);
@@ -44,21 +44,29 @@ barn_create_allocated_string()
 }
 
 void
-barn_append_char_to_allocated_string(char* str, char c)
+barn_append_char_to_allocated_string(char** str, char c)
 {
-    size_t str_length = strlen(str);
-    str = (char*)realloc(str, str_length + 2);
+    size_t old_length = *str ? strlen(*str) : 0; // Handle case where str is initially NULL
+    size_t new_length = old_length + 2; // 1 for the new character and 1 for the null terminator
 
-    BARN_NO_NULL(str);
+    // Reallocate memory for the new string
+    char* new_str = (char*)realloc(*str, new_length * sizeof(char));
+    if (new_str == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return; // Error handling
+    }
 
-    str[str_length + 0] = c;
-    str[str_length + 1] = '\0';
+    // Append the character and null-terminate the string
+    new_str[old_length] = c;
+    new_str[new_length - 1] = '\0';
+
+    *str = new_str; // Update the pointer to the new string
 }
 
 char* 
 barn_create_string_from_char(char c)
 {
-    char* str = (char*)calloc(3, sizeof(char));
+    char* str = (char*)calloc(2, sizeof(char));
     BARN_NO_NULL(str);
 
     str[0] = c;

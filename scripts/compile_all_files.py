@@ -48,14 +48,19 @@ def start_compilation_process(folder_path):
     if len(files) == 0:
         print(f"barn: compile_all_files.py: there isn't any barn files (with extension {BARN_EXTENSION}) inside {folder_path}")
     else:
+        success = 0
         for file in files:
             print(f"Compiling: {file}...")
             completed_process = subprocess.run(f"barn {file}", shell=True, text=True, capture_output=True)
 
             if completed_process.returncode == 0:
                 print(f"Success: {completed_process.stdout}")
+                success += 1
             else:
-                print(f"Error message: {completed_process.stderr}")
+                print(f"Error message: \n{completed_process.stdout}")
+        
+        total_files = len(files)
+        print(f"Successfully compiled {success}/{total_files}")
 
 def main():
     if len(sys.argv) >= 2:
