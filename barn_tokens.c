@@ -29,6 +29,10 @@ barn_token_kind_to_string(barn_token_kind_t kind)
     switch (kind) {
         case BARN_TOKEN_NONE:
             return "NONE";
+        case BARN_TOKEN_INCREMENTATION:
+            return "INCREMENTATION";
+        case BARN_TOKEN_DECREMENTATION:
+            return "DECREMENTATION";
         case BARN_TOKEN_EOF:
             return "EOF";
         case BARN_TOKEN_INT:

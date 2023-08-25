@@ -69,9 +69,6 @@ barn_lexer_store_file_lines(barn_lexer_t* lexer, const char* filename)
     FILE* f = fopen(filename, "rb");
     BARN_NO_NULL(f);
 
-    /* Get file line amount */
-    int64_t line_count = barn_get_file_amount_of_lines(f);
-
     char line_buffer[MAX_LINE_LENGTH];
     char current_char;
 
@@ -105,42 +102,6 @@ barn_lexer_store_file_lines(barn_lexer_t* lexer, const char* filename)
 
     fclose(f);
 }
-
-// void 
-// barn_lexer_store_file_lines(barn_lexer_t* lexer)
-// {
-    // barn_debug_entry("strlen", __FILE__, __LINE__);
-    // size_t length = strlen(lexer->file_content);
-
-    // if (length == 0)
-    //     return;
-
-    // /* Crete first line */
-    // barn_append_element_to_array(lexer->file_lines, barn_create_allocated_string());
-
-    // for (int i = 0; i < length - 1; i++)
-    // {
-    //     char curr_char = lexer->file_content[i];
-    //     printf("%c", curr_char);
-
-    //     if (curr_char == '\n' && i != length - 1)
-    //     {
-    //         barn_append_element_to_array(lexer->file_lines, barn_create_allocated_string());
-    //     }
-    //     else 
-    //     {
-    //         char*  last_line     = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
-    //         char** last_line_ptr = &last_line;
-    //         printf("on line %d\n", lexer->file_lines->length);
-    //         barn_debug_entry("barn_append_char_to_allocated_string 1", __FILE__, __LINE__);
-    //         barn_append_char_to_allocated_string(last_line_ptr, curr_char);
-    //     }
-    // }
-
-    // char*  last_line     = barn_get_element_from_array(lexer->file_lines, lexer->file_lines->length - 1);
-    // char** last_line_ptr = &last_line;
-    // barn_append_char_to_allocated_string(last_line_ptr, lexer->file_content[length]);
-// }
 
 char 
 barn_lexer_get_next_char(barn_lexer_t* lexer)
