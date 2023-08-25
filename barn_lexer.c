@@ -55,8 +55,13 @@ barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
     barn_lexer_store_file_lines(lexer, lexer->filename);
     barn_debug_entry("barn_lexer_main", __FILE__, __LINE__);
     barn_lexer_main(lexer);
-    barn_debug_entry("barn_lexer_show_all_tokens", __FILE__, __LINE__);
-    // barn_lexer_show_all_tokens(lexer);   
+
+    // TODO: barn_is_flag function is really bugged. need to fix it.
+    // if (barn_is_flag(args_parser, "--tokens") == false || barn_is_flag(args_parser, "-t") == false)
+    // {
+        // barn_debug_entry("barn_lexer_show_all_tokens", __FILE__, __LINE__);
+        // barn_lexer_show_all_tokens(lexer);   
+    // }
 
     return lexer;
 }
@@ -894,6 +899,10 @@ barn_lexer_main(barn_lexer_t* lexer)
             }
         }
     }
+
+    barn_token_t* token = barn_create_token("eof", (char*)lexer->filename, "", 
+                                            lexer->col, lexer->row, BARN_TOKEN_EOF);
+    BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
 }
 
 void 

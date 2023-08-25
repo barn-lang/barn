@@ -78,6 +78,9 @@ barn_filename_action(barn_args_parser_t* args_parser)
     barn_lexer_t* lexer = barn_start_lexer(file_content, args_parser);
     BARN_USE(lexer);
 
+    barn_debug_entry("barn_include_files", __FILE__, __LINE__);
+    barn_include_files(lexer);
+
     // Parser
 
     // Typechecker
