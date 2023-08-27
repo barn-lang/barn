@@ -18,27 +18,27 @@
  *
 */
 
-#ifndef __BARN_ARRAY__
-#define __BARN_ARRAY__
-
 #include <barn_core.h>
+#include <barn_std.h>
 
-typedef struct __barn_array_t {
-    size_t size_of_element;
-    size_t length;
+#include <barn_string.h>
 
-    void** ptr;
-} barn_array_t;
+#ifndef BARN_STD_FOLDER
+# define BARN_STD_FOLDER ".barn/libs/"
+#endif /* BARN_STD_FOLDER */
 
-barn_array_t* barn_create_array(size_t size_of_element);
-barn_array_t* barn_destroy_array(barn_array_t* array);
+// TODO: make this function more lightweight without each time using
+//       sprintf
+const char* 
+barn_std_get_path()
+{
+#ifdef _WIN32
+    return BARN_STD_FOLDER;
+#else
+    char* env_home = getenv("HOME");
+    char* buffer = (char*)calloc(strlen(env_home) + strlen(BARN_STD_FOLDER) + 1, sizeof(char));
+    sprintf(buffer, "%s/%s", env_home, BARN_STD_FOLDER);
 
-void* barn_get_element_from_array(barn_array_t* array, size_t index);
-
-barn_error_or_t barn_append_element_to_array(barn_array_t* array, void* element);
-barn_error_or_t barn_delete_element_from_array(barn_array_t* array, size_t index);
-barn_error_or_t barn_insert_element_in_array(barn_array_t* array, size_t index, void* element);
-barn_error_or_t barn_delete_last_element_from_array(barn_array_t* array);
-barn_error_or_t barn_resize_array(barn_array_t* array, size_t n);
-
-#endif /* __BARN_ARRAY__ */
+    return barn_duplicate_string(buffer);
+#endif /* _WIN32 */
+}

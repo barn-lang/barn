@@ -175,3 +175,32 @@ barn_resize_array(barn_array_t* array, size_t n)
     array->length = n;
     return 0;
 }
+
+barn_error_or_t 
+barn_insert_element_in_array(barn_array_t* array, size_t index, void* element)
+{
+#ifdef __BARN_SHOW_DEBUG__
+
+    if (index < 0)
+    {
+        barn_debug_error("barn_insert_element_in_array: index need to be bigger than 0", __FILE_NAME__, __LINE__);
+    }
+
+#endif /* __BARN_SHOW_DEBUG__ */
+
+    if (array == NULL || element == NULL || index > array->length)
+        return -1;
+
+    void** new_ptr = (void**)realloc(array->ptr, (array->length + 1) * sizeof(void*));
+    BARN_NO_NULL(new_ptr);
+
+    array->ptr = new_ptr;
+
+    for (size_t i = array->length; i > index; i--)
+        array->ptr[i] = array->ptr[i - 1];
+
+    array->ptr[index] = element;
+    array->length++;
+
+    return 0;
+}

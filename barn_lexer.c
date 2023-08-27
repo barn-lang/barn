@@ -106,6 +106,11 @@ barn_lexer_store_file_lines(barn_lexer_t* lexer, const char* filename)
     }
 
     fclose(f);
+    
+    // for (int i = 0; i < lexer->file_lines->length; i++)
+    // {
+    //     printf("file_lines[%d]: \"%s\"\n", i, barn_get_element_from_array(lexer->file_lines, i));
+    // }
 }
 
 char 
@@ -190,7 +195,7 @@ barn_lexer_comment_multiline_open(barn_lexer_t* lexer)
     {
         barn_error_show_with_line(lexer,
             BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-            barn_get_element_from_array(lexer->file_lines, lexer->row),
+            barn_get_element_from_array(lexer->file_lines, lexer->row - 1),
             "opening another multiline comment when the old one isn't closed");
         exit(1);
     }
@@ -217,7 +222,7 @@ barn_lexer_comment_multiline_close(barn_lexer_t* lexer)
     {
         barn_error_show_with_line(lexer,
             BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-            barn_get_element_from_array(lexer->file_lines, lexer->row),
+            barn_get_element_from_array(lexer->file_lines, lexer->row - 1),
             "there isn't any multiline comment that need to be closed");
         exit(1);
     }
@@ -234,7 +239,7 @@ barn_lexer_create_string(barn_lexer_t* lexer)
 
     lexer->is_string = true;
 
-    char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row);
+    char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row - 1);
     barn_token_t* token = barn_create_token(barn_create_allocated_string(), (char*)lexer->filename, 
                                             current_line, lexer->col, lexer->row, BARN_TOKEN_STRING);
 
@@ -286,7 +291,7 @@ barn_lexer_add_char_to_string(barn_lexer_t* lexer)
         default:
             barn_error_show_with_line(lexer,
                 BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 2, true, 
-                barn_get_element_from_array(lexer->file_lines, lexer->row),  
+                barn_get_element_from_array(lexer->file_lines, lexer->row - 1),  
                 "unknown escape sequence '\\%c'", lexer->curr_char);
             exit(1);
             break;
@@ -303,7 +308,7 @@ barn_lexer_collect_to_char_token(barn_lexer_t* lexer)
     {
         barn_error_show_with_line(lexer,
             BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-            barn_get_element_from_array(lexer->file_lines, lexer->row),  
+            barn_get_element_from_array(lexer->file_lines, lexer->row - 1),  
             "expected character instead of EOF");
         exit(1);
     }
@@ -318,7 +323,7 @@ barn_lexer_create_char(barn_lexer_t* lexer)
     {
         barn_error_show_with_line(lexer,
             BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-            barn_get_element_from_array(lexer->file_lines, lexer->row),  
+            barn_get_element_from_array(lexer->file_lines, lexer->row - 1),  
             "expected an character between ''");
         exit(1);
     }
@@ -330,12 +335,12 @@ barn_lexer_create_char(barn_lexer_t* lexer)
     {
         barn_error_show_with_line(lexer,
             BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-            barn_get_element_from_array(lexer->file_lines, lexer->row),  
+            barn_get_element_from_array(lexer->file_lines, lexer->row - 1),  
             "expected ' to close character token");
         exit(1);
     }
 
-    char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row);
+    char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row - 1);
     barn_token_t* token = barn_create_token(value_of_char, (char*)lexer->filename, current_line,
                                             lexer->col, lexer->row, BARN_TOKEN_CHAR);
 
@@ -409,7 +414,7 @@ barn_lexer_create_identifier_no_space(barn_lexer_t* lexer, char* current_line)
 void
 barn_lexer_create_identifier(barn_lexer_t* lexer)
 {
-    char* current_line = barn_get_element_from_array(lexer->file_lines, lexer->row);
+    char* current_line = barn_get_element_from_array(lexer->file_lines, lexer->row - 1);
 
     if (barn_lexer_create_identifier_last_token_null(lexer, current_line))
         return;
@@ -477,7 +482,7 @@ barn_lexer_create_number_no_space(barn_lexer_t* lexer, char* current_line)
 void 
 barn_lexer_create_number(barn_lexer_t* lexer)
 {
-    char* current_line = barn_get_element_from_array(lexer->file_lines, lexer->row);
+    char* current_line = barn_get_element_from_array(lexer->file_lines, lexer->row - 1);
 
     if (barn_lexer_create_number_last_token_null(lexer, current_line))
         return;
@@ -508,7 +513,7 @@ barn_lexer_create_float_last_token_no_null(barn_lexer_t* lexer, char* current_li
     {
         barn_error_show_with_line(lexer,
             BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-            barn_get_element_from_array(lexer->file_lines, lexer->row),
+            barn_get_element_from_array(lexer->file_lines, lexer->row - 1),
             "can't add another '.' to float");
         exit(1);
     } 
@@ -522,7 +527,7 @@ barn_lexer_create_float_last_token_no_null(barn_lexer_t* lexer, char* current_li
 
             if (symbol.symbol_kind != BARN_TOKEN_NONE)
             {
-                char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row);
+                char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row - 1);
                 barn_token_t* token = barn_create_token(barn_duplicate_string(symbol.symbol_value), (char*)lexer->filename, 
                                                         current_line, lexer->col, lexer->row, symbol.symbol_kind);
 
@@ -545,7 +550,7 @@ barn_lexer_create_float_last_token_no_null(barn_lexer_t* lexer, char* current_li
 void
 barn_lexer_create_float_number(barn_lexer_t* lexer)
 {
-    char* current_line = barn_get_element_from_array(lexer->file_lines, lexer->row);
+    char* current_line = barn_get_element_from_array(lexer->file_lines, lexer->row - 1);
 
     if (barn_lexer_create_float_last_token_no_null(lexer, current_line))
         return;
@@ -558,7 +563,7 @@ barn_lexer_create_float_number(barn_lexer_t* lexer)
 
         if (symbol.symbol_kind != BARN_TOKEN_NONE)
         {
-            char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row);
+            char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row - 1);
             barn_token_t* token = barn_create_token(barn_duplicate_string(symbol.symbol_value), (char*)lexer->filename, 
                                                     current_line, lexer->col, lexer->row, symbol.symbol_kind);
 
@@ -637,7 +642,7 @@ barn_lexer_create_symbol(barn_lexer_t* lexer)
                 {
                     barn_error_show_with_line(lexer,
                         BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-                        barn_get_element_from_array(lexer->file_lines, lexer->row),
+                        barn_get_element_from_array(lexer->file_lines, lexer->row - 1),
                         "expected '.' after '..' to create TRIPLEDOT token");
                     exit(1);
                 }
@@ -681,7 +686,7 @@ barn_lexer_create_symbol(barn_lexer_t* lexer)
 
             barn_error_show_with_line(lexer,
                 BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-                barn_get_element_from_array(lexer->file_lines, lexer->row),
+                barn_get_element_from_array(lexer->file_lines, lexer->row - 1),
                 "expected '||' to create OR token");
             exit(1);
         }
@@ -697,7 +702,7 @@ barn_lexer_create_symbol(barn_lexer_t* lexer)
 
             barn_error_show_with_line(lexer,
                 BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-                barn_get_element_from_array(lexer->file_lines, lexer->row),
+                barn_get_element_from_array(lexer->file_lines, lexer->row - 1),
                 "expected '&&' to create OR token");
             exit(1);
         }
@@ -881,7 +886,7 @@ barn_lexer_main(barn_lexer_t* lexer)
 
             if (symbol.symbol_kind != BARN_TOKEN_NONE)
             {
-                char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row);
+                char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row - 1);
                 barn_token_t* token = barn_create_token(barn_duplicate_string(symbol.symbol_value), (char*)lexer->filename, 
                                                         current_line, lexer->col, lexer->row, symbol.symbol_kind);
 
@@ -892,7 +897,7 @@ barn_lexer_main(barn_lexer_t* lexer)
             {
                 barn_error_show_with_line(lexer,
                     BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
-                    barn_get_element_from_array(lexer->file_lines, lexer->row),
+                    barn_get_element_from_array(lexer->file_lines, lexer->row - 1),
                     "unknown use of character: \'%c\' (%d)", 
                         lexer->curr_char, lexer->curr_char);
                 exit(1);

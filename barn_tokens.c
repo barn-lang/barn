@@ -131,10 +131,11 @@ barn_create_token(char* value, char* filename, char* line,
 void 
 barn_token_print(barn_token_t* token)
 {
-    printf(" { value: `%s`, row: %d, col: %d, kind: `%s`, filename: `%s`}\n",
+    printf(" { value: `%s`, row: %d, col: %d, kind: `%s`, filename: `%s`, line: %p }\n",
         token->value, 
         token->row,
         token->col, 
         barn_token_kind_to_string(token->kind),
-        token->filename);
+        token->filename,
+        token->line);
 }

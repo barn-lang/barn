@@ -20,8 +20,6 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-@import "fmt.ba"
-
 // Function for comparing string
 fun string_compare(string s1, string s2) -> bool {
 	__code__("return ((bool)((strcmp(s1, s2) == 0) == 1 ? 1 : 0));")

@@ -24,10 +24,8 @@
 #include <barn_tokens.h>
 #include <barn_array.h>
 #include <barn_lexer.h>
+#include <barn_std.h>
 #include <barn_io.h>
-
-const char*
-barn_std_get_path() { return "example/path/to/std/"; }
 
 void
 barn_include_tokenize_file_and_append_tokens(barn_include_t* include_struct)
@@ -44,11 +42,42 @@ barn_include_tokenize_file_and_append_tokens(barn_include_t* include_struct)
 
         char* filename_with_std = calloc(strlen(std_path) + strlen(filename) + 2, sizeof(char));
         sprintf(filename_with_std, "%s%s", std_path, filename);
+        printf("%s\n", filename_with_std);
 
-        /* TODO: check does this file exists, read it */
+        if (barn_file_exists(filename_with_std) == true)
+            file_value = barn_read_whole_file(filename_with_std);
+        else
+        {
+            barn_error_show_with_line(include_struct->main_lexer,
+                BARN_PARSER_ERROR, (char*)include_struct->curr_token->filename, include_struct->curr_token->row, 
+                include_struct->curr_token->col - 1, true, include_struct->curr_token->line,
+                "couldn't find file named \'%s\'", filename);
+            exit(1); 
+        }
+
+        filename = filename_with_std;
     }
 
-    /* TODO: tokenize file_value and append these tokens to main_lexer somehow.. */
+    
+    /* Create a custom args parser in which we would apply filename of imported file
+     * and then after it start lexer work */
+    barn_args_parser_t* custom_args_parser = (barn_args_parser_t*)calloc(1, sizeof(barn_args_parser_t));
+    custom_args_parser->is_filename   = true;
+    custom_args_parser->filename      = filename;
+
+    barn_debug_entry("barn_start_lexer", __FILE__, __LINE__);
+    barn_lexer_t* file_lexer = barn_start_lexer((const char*)file_value, custom_args_parser);
+    
+    barn_delete_element_from_array(include_struct->main_lexer->tokens, include_struct->index);
+    barn_delete_element_from_array(include_struct->main_lexer->tokens, include_struct->index - 1);
+
+    int add_tokens_at = include_struct->index - 1;
+
+    for (int i = 0; i < (file_lexer->tokens->length - 1); i++)
+    {
+        barn_token_t* token = barn_get_element_from_array(file_lexer->tokens, i);
+        barn_insert_element_in_array(include_struct->main_lexer->tokens, i + add_tokens_at, token);
+    }
 }
 
 void
