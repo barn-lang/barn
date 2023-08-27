@@ -23,4 +23,35 @@
 
 #include <barn_core.h>
 
+#include <barn_string.h>
+#include <barn_nodes.h>
+#include <barn_lexer.h>
+#include <barn_array.h>
+#include <barn_io.h>
+
+typedef struct __barn_parser_t {
+    barn_array_t* nodes;
+    barn_lexer_t* lexer;
+    barn_token_t* curr_token;
+    
+    int statement_open;
+    int index;
+
+    barn_array_t* function_nodes;
+    barn_array_t* local_variables;
+    barn_array_t* global_variables;
+    barn_array_t* structure_nodes;
+
+    barn_node_t* statement_node;
+    barn_node_t* actual_function;
+} barn_parser_t;
+
+void barn_parser_skip(barn_parser_t* parser, int n);
+
+barn_parser_t* barn_start_parser(barn_lexer_t* lexer);
+
+void barn_parser_main_loop(barn_parser_t* parser);
+
+bool barn_parser_is_function_opened(barn_parser_t* parser);
+
 #endif /* __BARN_PARSER__ */

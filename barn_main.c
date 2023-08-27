@@ -31,6 +31,7 @@
 #include <barn_io.h>
 #include <barn_lexer.h>
 #include <barn_tokens.h>
+#include <barn_parser.h>
 
 void 
 barn_no_filename_action(char** argv, barn_args_parser_t* args_parser)
@@ -82,6 +83,9 @@ barn_filename_action(barn_args_parser_t* args_parser)
     barn_include_files(lexer);
 
     // Parser
+    barn_debug_entry("barn_start_parser", __FILE__, __LINE__);
+    barn_parser_t* parser = barn_start_parser(lexer);
+    BARN_USE(parser);
 
     // Typechecker
 

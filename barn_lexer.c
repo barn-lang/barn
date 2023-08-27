@@ -105,8 +105,14 @@ barn_lexer_store_file_lines(barn_lexer_t* lexer, const char* filename)
         }
     }
 
+    char* line_copy = barn_duplicate_string(line_buffer);
+    BARN_NO_NULL(line_copy);
+
+    barn_append_element_to_array(lexer->file_lines, line_copy);
+
     fclose(f);
     
+    // printf("lexer->file_lines->length=%d\n",lexer->file_lines->length);
     // for (int i = 0; i < lexer->file_lines->length; i++)
     // {
     //     printf("file_lines[%d]: \"%s\"\n", i, barn_get_element_from_array(lexer->file_lines, i));

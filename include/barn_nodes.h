@@ -23,4 +23,8 @@
 
 #include <barn_core.h>
 
+typedef struct __barn_node_t {
+
+} barn_node_t;
+
 #endif /* __BARN_NODES__ */
