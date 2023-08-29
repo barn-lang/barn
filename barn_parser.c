@@ -27,7 +27,7 @@
 #include <barn_array.h>
 #include <barn_io.h>
 
-#define BARN_TOKEN_CMP(parser, str) (strcmp(parser->curr_token->value, str) == 0)
+#define BARN_TOKEN_CMP(str) (strcmp(parser->curr_token->value, str) == 0)
 
 /* Function for skipping tokens */
 void 
@@ -46,7 +46,7 @@ barn_parser_function_declaration(barn_parser_t* parser)
 void
 barn_parser_identifier(barn_parser_t* parser)
 {
-    if (BARN_TOKEN_CMP(parser, "fun"))
+    if (BARN_TOKEN_CMP("fun"))
         barn_parser_function_declaration(parser);
 }
 

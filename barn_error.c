@@ -86,25 +86,36 @@ barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, ch
         printf("%c", line[i]);
     }
 
-    if (lexer->file_lines->length <= (row + 1))
-    {
-        printf("%s\n", barn_get_color_as_str_code(BARN_COLOR_GRAY));
-        printf("%s%d %s| %s...%s\n\n", 
-            barn_get_color_as_str_code(BARN_COLOR_GREEN), row+1, 
-            barn_get_color_as_str_code(BARN_COLOR_GRAY), 
-            barn_get_color_as_str_code(BARN_COLOR_GRAY), 
-            barn_get_color_as_str_code(BARN_COLOR_RESET));
-    }
-    else
-    {
-        printf("%s\n", barn_get_color_as_str_code(BARN_COLOR_GRAY));
-        printf("%s%d %s| %s%s%s\n\n", 
-            barn_get_color_as_str_code(BARN_COLOR_GREEN), row+1, 
-            barn_get_color_as_str_code(BARN_COLOR_GRAY), 
-            barn_get_color_as_str_code(BARN_COLOR_GRAY), 
-            barn_get_element_from_array(lexer->file_lines, row+1),
-            barn_get_color_as_str_code(BARN_COLOR_RESET));
-    }
+    memset(buf, 512, 0);
+    sprintf(buf, "%d |", row);
+
+    printf("\n");
+    for (int i = 0; i < strlen(buf); i++)
+        printf(" ");
+
+    for (int i = 0; i < col + 1; i++)
+        printf(" ");
+    printf("%s^---%s error occurred here\n", barn_get_color_as_str_code(BARN_COLOR_GREEN), barn_get_color_as_str_code(BARN_COLOR_WHITE));
+
+    // if (lexer->file_lines->length <= (row + 1))
+    // {
+    //     printf("%s\n", barn_get_color_as_str_code(BARN_COLOR_GRAY));
+    //     printf("%s%d %s| %s...%s\n\n", 
+    //         barn_get_color_as_str_code(BARN_COLOR_GREEN), row+1, 
+    //         barn_get_color_as_str_code(BARN_COLOR_GRAY), 
+    //         barn_get_color_as_str_code(BARN_COLOR_GRAY), 
+    //         barn_get_color_as_str_code(BARN_COLOR_RESET));
+    // }
+    // else
+    // {
+    //     printf("%s\n", barn_get_color_as_str_code(BARN_COLOR_GRAY));
+    //     printf("%s%d %s| %s%s%s\n\n", 
+    //         barn_get_color_as_str_code(BARN_COLOR_GREEN), row+1, 
+    //         barn_get_color_as_str_code(BARN_COLOR_GRAY), 
+    //         barn_get_color_as_str_code(BARN_COLOR_GRAY), 
+    //         barn_get_element_from_array(lexer->file_lines, row+1),
+    //         barn_get_color_as_str_code(BARN_COLOR_RESET));
+    // }
 
     va_end(list);
 }
