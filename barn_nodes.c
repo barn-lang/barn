@@ -19,3 +19,38 @@
 */
 
 #include <barn_core.h>
+
+#include <barn_nodes.h>
+
+char* 
+barn_node_kind_show(barn_node_kind_t kind)
+{
+    switch (kind)
+    {
+        case NODE_FUNCTION_DECLARATION:
+            return "FunctionDeclaration";
+        case NODE_FUNCTION_RETURN:
+            return "FunctionReturn";
+        case NODE_FUNCTION_CALL:
+            return "FunctionCall";
+    }
+
+    BARN_UNIMPLEMENTED("unhandled node type");
+    return NULL;
+}
+
+void 
+barn_node_show(barn_node_t* node)
+{
+    printf("{ node_kind: %s }\n",
+        barn_node_kind_show(node->node_kind));
+}
+
+barn_node_t* 
+barn_create_empty_node(barn_node_kind_t kind)
+{
+    barn_node_t* node = (barn_node_t*)calloc(1, sizeof(barn_node_t));
+    node->node_kind   = kind;
+
+    return node;
+}

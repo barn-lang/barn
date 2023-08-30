@@ -61,6 +61,12 @@
     }                                                                                        \
 })
 
+#define BARN_UNIMPLEMENTED(msg) ({                                                          \
+    barn_error_show(BARN_COMPILER_ERROR, "unimplemented feauter in %s in %s at %d: %s\n\t\tplease create a new issue on github that will report this weird action",\
+        __FILE_NAME__, __PRETTY_FUNCTION__, __LINE__, msg);                                 \
+    exit(1);                                                                                \
+})                                                                                          \
+
 typedef char barn_error_or_t;
 
 #define BARN_TRY(func) ({                                                          \

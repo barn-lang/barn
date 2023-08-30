@@ -22,9 +22,29 @@
 #define __BARN_NODES__
 
 #include <barn_core.h>
+#include <barn_array.h>
+#include <barn_types.h>
+
+typedef enum __barn_node_kind_t {
+    NODE_FUNCTION_DECLARATION,
+    NODE_FUNCTION_RETURN,
+    NODE_FUNCTION_CALL,
+} barn_node_kind_t;
 
 typedef struct __barn_node_t {
+    barn_node_kind_t node_kind;
 
+    struct {
+        barn_array_t* function_args;
+        barn_array_t* function_nodes;
+        barn_type_t*  function_return;
+        char*         function_name;
+    } function_declaration;
 } barn_node_t;
+
+char* barn_node_kind_show(barn_node_kind_t kind);
+void barn_node_show(barn_node_t* node);
+
+barn_node_t* barn_create_empty_node(barn_node_kind_t kind);
 
 #endif /* __BARN_NODES__ */

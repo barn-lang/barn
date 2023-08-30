@@ -23,10 +23,11 @@
 
 #include <barn_core.h>
 
+#include <barn_types.h>
+#include <barn_array.h>
 #include <barn_string.h>
 #include <barn_nodes.h>
 #include <barn_lexer.h>
-#include <barn_array.h>
 #include <barn_io.h>
 
 typedef struct __barn_parser_t {

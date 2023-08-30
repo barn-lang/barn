@@ -83,7 +83,8 @@ barn_read_whole_file(const char* filename)
 }
 
 char*
-barn_get_current_architecture() {
+barn_get_current_architecture() 
+{
     #if defined(__x86_64__) || defined(_M_X64)
         return "x86_64";
     #elif defined(i386) || defined(__i386__) || defined(__i386) || defined(_M_IX86)
@@ -125,6 +126,6 @@ barn_get_current_architecture() {
     #elif defined(__m68k__)
         return "M68K";
     #else
-        return "UNKNOWN"; // yo man you are using calculator?
+        return "UNKNOWN"; 
     #endif
 }

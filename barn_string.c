@@ -46,21 +46,16 @@ barn_create_allocated_string()
 void
 barn_append_char_to_allocated_string(char** str, char c)
 {
-    size_t old_length = *str ? strlen(*str) : 0; // Handle case where str is initially NULL
-    size_t new_length = old_length + 2; // 1 for the new character and 1 for the null terminator
+    size_t old_length = *str ? strlen(*str) : 0; 
+    size_t new_length = old_length + 2;
 
-    // Reallocate memory for the new string
     char* new_str = (char*)realloc(*str, new_length * sizeof(char));
-    if (new_str == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        return; // Error handling
-    }
+    BARN_NO_NULL(new_str);
 
-    // Append the character and null-terminate the string
     new_str[old_length] = c;
     new_str[new_length - 1] = '\0';
 
-    *str = new_str; // Update the pointer to the new string
+    *str = new_str; 
 }
 
 char* 

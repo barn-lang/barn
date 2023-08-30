@@ -135,8 +135,8 @@ barn_delete_last_element_from_array(barn_array_t* array)
     void** new_ptr = realloc(array->ptr, new_length * sizeof(void*));
     BARN_NO_NULL(new_ptr);
     
-    // If the size of the elements varies, we need to manually free the last element
-    if (array->size_of_element > 0) {
+    if (array->size_of_element > 0) 
+    {
         void* last_element = array->ptr[array->length - 1];
         free(last_element);
     }
@@ -144,7 +144,7 @@ barn_delete_last_element_from_array(barn_array_t* array)
     array->ptr = new_ptr;
     array->length = new_length;
 
-    return 0; // Success
+    return 0; 
 }
 
 barn_error_or_t
