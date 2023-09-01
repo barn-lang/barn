@@ -112,11 +112,11 @@ barn_lexer_store_file_lines(barn_lexer_t* lexer, const char* filename)
 
     fclose(f);
     
-    // printf("lexer->file_lines->length=%d\n",lexer->file_lines->length);
-    // for (int i = 0; i < lexer->file_lines->length; i++)
-    // {
-    //     printf("file_lines[%d]: \"%s\"\n", i, barn_get_element_from_array(lexer->file_lines, i));
-    // }
+    printf("lexer->file_lines->length=%d\n",lexer->file_lines->length);
+    for (int i = 0; i < lexer->file_lines->length; i++)
+    {
+        printf("file_lines[%d]: \"%s\"\n", i, barn_get_element_from_array(lexer->file_lines, i));
+    }
 }
 
 char 

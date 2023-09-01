@@ -99,16 +99,14 @@ barn_filename_action(barn_args_parser_t* args_parser)
 int
 main(int argc, char** argv)
 {
-    // barn_debug_entry("barn_args_parser_start", __FILE__, __LINE__);
-    // barn_args_parser_t* args_parser = barn_args_parser_start(argc, argv);
+    barn_debug_entry("barn_args_parser_start", __FILE__, __LINE__);
+    barn_args_parser_t* args_parser = barn_args_parser_start(argc, argv);
 
-    // if (args_parser->is_filename == false)
-    //     barn_no_filename_action(argv, args_parser);
+    if (args_parser->is_filename == false)
+        barn_no_filename_action(argv, args_parser);
 
-    // barn_debug_entry("barn_filename_action", __FILE__, __LINE__);
-    // barn_filename_action(args_parser);
-    printf("%lu\n", barn_convert_type_to_size(BARN_TYPE_PTR));
-    printf("%lu\n", barn_convert_type_to_size(BARN_TYPE_STRUCT));
+    barn_debug_entry("barn_filename_action", __FILE__, __LINE__);
+    barn_filename_action(args_parser);
 
     return EXIT_SUCCESS;
 } 

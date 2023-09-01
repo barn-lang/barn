@@ -29,6 +29,14 @@
 
 #define BARN_TOKEN_CMP(str) (strcmp(parser->curr_token->value, str) == 0)
 
+#define BARN_PARSER_ERR(parser, error_type, msg, ...) ({            \
+    barn_error_show_with_line(parser->lexer,                        \
+        error_type, parser->curr_token->filename,                   \
+        parser->curr_token->row - 1, parser->curr_token->col - 1,   \
+        true, parser->curr_token->line, msg, __VA_ARGS__);          \
+    exit(1);                                                        \
+})
+
 /* Function for skipping tokens */
 void 
 barn_parser_skip(barn_parser_t* parser, int n)
@@ -37,10 +45,27 @@ barn_parser_skip(barn_parser_t* parser, int n)
     parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
 }
 
+bool
+barn_parser_is_next_token(barn_parser_t* parser, barn_token_kind_t kind)
+{
+    if (parser->curr_token->kind == BARN_TOKEN_EOF)
+        return false;
+
+    barn_parser_skip(parser, 1);
+    if (parser->curr_token->kind == kind)
+        return true;
+
+    return false;
+}
+ 
 void
 barn_parser_function_declaration(barn_parser_t* parser)
 {
-    
+    if (barn_parser_is_function_opened(parser))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "function is already opened", 0);
+
+    if (!barn_parser_is_next_token(parser, BARN_TOKEN_IDENTIFIER))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected function name after 'func' keyword", 0);
 }
 
 void
@@ -56,21 +81,14 @@ barn_parser_main_loop(barn_parser_t* parser)
     for (; parser->index < parser->lexer->tokens->length; parser->index++)
     {
         barn_parser_skip(parser, 0);
-        // printf("%s\n", parser->curr_token->value);
 
         if (parser->curr_token->kind == BARN_TOKEN_EOF)
             break;
         else if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER)
             barn_parser_identifier(parser);
         else 
-        {
-            barn_error_show_with_line(parser->lexer,
-                BARN_SYNTAX_ERROR, parser->curr_token->filename,
-                parser->curr_token->row - 1, parser->curr_token->col - 1, 
-                true, parser->curr_token->line, "unknown use of '%s' token in this place", 
-                parser->curr_token->value);
-            exit(1);
-        }
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unknown use of '%s' token in this place", 
+                            parser->curr_token->value);
     }
 }
 
