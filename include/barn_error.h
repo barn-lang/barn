@@ -34,6 +34,7 @@ typedef enum __barn_error_types_t {
 	BARN_UNKNOWN_ERROR,
 	BARN_COMPILER_ERROR,
 	BARN_OVERFLOW_ERROR,
+	BARN_NAMESPACE_ERROR
 } barn_error_types_t;
 
 typedef struct __barn_lexer_t barn_lexer_t;

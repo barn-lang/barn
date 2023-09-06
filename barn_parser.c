@@ -49,15 +49,60 @@ bool
 barn_parser_is_next_token(barn_parser_t* parser, barn_token_kind_t kind)
 {
     if (parser->curr_token->kind == BARN_TOKEN_EOF)
+    {
+        barn_parser_skip(parser, -1);
         return false;
+    }
 
     barn_parser_skip(parser, 1);
     if (parser->curr_token->kind == kind)
+    {
+        barn_parser_skip(parser, -1);
         return true;
+    }
 
+    barn_parser_skip(parser, -1);
     return false;
 }
+
+bool
+barn_parser_is_id_correct_namespace(char* id_namespace)
+{
+    // TODO: implement this function chceck is id_namespace a keyword or smth else
+    return true;
+}
+
+bool
+barn_parser_function_exists(char* function_name)
+{
+
+}
  
+/* 
+ * This function named `barn_parser_collect_function_name`
+ * is a very interesting one because it first of all checks
+ * is the current token EOF kind next we duplicate this string
+ * and checks is it a correct namespace and does a function
+ * like this doesn't exists already 
+ */
+const char*
+barn_parser_collect_function_name(barn_parser_t* parser)
+{
+    if (parser->curr_token->kind == BARN_TOKEN_EOF)
+        return NULL;
+
+    const char* function_name = barn_duplicate_string(parser->curr_token->value);
+    if (!barn_parser_is_id_correct_namespace(function_name))
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "function couldn't be named \'%s\'", parser->curr_token->value);
+
+    if (barn_parser_function_exists(function_name) == NULL)
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "function with this name already exists", 0);
+
+    // TODO: does function name equal to variable name
+
+    return function_name;
+}
+
 void
 barn_parser_function_declaration(barn_parser_t* parser)
 {
@@ -66,11 +111,17 @@ barn_parser_function_declaration(barn_parser_t* parser)
 
     if (!barn_parser_is_next_token(parser, BARN_TOKEN_IDENTIFIER))
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected function name after 'func' keyword", 0);
+    barn_parser_skip(parser, 1);
+
+    const char* function_name = barn_parser_collect_function_name(parser);
 }
 
 void
 barn_parser_identifier(barn_parser_t* parser)
 {
+    if (!barn_parser_is_id_keyword(parser->curr_token->value))
+        BARN_UNIMPLEMENTED("can't parse not keyword identifier expression for now");
+
     if (BARN_TOKEN_CMP("fun"))
         barn_parser_function_declaration(parser);
 }

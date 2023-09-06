@@ -34,6 +34,7 @@ const char* barn_error_codes_string[BARN_ERROR_CODES_LENGTH] = {
 	[BARN_UNKNOWN_ERROR  ] = "UnknownError",
 	[BARN_COMPILER_ERROR ] = "CompilerError",
 	[BARN_OVERFLOW_ERROR ] = "OverflowError",
+	[BARN_NAMESPACE_ERROR] = "NamespaceError",
 };
 
 const char* 
@@ -72,7 +73,6 @@ barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, ch
     printf("%s%d %s| %s", 
             barn_get_color_as_str_code(BARN_COLOR_GREEN), row, 
             barn_get_color_as_str_code(BARN_COLOR_GRAY), barn_get_color_as_str_code(BARN_COLOR_GRAY));
-    
     for (int i = 0; i < strlen(line); i++)
     {
         if (i == col)
