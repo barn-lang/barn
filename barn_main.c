@@ -22,6 +22,7 @@
 
 #include <barn_args_parser.h>
 #include <barn_time_comp.h>
+#include <barn_include.h>
 #include <barn_message.h>
 #include <barn_colors.h>
 #include <barn_array.h>

@@ -47,6 +47,16 @@ typedef struct __barn_parser_t {
     barn_node_t* actual_function;
 } barn_parser_t;
 
+#define BARN_TOKEN_CMP(str) (strcmp(parser->curr_token->value, str) == 0)
+
+#define BARN_PARSER_ERR(parser, error_type, msg, ...) ({            \
+    barn_error_show_with_line(parser->lexer,                        \
+        error_type, parser->curr_token->filename,                   \
+        parser->curr_token->row - 1, parser->curr_token->col - 1,   \
+        true, parser->curr_token->line, msg, __VA_ARGS__);          \
+    exit(1);                                                        \
+})
+
 void barn_parser_skip(barn_parser_t* parser, int n);
 
 barn_parser_t* barn_start_parser(barn_lexer_t* lexer);
@@ -54,5 +64,8 @@ barn_parser_t* barn_start_parser(barn_lexer_t* lexer);
 void barn_parser_main_loop(barn_parser_t* parser);
 
 bool barn_parser_is_function_opened(barn_parser_t* parser);
+bool barn_parser_is_next_token(barn_parser_t* parser, barn_token_kind_t kind);
+bool barn_parser_is_id_keyword(char* id_keyword);
+bool barn_parser_is_id_correct_namespace(char* id_namespace);
 
 #endif /* __BARN_PARSER__ */

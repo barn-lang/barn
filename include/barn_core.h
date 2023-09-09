@@ -65,7 +65,9 @@
     barn_error_show(BARN_COMPILER_ERROR, "unimplemented feauter in %s in %s at %d: %s\n\t\tplease create a new issue on github that will report this weird action",\
         __FILE_NAME__, __PRETTY_FUNCTION__, __LINE__, msg);                                 \
     exit(1);                                                                                \
-})                                                                                          \
+})        
+
+#define BARN_STR_CMP(s1, s2) (strcmp(s1, s2) == 0)                                                                  
 
 typedef char barn_error_or_t;
 

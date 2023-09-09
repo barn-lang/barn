@@ -21,21 +21,46 @@
 #include <barn_core.h>
 
 #include <barn_parser.h>
+#include <barn_functions.h>
 #include <barn_string.h>
 #include <barn_lexer.h>
 #include <barn_nodes.h>
 #include <barn_array.h>
 #include <barn_io.h>
 
-#define BARN_TOKEN_CMP(str) (strcmp(parser->curr_token->value, str) == 0)
+#ifndef BARN_TOKEN_CMP
+# define BARN_TOKEN_CMP(str) (strcmp(parser->curr_token->value, str) == 0)
+#endif /* BARN_TOKEN_CMP */
 
-#define BARN_PARSER_ERR(parser, error_type, msg, ...) ({            \
-    barn_error_show_with_line(parser->lexer,                        \
-        error_type, parser->curr_token->filename,                   \
-        parser->curr_token->row - 1, parser->curr_token->col - 1,   \
-        true, parser->curr_token->line, msg, __VA_ARGS__);          \
-    exit(1);                                                        \
-})
+#ifndef BARN_PARSER_ERR
+# define BARN_PARSER_ERR(parser, error_type, msg, ...) ({            \
+     barn_error_show_with_line(parser->lexer,                        \
+         error_type, parser->curr_token->filename,                   \
+         parser->curr_token->row - 1, parser->curr_token->col - 1,   \
+         true, parser->curr_token->line, msg, __VA_ARGS__);          \
+     exit(1);                                                        \
+ })
+#endif /* BARN_PARSER_ERR */
+
+#define BARN_KEYWORDS_LEN 15
+
+static const char* barn_const_keywords[BARN_KEYWORDS_LEN] = {
+    [0 ] = "fun",
+    [1 ] = "extern",
+    [2 ] = "@import_c",
+    [3 ] = "@import",
+    [4 ] = "let",
+    [5 ] = "const",
+    [6 ] = "return",
+    [7 ] = "if",
+    [8 ] = "else",
+    [9 ] = "elif",
+    [10] = "while",
+    [11] = "continue",
+    [12] = "break",
+    [13] = "for",
+    [14] = "struct",
+};
 
 /* Function for skipping tokens */
 void 
@@ -66,54 +91,24 @@ barn_parser_is_next_token(barn_parser_t* parser, barn_token_kind_t kind)
 }
 
 bool
-barn_parser_is_id_correct_namespace(char* id_namespace)
+barn_parser_is_id_keyword(char* id_keyword)
 {
-    // TODO: implement this function chceck is id_namespace a keyword or smth else
-    return true;
+    for (int i = 0; i < BARN_KEYWORDS_LEN; i++)
+        if (BARN_STR_CMP(barn_const_keywords[i], id_keyword))
+            return true;
+
+    return false;
 }
 
 bool
-barn_parser_function_exists(char* function_name)
+barn_parser_is_id_correct_namespace(char* id_namespace)
 {
+    if (barn_parser_is_id_keyword(id_namespace) == true)
+        return false;
 
-}
- 
-/* 
- * This function named `barn_parser_collect_function_name`
- * is a very interesting one because it first of all checks
- * is the current token EOF kind next we duplicate this string
- * and checks is it a correct namespace and does a function
- * like this doesn't exists already 
- */
-const char*
-barn_parser_collect_function_name(barn_parser_t* parser)
-{
-    if (parser->curr_token->kind == BARN_TOKEN_EOF)
-        return NULL;
+    // TODO: check is namespace already taken by a constant variable
 
-    const char* function_name = barn_duplicate_string(parser->curr_token->value);
-    if (!barn_parser_is_id_correct_namespace(function_name))
-        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "function couldn't be named \'%s\'", parser->curr_token->value);
-
-    if (barn_parser_function_exists(function_name) == NULL)
-        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "function with this name already exists", 0);
-
-    // TODO: does function name equal to variable name
-
-    return function_name;
-}
-
-void
-barn_parser_function_declaration(barn_parser_t* parser)
-{
-    if (barn_parser_is_function_opened(parser))
-        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "function is already opened", 0);
-
-    if (!barn_parser_is_next_token(parser, BARN_TOKEN_IDENTIFIER))
-        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected function name after 'func' keyword", 0);
-    barn_parser_skip(parser, 1);
-
-    const char* function_name = barn_parser_collect_function_name(parser);
+    return true;
 }
 
 void

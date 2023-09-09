@@ -18,32 +18,23 @@
  *
 */
 
-#ifndef __BARN_ERROR__
-#define __BARN_ERROR__
+#ifndef __BARN_FUNCTIONS__
+#define __BARN_FUNCTIONS__
 
 #include <barn_core.h>
+#include <barn_parser.h>
 
-#define BARN_ERROR_CODES_LENGTH 9
+/* 
+ * This function named `barn_parser_collect_function_name`
+ * is a very interesting one because it first of all checks
+ * is the current token EOF kind next we duplicate this string
+ * and checks is it a correct namespace and does a function
+ * like this doesn't exists already 
+ */
+const char* barn_parser_collect_function_name(barn_parser_t* parser);
 
-typedef enum __barn_error_types_t {
-	BARN_ARGUMENT_ERROR,
-	BARN_FILE_ERROR,
-	BARN_SYNTAX_ERROR,
-	BARN_PARSER_ERROR,
-	BARN_UNDEFINED_ERROR,
-	BARN_UNKNOWN_ERROR,
-	BARN_COMPILER_ERROR,
-	BARN_OVERFLOW_ERROR,
-	BARN_NAMESPACE_ERROR
-} barn_error_types_t;
+void barn_parser_function_declaration(barn_parser_t* parser);
 
-typedef struct __barn_lexer_t barn_lexer_t;
+barn_node_t* barn_parser_function_get_by_name(barn_parser_t* parser, char* function_name);
 
-const char* barn_error_code_to_string(barn_error_types_t error_type);
-
-void barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, char* filename, 
-                          	   int row, int col, bool is_line, char* line, char* fmt, ...);
-
-void barn_error_show(barn_error_types_t error_type, char* message, ...);
-
-#endif /* __BARN_ERROR__ */
+#endif /* __BARN_FUNCTIONS__ */

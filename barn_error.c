@@ -67,12 +67,12 @@ barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, ch
 
     if (row != 0) 
         printf("%s%d %s| %s...%s\n", 
-            barn_get_color_as_str_code(BARN_COLOR_GREEN), row-1, barn_get_color_as_str_code(BARN_COLOR_GRAY), 
+            barn_get_color_as_str_code(BARN_COLOR_GREEN), row, barn_get_color_as_str_code(BARN_COLOR_RESET), 
             barn_get_color_as_str_code(BARN_COLOR_GRAY), barn_get_color_as_str_code(BARN_COLOR_RESET));
     
     printf("%s%d %s| %s", 
-            barn_get_color_as_str_code(BARN_COLOR_GREEN), row, 
-            barn_get_color_as_str_code(BARN_COLOR_GRAY), barn_get_color_as_str_code(BARN_COLOR_GRAY));
+            barn_get_color_as_str_code(BARN_COLOR_GREEN), row + 1, 
+            barn_get_color_as_str_code(BARN_COLOR_RESET), barn_get_color_as_str_code(BARN_COLOR_GRAY));
     for (int i = 0; i < strlen(line); i++)
     {
         if (i == col)
@@ -87,15 +87,16 @@ barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, ch
     }
 
     memset(buf, 512, 0);
-    sprintf(buf, "%d |", row);
+    sprintf(buf, "%d ", row + 1);
 
     printf("\n");
     for (int i = 0; i < strlen(buf); i++)
         printf(" ");
+    printf("%s|%s",  barn_get_color_as_str_code(BARN_COLOR_RESET),  barn_get_color_as_str_code(BARN_COLOR_GRAY));
 
     for (int i = 0; i < col + 1; i++)
         printf(" ");
-    printf("%s^---%s error occurred here\n", barn_get_color_as_str_code(BARN_COLOR_GREEN), barn_get_color_as_str_code(BARN_COLOR_WHITE));
+    printf("%s^~~~%s error occurred here\n", barn_get_color_as_str_code(BARN_COLOR_GREEN), barn_get_color_as_str_code(BARN_COLOR_WHITE));
 
     // if (lexer->file_lines->length <= (row + 1))
     // {
