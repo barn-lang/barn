@@ -23,6 +23,41 @@
 #include <barn_types.h>
 #include <barn_parser.h>
 
+static barn_type_t* barn_type_u8_global;
+static barn_type_t* barn_type_u16_global;
+static barn_type_t* barn_type_u32_global;
+static barn_type_t* barn_type_u64_global;
+
+static barn_type_t* barn_type_i8_global;
+static barn_type_t* barn_type_i16_global;
+static barn_type_t* barn_type_i32_global;
+static barn_type_t* barn_type_i64_global;
+
+static barn_type_t* barn_type_ptr_global;
+static barn_type_t* barn_type_str_global;
+static barn_type_t* barn_type_bool_global;
+
+static barn_type_t* barn_type_f32_global;
+static barn_type_t* barn_type_f64_global;
+
+void
+barn_initalize_types()
+{
+    barn_type_u8_global   = barn_create_type(BARN_TYPE_U8);
+    barn_type_u16_global  = barn_create_type(BARN_TYPE_U16);
+    barn_type_u32_global  = barn_create_type(BARN_TYPE_U32);
+    barn_type_u64_global  = barn_create_type(BARN_TYPE_U64);
+    barn_type_i8_global   = barn_create_type(BARN_TYPE_I8);
+    barn_type_i16_global  = barn_create_type(BARN_TYPE_I16);
+    barn_type_i32_global  = barn_create_type(BARN_TYPE_I32);
+    barn_type_i64_global  = barn_create_type(BARN_TYPE_I64);
+    barn_type_ptr_global  = barn_create_type(BARN_TYPE_PTR);
+    barn_type_str_global  = barn_create_type(BARN_TYPE_STRING);
+    barn_type_bool_global = barn_create_type(BARN_TYPE_BOOL);
+    barn_type_f32_global  = barn_create_type(BARN_TYPE_F32);
+    barn_type_f64_global  = barn_create_type(BARN_TYPE_F64);
+}
+
 barn_type_t* 
 barn_create_type(barn_type_kind_t type)
 {
@@ -86,6 +121,7 @@ barn_convert_type_to_size(barn_type_kind_t type)
         case BARN_TYPE_U8:
         case BARN_TYPE_I8:
         case BARN_TYPE_BOOL:
+        case BARN_TYPE_NONE:
             return 1;
             break;
         case BARN_TYPE_U16:
@@ -110,4 +146,40 @@ barn_convert_type_to_size(barn_type_kind_t type)
     }
 
     return -1;
+}
+
+barn_type_t*
+barn_parser_current_token_type_representation(barn_parser_t* parser)
+{
+    barn_type_t* type = NULL;
+
+    if      (BARN_STR_CMP(parser->curr_token->value, "u8") || BARN_STR_CMP(parser->curr_token->value, "byte"))
+        type = barn_type_u8_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "u16") || BARN_STR_CMP(parser->curr_token->value, "ushort"))
+        type = barn_type_u16_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "u32") || BARN_STR_CMP(parser->curr_token->value, "uint"))
+        type = barn_type_u32_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "u64") || BARN_STR_CMP(parser->curr_token->value, "ulong"))
+        type = barn_type_u64_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "i8") || BARN_STR_CMP(parser->curr_token->value, "char"))
+        type = barn_type_i8_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "i16") || BARN_STR_CMP(parser->curr_token->value, "short"))
+        type = barn_type_i16_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "i32") || BARN_STR_CMP(parser->curr_token->value, "int"))
+        type = barn_type_i32_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "i64") || BARN_STR_CMP(parser->curr_token->value, "long"))
+        type = barn_type_i64_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "f32") || BARN_STR_CMP(parser->curr_token->value, "float"))
+        type = barn_type_f32_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "f64") || BARN_STR_CMP(parser->curr_token->value, "double"))
+        type = barn_type_f64_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "string"))
+        type = barn_type_str_global;
+    else if (BARN_STR_CMP(parser->curr_token->value, "bool"))
+        type = barn_type_bool_global;
+
+    // TODO: implement structure types
+    // TODO: implement pointers
+
+    return type;
 }

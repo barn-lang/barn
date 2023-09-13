@@ -62,7 +62,7 @@
 })
 
 #define BARN_UNIMPLEMENTED(msg) ({                                                          \
-    barn_error_show(BARN_COMPILER_ERROR, "unimplemented feauter in %s in %s at %d: %s\n\t\tplease create a new issue on github that will report this weird action",\
+    barn_error_show(BARN_COMPILER_ERROR, "unimplemented feauter in %s in \x1b[1;37m%s\x1b[0;0m at %d: \x1b[1;31m%s\x1b[0;0m\n\t\tplease create a new issue on github that will report this weird action",\
         __FILE_NAME__, __PRETTY_FUNCTION__, __LINE__, msg);                                 \
     exit(1);                                                                                \
 })        

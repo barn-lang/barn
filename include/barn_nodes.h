@@ -21,6 +21,9 @@
 #ifndef __BARN_NODES__
 #define __BARN_NODES__
 
+typedef struct __barn_node_t barn_node_t;
+typedef struct __barn_type_t barn_type_t;
+
 #include <barn_core.h>
 #include <barn_array.h>
 #include <barn_types.h>

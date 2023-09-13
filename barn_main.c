@@ -84,6 +84,9 @@ barn_filename_action(barn_args_parser_t* args_parser)
     barn_debug_entry("barn_include_files", __FILE__, __LINE__);
     barn_include_files(lexer);
 
+    // Types
+    barn_initalize_types();
+    
     // Parser
     barn_debug_entry("barn_start_parser", __FILE__, __LINE__);
     barn_parser_t* parser = barn_start_parser(lexer);

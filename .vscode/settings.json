@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "__config": "cpp",
+        "__locale": "cpp",
+        "cstdlib": "cpp",
+        "memory_resource": "cpp",
+        "locale": "cpp",
+        "ostream": "cpp",
+        "system_error": "cpp",
+        "typeinfo": "cpp",
+        "version": "cpp",
+        "__string": "cpp",
+        "concepts": "cpp",
+        "type_traits": "cpp",
+        "string": "cpp"
+    }
+}

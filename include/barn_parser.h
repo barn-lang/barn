@@ -23,7 +23,11 @@
 
 #include <barn_core.h>
 
-#include <barn_types.h>
+/* I don't know why but i get some weird asf errors that
+   barn_parser_t is not defined so i added this here and
+   now it works */
+typedef struct __barn_parser_t barn_parser_t;
+
 #include <barn_array.h>
 #include <barn_string.h>
 #include <barn_nodes.h>
@@ -47,6 +51,8 @@ typedef struct __barn_parser_t {
     barn_node_t* actual_function;
 } barn_parser_t;
 
+#include <barn_types.h>
+
 #define BARN_TOKEN_CMP(str) (strcmp(parser->curr_token->value, str) == 0)
 
 #define BARN_PARSER_ERR(parser, error_type, msg, ...) ({            \
@@ -67,5 +73,8 @@ bool barn_parser_is_function_opened(barn_parser_t* parser);
 bool barn_parser_is_next_token(barn_parser_t* parser, barn_token_kind_t kind);
 bool barn_parser_is_id_keyword(char* id_keyword);
 bool barn_parser_is_id_correct_namespace(char* id_namespace);
+
+void barn_parser_reset_local_variables(barn_parser_t* parser);
+void barn_parser_append_node(barn_parser_t* parser, barn_node_t* node);
 
 #endif /* __BARN_PARSER__ */

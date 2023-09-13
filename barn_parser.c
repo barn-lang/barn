@@ -74,10 +74,8 @@ bool
 barn_parser_is_next_token(barn_parser_t* parser, barn_token_kind_t kind)
 {
     if (parser->curr_token->kind == BARN_TOKEN_EOF)
-    {
-        barn_parser_skip(parser, -1);
-        return false;
-    }
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expeceted '%s' not EOF", 
+                        barn_token_kind_to_string(parser->curr_token->kind));
 
     barn_parser_skip(parser, 1);
     if (parser->curr_token->kind == kind)
@@ -122,6 +120,20 @@ barn_parser_identifier(barn_parser_t* parser)
 }
 
 void 
+barn_parser_reset_local_variables(barn_parser_t* parser)
+{
+    barn_destroy_array(parser->local_variables);
+    parser->local_variables = barn_create_array(sizeof(barn_node_t));
+}
+
+void 
+barn_parser_close_brace(barn_parser_t* parser)
+{
+    parser->actual_function = NULL;
+    barn_parser_reset_local_variables(parser);
+}
+
+void 
 barn_parser_main_loop(barn_parser_t* parser)
 {
     for (; parser->index < parser->lexer->tokens->length; parser->index++)
@@ -132,6 +144,8 @@ barn_parser_main_loop(barn_parser_t* parser)
             break;
         else if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER)
             barn_parser_identifier(parser);
+        else if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
+            barn_parser_close_brace(parser);
         else 
             BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unknown use of '%s' token in this place", 
                             parser->curr_token->value);
@@ -168,4 +182,13 @@ barn_parser_is_function_opened(barn_parser_t* parser)
     return (parser->actual_function == NULL)
         ? false 
         : true;
+}
+
+void 
+barn_parser_append_node(barn_parser_t* parser, barn_node_t* node)
+{
+    if (barn_parser_is_function_opened(parser))
+        BARN_UNIMPLEMENTED("implement appending nodes when functions are opened");
+
+    barn_append_element_to_array(parser->nodes, node);
 }

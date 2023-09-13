@@ -22,6 +22,7 @@
 #define __BARN_TYPES__
 
 #include <barn_core.h>
+#include <barn_parser.h>
 
 typedef enum __barn_type_kind_t {
     /* Unsigned */
@@ -46,7 +47,8 @@ typedef enum __barn_type_kind_t {
     BARN_TYPE_F64,
 
     /* Other */
-    BARN_TYPE_STRUCT
+    BARN_TYPE_STRUCT,
+    BARN_TYPE_NONE
 } barn_type_kind_t;
 
 typedef struct __barn_type_t {
@@ -71,5 +73,9 @@ bool barn_is_type_signed(barn_type_kind_t type);
 bool barn_is_type_string(barn_type_kind_t type);
 bool barn_is_type_float(barn_type_kind_t type);
 bool barn_is_type_ptr(barn_type_kind_t type);
+
+barn_type_t* barn_parser_current_token_type_representation(barn_parser_t* parser);
+
+void barn_initalize_types();
 
 #endif /* __BARN_TYPES__ */

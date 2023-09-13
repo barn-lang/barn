@@ -24,6 +24,16 @@
 #include <barn_core.h>
 #include <barn_parser.h>
 
+typedef struct __barn_func_argument_t {
+    barn_type_t* argument_type;
+    const char*  argument_name;
+} barn_func_argument_t;
+
+typedef struct __barn_parse_function_args_t {
+    bool expect_name, expect_comma, expect_type;
+    size_t index;
+} barn_parse_function_args_t;
+
 /* 
  * This function named `barn_parser_collect_function_name`
  * is a very interesting one because it first of all checks
@@ -36,5 +46,7 @@ const char* barn_parser_collect_function_name(barn_parser_t* parser);
 void barn_parser_function_declaration(barn_parser_t* parser);
 
 barn_node_t* barn_parser_function_get_by_name(barn_parser_t* parser, char* function_name);
+
+barn_func_argument_t* barn_create_func_argument(barn_type_t* argument_type, const char* argument_name);
 
 #endif /* __BARN_FUNCTIONS__ */

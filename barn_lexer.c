@@ -92,6 +92,7 @@ barn_lexer_store_file_lines(barn_lexer_t* lexer, const char* filename)
             barn_append_element_to_array(lexer->file_lines, line_copy);
             line_index += 1;
             char_index =  0;
+            memset(line_buffer, 0, MAX_LINE_LENGTH); 
         } 
         else 
         {
