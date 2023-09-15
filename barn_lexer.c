@@ -60,7 +60,7 @@ barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
     // if (barn_is_flag(args_parser, "--tokens") == false || barn_is_flag(args_parser, "-t") == false)
     // {
         // barn_debug_entry("barn_lexer_show_all_tokens", __FILE__, __LINE__);
-        // barn_lexer_show_all_tokens(lexer);   
+        barn_lexer_show_all_tokens(lexer);   
     // }
 
     return lexer;

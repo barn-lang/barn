@@ -1,5 +1,9 @@
-- [ ] Lexer
+- [X] Lexer
 - [ ] Parser
+    - [X] Function declaration
+    - [ ] Mathematical & Logical Expressions
+    - [ ] Function return
+    - [ ] Function call
 - [ ] Typechecker
 - [ ] Codegen
 - [ ] Implement every thing from barngo

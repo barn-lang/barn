@@ -24,6 +24,23 @@
 #include <barn_core.h>
 #include <barn_parser.h>
 
+static barn_type_t* barn_type_u8_global;
+static barn_type_t* barn_type_u16_global;
+static barn_type_t* barn_type_u32_global;
+static barn_type_t* barn_type_u64_global;
+
+static barn_type_t* barn_type_i8_global;
+static barn_type_t* barn_type_i16_global;
+static barn_type_t* barn_type_i32_global;
+static barn_type_t* barn_type_i64_global;
+
+static barn_type_t* barn_type_ptr_global;
+static barn_type_t* barn_type_str_global;
+static barn_type_t* barn_type_bool_global;
+
+static barn_type_t* barn_type_f32_global;
+static barn_type_t* barn_type_f64_global;
+
 typedef enum __barn_type_kind_t {
     /* Unsigned */
     BARN_TYPE_U8,

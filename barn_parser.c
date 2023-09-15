@@ -22,6 +22,7 @@
 
 #include <barn_parser.h>
 #include <barn_functions.h>
+#include <barn_expressions.h>
 #include <barn_string.h>
 #include <barn_lexer.h>
 #include <barn_nodes.h>
@@ -136,20 +137,22 @@ barn_parser_close_brace(barn_parser_t* parser)
 void 
 barn_parser_main_loop(barn_parser_t* parser)
 {
-    for (; parser->index < parser->lexer->tokens->length; parser->index++)
-    {
-        barn_parser_skip(parser, 0);
+    // for (; parser->index < parser->lexer->tokens->length; parser->index++)
+    // {
+    //     barn_parser_skip(parser, 0);
 
-        if (parser->curr_token->kind == BARN_TOKEN_EOF)
-            break;
-        else if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER)
-            barn_parser_identifier(parser);
-        else if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
-            barn_parser_close_brace(parser);
-        else 
-            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unknown use of '%s' token in this place", 
-                            parser->curr_token->value);
-    }
+    //     if (parser->curr_token->kind == BARN_TOKEN_EOF)
+    //         break;
+    //     else if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER)
+    //         barn_parser_identifier(parser);
+    //     else if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
+    //         barn_parser_close_brace(parser);
+    //     else 
+    //         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unknown use of '%s' token in this place", 
+    //                         parser->curr_token->value);
+    // }
+    barn_parser_skip(parser, 0);
+    barn_expr_parse_end_at(parser, BARN_TOKEN_SEMICOL);
 }
 
 barn_parser_t* 
