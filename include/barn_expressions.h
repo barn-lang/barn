@@ -26,13 +26,6 @@
 #include <barn_tokens.h>
 #include <barn_parser.h>
 
-typedef enum __barn_expression_type_t {
-    BARN_EXPRESSION_ADD,
-    BARN_EXPRESSION_MINUS,
-    BARN_EXPRESSION_MULTIPLY,
-    BARN_EXPRESSION_DIVIDE,
-} barn_expression_type_t;
-
 typedef enum __barn_expression_value_type_t {
     BARN_EXPRESSION_VALUE_FUNCTION_CALL,
     BARN_EXPRESSION_VALUE_VARIABLE,
@@ -45,23 +38,25 @@ typedef struct __barn_expression_value_t {
 } barn_expression_value_t;
 
 typedef struct __barn_expression_node_t {
-    void* lhs_ptr;
-    bool  lhs_is_node;
-
-    void* rhs_ptr;
-    bool  rhs_is_node;
-
-    barn_expression_type_t node_type;
+    barn_expression_value_t* lhs;
+    barn_expression_value_t* rhs;
+    
+    barn_token_kind_t operator;
+    unsigned long     parents;
 } barn_expression_node_t;
 
-typedef struct __barn_expression_t {
-    barn_expression_node_t* root_node;
-} barn_expression_t;
+typedef struct __barn_expr_parser_t {
+    long index;
+    long parents;
+
+    barn_node_t* main_expr_node;
+} barn_expr_parser_t;
 
 barn_expression_value_t* barn_create_expression_value(barn_token_t* expr_val_token, barn_type_t* expr_val_type);
-barn_expression_node_t*  barn_create_exression_node(void* lhs, bool lhs_is_node, void* rhs, bool rhs_is_node, barn_expression_type_t node_type);
-barn_expression_t*       barn_create_expression(barn_expression_node_t* node);
+barn_expression_node_t*  barn_create_expression_node(barn_expression_value_t* lhs, barn_expression_value_t* rhs,
+                                                     barn_token_kind_t operator,   unsigned long parents);
+barn_node_t*             barn_create_expression_ast_node();
 
-barn_expression_t* barn_expr_parse_end_at(barn_parser_t* parser, barn_token_kind_t end_kind);
+barn_node_t* barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind);
 
 #endif /* __BARN_EXPRESSIONS__ */

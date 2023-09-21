@@ -50,7 +50,7 @@ barn_parser_function_get_by_name(barn_parser_t* parser, char* function_name)
     {
         barn_node_t* node = barn_get_element_from_array(parser->function_nodes, i);
         
-        if (node->node_kind != NODE_FUNCTION_DECLARATION)
+        if (node->node_kind != BARN_NODE_FUNCTION_DECLARATION)
             BARN_UNIMPLEMENTED("unknown node_kind that shouldn't be here");
 
         if (BARN_STR_CMP(node->function_declaration.function_name, function_name))
@@ -228,7 +228,7 @@ barn_node_t*
 barn_function_declaration_create_node(const char* function_name, barn_array_t* function_args,
                                       barn_type_t* function_return_type)
 {
-    barn_node_t* function_decl = barn_create_empty_node(NODE_FUNCTION_DECLARATION);
+    barn_node_t* function_decl = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
 
     function_decl->function_declaration.function_name   = function_name;
     function_decl->function_declaration.function_args   = function_args;

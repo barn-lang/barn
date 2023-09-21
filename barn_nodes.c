@@ -27,12 +27,14 @@ barn_node_kind_show(barn_node_kind_t kind)
 {
     switch (kind)
     {
-        case NODE_FUNCTION_DECLARATION:
+        case BARN_NODE_FUNCTION_DECLARATION:
             return "FunctionDeclaration";
-        case NODE_FUNCTION_RETURN:
+        case BARN_NODE_FUNCTION_RETURN:
             return "FunctionReturn";
-        case NODE_FUNCTION_CALL:
+        case BARN_NODE_FUNCTION_CALL:
             return "FunctionCall";
+        case BARN_NODE_EXPRESSION:
+            return "Expression";
     }
 
     BARN_UNIMPLEMENTED("unhandled node type");
@@ -52,5 +54,6 @@ barn_create_empty_node(barn_node_kind_t kind)
     barn_node_t* node = (barn_node_t*)calloc(1, sizeof(barn_node_t));
     node->node_kind   = kind;
 
+    BARN_NO_NULL(node);
     return node;
 }

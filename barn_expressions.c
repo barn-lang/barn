@@ -29,39 +29,40 @@ barn_create_expression_value(barn_token_t* expr_val_token,
                              barn_type_t* expr_val_type)
 {
     barn_expression_value_t* expr_value = (barn_expression_value_t*)calloc(1, sizeof(barn_expression_value_t));
+    BARN_NO_NULL(expr_value);
+    
     expr_value->expr_val_token = expr_val_token;
     expr_value->expr_val_type  = expr_val_type;
 
     return expr_value;
 }
 
-barn_expression_node_t*  
-barn_create_expression_node(void* lhs, bool lhs_is_node,
-                           void* rhs, bool rhs_is_node,
-                           barn_expression_type_t node_type)
+barn_expression_node_t*  barn_create_expression_node(barn_expression_value_t* lhs, barn_expression_value_t* rhs,
+                                                     barn_token_kind_t operator,   unsigned long parents)
 {
     barn_expression_node_t* expr_node = (barn_expression_node_t*)calloc(1, sizeof(barn_expression_node_t));
-    expr_node->lhs_ptr = lhs;
-    expr_node->rhs_ptr = rhs;
+    BARN_NO_NULL(expr_node);
 
-    expr_node->lhs_is_node = lhs_is_node;
-    expr_node->rhs_is_node = rhs_is_node;
-    expr_node->node_type   = node_type;
+    expr_node->lhs = lhs;
+    expr_node->rhs = rhs;
+
+    expr_node->operator = operator;
+    expr_node->parents  = parents;
 
     return expr_node;
 }
 
-barn_expression_t*       
-barn_create_expression(barn_expression_node_t* node)
+barn_node_t*  
+barn_create_expression_ast_node()
 {
-    barn_expression_t* expr = (barn_expression_t*)calloc(1, sizeof(barn_expression_t));
-    expr->root_node = node;
+    barn_node_t* node = barn_create_empty_node(BARN_NODE_EXPRESSION);
+    node->expression.expression_nodes = barn_create_array(sizeof(barn_expression_node_t*));
 
-    return expr;
+    return node;
 }
 
 barn_expression_value_t* 
-barn_expr_get_value(barn_parser_t* parser)
+barn_get_expr_value(barn_parser_t* parser, unsigned long* parents)
 {
     barn_expression_value_t* expr_value = barn_create_expression_value(NULL, NULL);
 
@@ -86,6 +87,12 @@ barn_expr_get_value(barn_parser_t* parser)
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected value token not EOF", 
                         parser->curr_token->value);
     }
+    else if (parser->curr_token->kind == BARN_TOKEN_OPENPARENT)
+    {
+        barn_parser_skip(parser, 1);
+        *parents++;
+        return NULL;
+    }
     else 
     {
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unexpected use of \"%s\" in this place", 
@@ -96,81 +103,155 @@ barn_expr_get_value(barn_parser_t* parser)
     return expr_value;
 }
 
-barn_expression_type_t
-barn_expr_detect_sign(barn_parser_t* parser)
+bool
+barn_expression_is_curr_operator(barn_parser_t* parser)
 {
-    switch (parser->curr_token->kind) 
+    switch (parser->curr_token->kind)
     {
         case BARN_TOKEN_PLUS:
-            return BARN_EXPRESSION_ADD;
-            break;
         case BARN_TOKEN_MINUS:
-            return BARN_EXPRESSION_MINUS;
-            break;
         case BARN_TOKEN_MUL:
-            return BARN_EXPRESSION_MULTIPLY;
-            break;
+        case BARN_TOKEN_OPENPARENT:
+        case BARN_TOKEN_CLOSEPARENT:
         case BARN_TOKEN_DIV:
-            return BARN_EXPRESSION_DIVIDE;
+            return true;
             break;
         default:
-        {
-            if (parser->curr_token->kind == BARN_TOKEN_EOF)
-            {
-                barn_parser_skip(parser, -1);
-                BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected expression operator not EOF", 
-                                parser->curr_token->value);
-            }
-            else
-                BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unexpected use of \"%s\" in this place", 
-                                parser->curr_token->value);
-        }
+            return false;
+            break;
+    }
+
+    return false;
+}
+
+int
+barn_expression_parser_check_parents(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
+{
+    if (parser->curr_token->kind == BARN_TOKEN_OPENPARENT)
+    {
+        if (expr_parser->index == 0)
+            expr_parser->index = -1;
+
+        expr_parser->parents++;
+        barn_parser_skip(parser, 1);
+        return 1;
+    }
+    
+    if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
+    {
+        if (expr_parser->parents == 0)
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unexpected use of close parent", 0);
+
+        expr_parser->parents--; 
+        barn_parser_skip(parser, 1);
+        return 1;
+    }
+
+    return 0;
+}
+
+void
+barn_expression_parser_check_rhs_value_null(barn_parser_t* parser, barn_expression_value_t* rhs, 
+                                            barn_expr_parser_t* expr_parser)
+{
+    if (rhs == NULL)
+    {
+        expr_parser->index = -1;
+        barn_parser_skip(parser, -1);
     }
 }
 
-char*
-barn_expr_type_to_string(barn_expression_type_t expr_type)
+void
+barn_expression_parser_not_full_op_rhs(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
 {
-    switch (expr_type) 
-    {
-        case BARN_EXPRESSION_ADD:
-            return "+";
-            break;
-        case BARN_EXPRESSION_MINUS:
-            return "-";
-            break;
-        case BARN_EXPRESSION_MULTIPLY:
-            return "*";
-            break;
-        case BARN_EXPRESSION_DIVIDE:
-            return "/";
-            break;
-    }
+    // Collect operator
+    barn_token_kind_t operator = parser->curr_token->kind;
+    if (!barn_expression_is_curr_operator(parser))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected operator not \"%s\"", 
+                        barn_token_kind_to_string(parser->curr_token->kind));
+    barn_parser_skip(parser, 1);
+
+    // Get rhs value
+    if (parser->curr_token->kind == BARN_TOKEN_EOF) 
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected expression value not EOF", 0);
+    barn_expression_value_t* rhs_value = barn_get_expr_value(parser, &expr_parser->parents);
+
+    barn_expression_parser_check_rhs_value_null(parser, rhs_value, expr_parser);
+
+    // Append new mathematical expression node
+    barn_expression_node_t* append_expr_node = barn_create_expression_node(NULL, rhs_value, operator, expr_parser->parents);
+    barn_append_element_to_array(expr_parser->main_expr_node->expression.expression_nodes, append_expr_node);
 }
 
-barn_expression_t* 
-barn_expr_parse_end_at(barn_parser_t* parser, barn_token_kind_t end_kind)
+void
+barn_expression_parser_full_lhs_op_rhs(barn_parser_t* parser,  barn_expr_parser_t* expr_parser)
 {
-    barn_expression_value_t* lhs_value = barn_expr_get_value(parser);
-    barn_expression_node_t*  expr_node = barn_create_expression_node(lhs_value, false, NULL, false, BARN_EXPRESSION_ADD);
-   
-    while (parser->curr_token->kind != BARN_TOKEN_EOF || parser->curr_token->kind != end_kind)
+    // Get lhs value
+    barn_expression_value_t* lhs_value = barn_get_expr_value(parser, expr_parser->parents);
+
+    // Collect operator
+    barn_token_kind_t operator = parser->curr_token->kind;
+    if (!barn_expression_is_curr_operator(parser))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected operator not \"%s\"", 
+                        barn_token_kind_to_string(parser->curr_token->kind));
+    barn_parser_skip(parser, 1);
+
+    // Get rhs value
+    if (parser->curr_token->kind == BARN_TOKEN_EOF) 
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected expression value not EOF", 0);
+    barn_expression_value_t* rhs_value = barn_get_expr_value(parser, expr_parser->parents);
+
+    barn_expression_parser_check_rhs_value_null(parser, rhs_value, expr_parser->index);
+
+    // Append new mathematical expression node
+    barn_expression_node_t* append_expr_node = barn_create_expression_node(lhs_value, rhs_value, operator, expr_parser->parents);
+    barn_append_element_to_array(expr_parser->main_expr_node->expression.expression_nodes, append_expr_node);
+}
+
+barn_node_t* 
+barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind)
+{
+    barn_node_t* expr_node = barn_create_expression_ast_node();
+
+    if (parser->curr_token->kind == end_kind)
+        return expr_node;
+    
+    if (parser->curr_token->kind == BARN_TOKEN_EOF)
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected expression value not EOF", 0);
+
+    barn_expr_parser_t* expr_parser = (barn_expr_parser_t*)calloc(1, sizeof(barn_expr_parser_t));
+    expr_parser->main_expr_node = expr_node;
+    expr_parser->parents        = 0;
+    expr_parser->index          = 0;
+
+    for (; ; expr_parser->index++)
     {
+        if (barn_expression_parser_check_parents(parser, expr_parser) == 1)
+            continue;
+
         if (parser->curr_token->kind == BARN_TOKEN_EOF || parser->curr_token->kind == end_kind)
             break;
 
-        printf("%s\n", parser->curr_token->value);
-        barn_expression_type_t sign = barn_expr_detect_sign(parser);
-        expr_node->node_type = sign;
-        barn_parser_skip(parser, 1);
-
-        barn_expression_value_t* rhs_value = barn_expr_get_value(parser);
-        expr_node->rhs_is_node = false;
-        expr_node->rhs_ptr     = rhs_value;
+        if (expr_parser->index == 0)
+            barn_expression_parser_full_lhs_op_rhs(parser, expr_parser);
+        else 
+            barn_expression_parser_not_full_op_rhs(parser, expr_parser);
     }
 
-    printf("%s %s %s\n", 
-        ((barn_expression_value_t*)expr_node->lhs_ptr)->expr_val_token->value,
-        barn_expr_type_to_string(expr_node->node_type),
-        ((barn_expression_value_t*)expr_node->rhs_ptr)->expr_val_token->value);
+    for (int i = 0; i < expr_node->expression.expression_nodes->length; i++)
+    {
+        barn_expression_node_t* curr_expr_node = barn_get_element_from_array(expr_node->expression.expression_nodes, i);
+        
+        printf("lhs: \"%s\", rhs: \"%s\", op: \"%s\", parents: %d\n",
+            curr_expr_node->lhs != NULL
+                ? curr_expr_node->lhs->expr_val_token->value
+                : "(null)",
+            curr_expr_node->rhs != NULL
+                ? curr_expr_node->rhs->expr_val_token->value
+                : "(null)",
+            barn_token_kind_to_string(curr_expr_node->operator),
+            curr_expr_node->parents);
+    }
+
+    return expr_node;
 }

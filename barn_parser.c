@@ -152,7 +152,7 @@ barn_parser_main_loop(barn_parser_t* parser)
     //                         parser->curr_token->value);
     // }
     barn_parser_skip(parser, 0);
-    barn_expr_parse_end_at(parser, BARN_TOKEN_SEMICOL);
+    barn_parse_expression(parser, BARN_TOKEN_SEMICOL);
 }
 
 barn_parser_t* 

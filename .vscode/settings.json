@@ -12,6 +12,8 @@
         "__string": "cpp",
         "concepts": "cpp",
         "type_traits": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "barn_core.h": "c",
+        "barn_expressions.h": "c"
     }
 }
