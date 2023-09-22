@@ -53,6 +53,7 @@ typedef struct __barn_parser_t {
 
 #include <barn_types.h>
 
+#define BARN_COLLECT_CURR_TOK_VAL(parser) (parser->curr_token->value)
 #define BARN_TOKEN_CMP(str) (strcmp(parser->curr_token->value, str) == 0)
 
 #define BARN_PARSER_ERR(parser, error_type, msg, ...) ({            \

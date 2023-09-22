@@ -23,8 +23,9 @@
 #include <barn_parser.h>
 #include <barn_expressions.h>
 
-#include <barn_functions.h>
 #include <barn_func_return.h>
+#include <barn_functions.h>
+#include <barn_func_call.h>
 
 #include <barn_string.h>
 #include <barn_array.h>
@@ -118,7 +119,12 @@ void
 barn_parser_identifier(barn_parser_t* parser)
 {
     if (!barn_parser_is_id_keyword(parser->curr_token->value))
-        BARN_UNIMPLEMENTED("can't parse not keyword identifier expression for now");
+    {
+        if (barn_parser_is_next_token(parser, BARN_TOKEN_OPENPARENT))
+            barn_parser_func_call(parser);
+        else
+            BARN_UNIMPLEMENTED("statements like +=, -=, *= etc. are not implemented");
+    }
 
     if (BARN_TOKEN_CMP("fun"))
         barn_parser_function_declaration(parser);
