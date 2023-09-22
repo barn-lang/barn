@@ -27,6 +27,7 @@ typedef enum __barn_token_kind_t {
     /* Special tokens */
 	BARN_TOKEN_NONE = 0,
 	BARN_TOKEN_EOF,
+	BARN_TOKEN_NEWLINE,
 
 	/* Default tokens */
 	BARN_TOKEN_INT,

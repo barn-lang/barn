@@ -50,6 +50,10 @@ typedef struct __barn_node_t {
     } function_declaration;
 
     struct {
+        barn_node_t* return_value;
+    } function_return;
+
+    struct {
         barn_array_t* expression_nodes;
     } expression;
 } barn_node_t;

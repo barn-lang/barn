@@ -77,4 +77,6 @@ bool barn_parser_is_id_correct_namespace(char* id_namespace);
 void barn_parser_reset_local_variables(barn_parser_t* parser);
 void barn_parser_append_node(barn_parser_t* parser, barn_node_t* node);
 
+void barn_parser_show_ast(barn_parser_t* parser);
+
 #endif /* __BARN_PARSER__ */

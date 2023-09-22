@@ -1,8 +1,8 @@
 - [X] Lexer
 - [ ] Parser
     - [X] Function declaration
-    - [ ] Mathematical & Logical Expressions
-    - [ ] Function return
+    - [X] Mathematical & Logical Expressions
+    - [X] Function return
     - [ ] Function call
 - [ ] Typechecker
 - [ ] Codegen

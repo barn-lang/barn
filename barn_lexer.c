@@ -157,9 +157,15 @@ barn_lexer_new_line(barn_lexer_t* lexer)
     lexer->col = 0;
     lexer->is_space = true;
     lexer->is_comment_inline = false; 
+
+    char* current_line  = barn_get_element_from_array(lexer->file_lines, lexer->row - 1);
+    barn_token_t* token = barn_create_token("new_line", (char*)lexer->filename, 
+                                            current_line, lexer->col, lexer->row, BARN_TOKEN_NEWLINE);
+
+    BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
 }
 
-void 
+void    
 barn_lexer_space(barn_lexer_t* lexer)
 {
     if (lexer->is_string == true)

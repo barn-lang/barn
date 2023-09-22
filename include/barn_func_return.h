@@ -18,11 +18,12 @@
  *
 */
 
-#include <barn_core.h>
+#ifndef __BARN_FUNC_RETURN__
+#define __BARN_FUNC_RETURN__
 
-void
-barn_generate_tabs(int tabs)
-{
-    for (int i = 0; i < tabs; i++)
-        printf("\t");
-}
+#include <barn_core.h>
+#include <barn_parser.h>
+
+void barn_parser_func_return(barn_parser_t* parser);
+
+#endif /* __BARN_FUNC_RETURN__ */

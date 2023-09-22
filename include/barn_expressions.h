@@ -49,6 +49,8 @@ typedef struct __barn_expr_parser_t {
     long index;
     long parents;
 
+    barn_token_kind_t end_kind;
+
     barn_node_t* main_expr_node;
 } barn_expr_parser_t;
 

@@ -21,13 +21,17 @@
 #include <barn_core.h>
 
 #include <barn_parser.h>
-#include <barn_functions.h>
 #include <barn_expressions.h>
+
+#include <barn_functions.h>
+#include <barn_func_return.h>
+
 #include <barn_string.h>
-#include <barn_lexer.h>
-#include <barn_nodes.h>
 #include <barn_array.h>
 #include <barn_io.h>
+
+#include <barn_lexer.h>
+#include <barn_nodes.h>
 
 #ifndef BARN_TOKEN_CMP
 # define BARN_TOKEN_CMP(str) (strcmp(parser->curr_token->value, str) == 0)
@@ -118,6 +122,8 @@ barn_parser_identifier(barn_parser_t* parser)
 
     if (BARN_TOKEN_CMP("fun"))
         barn_parser_function_declaration(parser);
+    if (BARN_TOKEN_CMP("return"))
+        barn_parser_func_return(parser);
 }
 
 void 
@@ -137,22 +143,22 @@ barn_parser_close_brace(barn_parser_t* parser)
 void 
 barn_parser_main_loop(barn_parser_t* parser)
 {
-    // for (; parser->index < parser->lexer->tokens->length; parser->index++)
-    // {
-    //     barn_parser_skip(parser, 0);
+    for (; parser->index < parser->lexer->tokens->length; parser->index++)
+    {
+        barn_parser_skip(parser, 0);
 
-    //     if (parser->curr_token->kind == BARN_TOKEN_EOF)
-    //         break;
-    //     else if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER)
-    //         barn_parser_identifier(parser);
-    //     else if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
-    //         barn_parser_close_brace(parser);
-    //     else 
-    //         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unknown use of '%s' token in this place", 
-    //                         parser->curr_token->value);
-    // }
-    barn_parser_skip(parser, 0);
-    barn_parse_expression(parser, BARN_TOKEN_SEMICOL);
+        if (parser->curr_token->kind == BARN_TOKEN_EOF)
+            break;
+        else if (parser->curr_token->kind == BARN_TOKEN_NEWLINE)
+            continue;
+        else if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER)
+            barn_parser_identifier(parser);
+        else if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
+            barn_parser_close_brace(parser);
+        else 
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unknown use of '%s' token in this place", 
+                            parser->curr_token->value);
+    }
 }
 
 barn_parser_t* 
@@ -176,7 +182,48 @@ barn_start_parser(barn_lexer_t* lexer)
 
     barn_debug_entry("barn_parser_main_loop", __FILE__, __LINE__);
     barn_parser_main_loop(parser);
+    barn_parser_show_ast(parser);
     return parser;
+}
+
+void
+barn_parser_show_ast_child(barn_parser_t* parser, barn_array_t* nodes, int tabs)
+{
+    for (int i = 0; i < nodes->length; i++)
+    {
+        barn_node_t* curr_node = barn_get_element_from_array(nodes, i);
+
+        barn_generate_tabs(tabs);
+        printf("parser->nodes[%d]={ node_kind: %s, ", i, barn_node_kind_show(curr_node->node_kind));
+        printf("}\n");
+    }
+}
+
+void
+barn_parser_show_ast(barn_parser_t* parser)
+{
+    printf("AST Tree debug:\n");
+
+    for (int i = 0; i < parser->nodes->length; i++)
+    {
+        barn_node_t* curr_node = barn_get_element_from_array(parser->nodes, i);
+
+        printf("parser->nodes[%d]={ node_kind: %s, ", i, barn_node_kind_show(curr_node->node_kind));
+
+        if (curr_node->node_kind == BARN_NODE_FUNCTION_DECLARATION)
+            printf("function_declaration: { function_name: \"%s\", function_nodes: %p }, ",
+                curr_node->function_declaration.function_name,
+                curr_node->function_declaration.function_nodes);
+
+        printf("}\n");
+
+        if (curr_node->node_kind == BARN_NODE_FUNCTION_DECLARATION)
+        {
+            printf("{\n");
+            barn_parser_show_ast_child(parser, curr_node->function_declaration.function_nodes, 1);
+            printf("}\n");
+        }
+    }
 }
 
 bool 
@@ -191,7 +238,11 @@ void
 barn_parser_append_node(barn_parser_t* parser, barn_node_t* node)
 {
     if (barn_parser_is_function_opened(parser))
-        BARN_UNIMPLEMENTED("implement appending nodes when functions are opened");
+    {
+        barn_append_element_to_array(parser->actual_function->function_declaration.function_nodes,
+                                     node);
+        return;
+    }
 
     barn_append_element_to_array(parser->nodes, node);
 }
