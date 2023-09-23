@@ -1,8 +1,8 @@
-fun foo() {
-
+fun foo(i32 plus, i32 mul, i32 num) {
+    
 }
 
 fun main() -> i32 {
-    foko()
+    foo(1 + 1, 4 * 10, 1, 2)
     return 0
 }

@@ -56,6 +56,12 @@ typedef struct __barn_node_t {
     struct {
         barn_array_t* expression_nodes;
     } expression;
+
+    struct {
+        barn_array_t* function_args;
+        const char*   function_name;
+        barn_node_t*  function;
+    } function_call;
 } barn_node_t;
 
 char* barn_node_kind_show(barn_node_kind_t kind);

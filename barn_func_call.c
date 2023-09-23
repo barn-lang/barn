@@ -24,18 +24,86 @@
 #include <barn_expressions.h>
 #include <barn_functions.h>
 
+barn_array_t*
+barn_parse_function_call_arguments(barn_parser_t* parser)
+{
+    barn_array_t* func_call_args = barn_create_array(sizeof(barn_node_t*));
+
+    while (true)
+    {
+        if (parser->curr_token->kind == BARN_TOKEN_EOF)
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected value or \",\" to create argument list not EOF", 0);
+        
+        if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
+            return func_call_args;
+
+        barn_node_t* argument_value = barn_parse_expression(parser, BARN_TOKEN_COMMA, BARN_TOKEN_CLOSEPARENT, true);
+        barn_append_element_to_array(func_call_args, argument_value);
+
+        if (parser->curr_token->kind == BARN_TOKEN_COMMA)
+        {
+            barn_parser_skip(parser, 1);
+            continue;
+        }
+        else if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
+            return func_call_args;
+        else
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \",\" or \")\" after argument value", 0);
+    }
+
+    // for (int i = 0; i < func_call_args->length; i++)
+    // {
+    //     barn_node_t* curr_args_node = barn_get_element_from_array(func_call_args, i);
+
+    //     printf("func_call_args[%d]={ expression_nodes: %p, expression_nodes->length: %d }",
+    //         curr_args_node->expression.expression_nodes,
+    //         curr_args_node->expression.expression_nodes->length);
+    // }
+
+    return func_call_args;
+}
+
+void
+barn_parser_func_call_arugments_length(barn_parser_t* parser, barn_node_t* mentioned_function, 
+                                       barn_array_t* function_call_args)
+{
+    if (function_call_args->length != mentioned_function->function_declaration.function_args->length)
+    {   
+        if (function_call_args->length < mentioned_function->function_declaration.function_args->length)
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "too few arguments, expected %d, got %d",
+                mentioned_function->function_declaration.function_args->length,
+                function_call_args->length);
+        else
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "too many arguments, expected %d, got %d",
+                mentioned_function->function_declaration.function_args->length,
+                function_call_args->length);
+    }
+}
+
 void 
 barn_parser_func_call(barn_parser_t* parser)
 {
-    const char* function_name = BARN_COLLECT_CURR_TOK_VAL(parser);
+    const char* function_call_name = BARN_COLLECT_CURR_TOK_VAL(parser);
 
-    if (!BARN_STR_CMP(function_name, BARN_FUNCTION_INJECTING_CODE))
+    if (!BARN_STR_CMP(function_call_name, BARN_FUNCTION_INJECTING_CODE))
         if (!barn_parser_is_function_opened(parser))
             BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "function should be opened to call a function", 0);
 
-    barn_node_t* mentioned_function = barn_parser_function_get_by_name(parser, function_name);
+    barn_node_t* mentioned_function = barn_parser_function_get_by_name(parser, function_call_name);
 
     if (mentioned_function == NULL)
-        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "function named \"%s\" doesn't exists", function_name);
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "function named \"%s\" doesn't exists", function_call_name);
         
+    barn_parser_skip(parser, 1);
+    if (parser->curr_token->kind != BARN_TOKEN_OPENPARENT)
+        BARN_UNIMPLEMENTED("this shouldn't happend");
+
+    barn_array_t* function_call_args = barn_parse_function_call_arguments(parser);
+    barn_parser_func_call_arugments_length(parser, mentioned_function, function_call_args);
+
+    barn_node_t*  function_call_node = barn_create_empty_node(BARN_NODE_FUNCTION_CALL);
+    function_call_node->function_call.function_name = function_call_name;
+    function_call_node->function_call.function_args = function_call_args;
+    function_call_node->function_call.function      = mentioned_function;
+    barn_parser_append_node(parser, function_call_node);
 }

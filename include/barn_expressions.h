@@ -50,6 +50,9 @@ typedef struct __barn_expr_parser_t {
     long parents;
 
     barn_token_kind_t end_kind;
+    barn_token_kind_t end_kind_2;
+
+    bool function_argument_value;
 
     barn_node_t* main_expr_node;
 } barn_expr_parser_t;
@@ -59,6 +62,7 @@ barn_expression_node_t*  barn_create_expression_node(barn_expression_value_t* lh
                                                      barn_token_kind_t operator,   unsigned long parents);
 barn_node_t*             barn_create_expression_ast_node();
 
-barn_node_t* barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind);
+barn_node_t* barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind, 
+                                   barn_token_kind_t end_kind_2, bool function_argument_value);
 
 #endif /* __BARN_EXPRESSIONS__ */

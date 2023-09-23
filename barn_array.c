@@ -37,6 +37,8 @@
 barn_array_t* 
 barn_create_array(size_t size_of_element)
 {
+    barn_debug_entry("barn_create_array", __FILE_NAME__, __LINE__);
+
     ARRAY_VALIDATE_NUMBER(size_of_element);
 
     /* Initialize array fields with default 
