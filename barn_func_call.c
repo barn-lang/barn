@@ -48,7 +48,23 @@ barn_parse_function_call_arguments(barn_parser_t* parser)
         else if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
             return func_call_args;
         else
-            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \",\" or \")\" after argument value", 0);
+        {
+            if (parser->curr_token->kind == BARN_TOKEN_NEWLINE)
+            {
+                barn_parser_skip(parser, -1);
+                if (parser->curr_token->kind == BARN_TOKEN_COMMA)
+                {
+                    barn_parser_skip(parser, 1);
+                    continue;
+                }
+                else if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
+                    return func_call_args;
+                else
+                    BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \",\" or \")\" after argument value", 0);
+            }
+            else
+                BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \",\" or \")\" after argument value", 0);
+        }
     }
 
     // for (int i = 0; i < func_call_args->length; i++)
@@ -70,20 +86,23 @@ barn_parser_func_call_arugments_length(barn_parser_t* parser, barn_node_t* menti
     if (function_call_args->length != mentioned_function->function_declaration.function_args->length)
     {   
         if (function_call_args->length < mentioned_function->function_declaration.function_args->length)
-            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "too few arguments, expected %d, got %d",
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "too few arguments to call function \"%s\", expected %d, got %d",
+                mentioned_function->function_declaration.function_name,
                 mentioned_function->function_declaration.function_args->length,
                 function_call_args->length);
         else
-            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "too many arguments, expected %d, got %d",
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "too many arguments to call function \"%s\", expected %d, got %d",
+                mentioned_function->function_declaration.function_name,
                 mentioned_function->function_declaration.function_args->length,
                 function_call_args->length);
     }
 }
 
-void 
-barn_parser_func_call(barn_parser_t* parser)
+barn_node_t*
+__barn_parser_func_call(barn_parser_t* parser)
 {
     const char* function_call_name = BARN_COLLECT_CURR_TOK_VAL(parser);
+    barn_token_t* function_token   = parser->curr_token;
 
     if (!BARN_STR_CMP(function_call_name, BARN_FUNCTION_INJECTING_CODE))
         if (!barn_parser_is_function_opened(parser))
@@ -98,12 +117,39 @@ barn_parser_func_call(barn_parser_t* parser)
     if (parser->curr_token->kind != BARN_TOKEN_OPENPARENT)
         BARN_UNIMPLEMENTED("this shouldn't happend");
 
-    barn_array_t* function_call_args = barn_parse_function_call_arguments(parser);
+    barn_array_t* function_call_args = NULL;
+
+    if (barn_parser_is_next_token(parser, BARN_TOKEN_CLOSEPARENT))
+    {
+        function_call_args = barn_create_array(sizeof(void*));
+        barn_parser_skip(parser, 1);
+    }
+    else
+        function_call_args = barn_parse_function_call_arguments(parser);
+
+    // for (int i = 0; i < function_call_args->length; i++)
+    // {
+    //     barn_node_t* curr_args_node = barn_get_element_from_array(function_call_args, i);
+
+    //     printf("func_call_args[%d]={ expression_nodes: %p, expression_nodes->length: %d }", i,
+    //         curr_args_node->expression.expression_nodes,
+    //         curr_args_node->expression.expression_nodes->length);
+    // }
+
     barn_parser_func_call_arugments_length(parser, mentioned_function, function_call_args);
 
     barn_node_t*  function_call_node = barn_create_empty_node(BARN_NODE_FUNCTION_CALL);
-    function_call_node->function_call.function_name = function_call_name;
-    function_call_node->function_call.function_args = function_call_args;
-    function_call_node->function_call.function      = mentioned_function;
+    
+    function_call_node->function_call.function_token = function_token;
+    function_call_node->function_call.function_name  = function_call_name;
+    function_call_node->function_call.function_args  = function_call_args;
+    function_call_node->function_call.function       = mentioned_function;
+    return function_call_node;
+}
+
+void 
+barn_parser_func_call(barn_parser_t* parser)
+{
+    barn_node_t* function_call_node = __barn_parser_func_call(parser);
     barn_parser_append_node(parser, function_call_node);
 }

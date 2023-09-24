@@ -15,6 +15,9 @@
         "string": "cpp",
         "barn_core.h": "c",
         "barn_expressions.h": "c",
-        "barn_parser.h": "c"
+        "barn_parser.h": "c",
+        "barn_types.h": "c",
+        "barn_tokens.h": "c",
+        "barn_func_call.h": "c"
     }
 }

@@ -21,6 +21,7 @@
 #include <barn_core.h>
 
 #include <barn_expressions.h>
+#include <barn_func_call.h>
 #include <barn_tokens.h>
 #include <barn_parser.h>
 
@@ -62,7 +63,7 @@ barn_create_expression_ast_node()
 }
 
 barn_expression_value_t* 
-barn_get_expr_value(barn_parser_t* parser, unsigned long* parents)
+barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
 {
     barn_expression_value_t* expr_value = barn_create_expression_value(NULL, NULL);
 
@@ -81,6 +82,11 @@ barn_get_expr_value(barn_parser_t* parser, unsigned long* parents)
         expr_value->expr_val_token = parser->curr_token;
         expr_value->expr_val_type  = barn_type_f32_global;
     }
+    else if (parser->curr_token->kind == BARN_TOKEN_STRING)
+    {
+        expr_value->expr_val_token = parser->curr_token;
+        expr_value->expr_val_type = barn_type_str_global;
+    }
     else if (parser->curr_token->kind == BARN_TOKEN_EOF)
     {
         barn_parser_skip(parser, -1);
@@ -90,8 +96,21 @@ barn_get_expr_value(barn_parser_t* parser, unsigned long* parents)
     else if (parser->curr_token->kind == BARN_TOKEN_OPENPARENT)
     {
         barn_parser_skip(parser, 1);
-        *parents++;
+        expr_parser->parents++;
         return NULL;
+    }
+    else if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER)
+    {
+        if (barn_parser_is_next_token(parser, BARN_TOKEN_OPENPARENT))
+        {
+            barn_node_t* func_call = __barn_parser_func_call(parser);
+
+            expr_value->expr_val_type = func_call->function_call.function->function_declaration.function_return;
+            expr_value->expr_val_token = func_call->function_call.function_token;
+            expr_value->function_call = func_call;
+            expr_value->is_function_call = true;
+        }
+            
     }
     else 
     {
@@ -179,7 +198,7 @@ barn_expression_parser_not_full_op_rhs(barn_parser_t* parser, barn_expr_parser_t
     // Get rhs value
     if (parser->curr_token->kind == BARN_TOKEN_EOF) 
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected expression value not EOF", 0);
-    barn_expression_value_t* rhs_value = barn_get_expr_value(parser, &expr_parser->parents);
+    barn_expression_value_t* rhs_value = barn_get_expr_value(parser, expr_parser);
 
     barn_expression_parser_check_rhs_value_null(parser, rhs_value, expr_parser);
 
@@ -192,7 +211,7 @@ void
 barn_expression_parser_full_lhs_op_rhs(barn_parser_t* parser,  barn_expr_parser_t* expr_parser)
 {
     // Get lhs value
-    barn_expression_value_t* lhs_value = barn_get_expr_value(parser, expr_parser->parents);
+    barn_expression_value_t* lhs_value = barn_get_expr_value(parser, expr_parser);
 
     if (parser->curr_token->kind == BARN_TOKEN_EOF          || 
         parser->curr_token->kind == BARN_TOKEN_NEWLINE      ||
@@ -214,7 +233,7 @@ barn_expression_parser_full_lhs_op_rhs(barn_parser_t* parser,  barn_expr_parser_
     // Get rhs value
     if (parser->curr_token->kind == BARN_TOKEN_EOF) 
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected expression value not EOF", 0);
-    barn_expression_value_t* rhs_value = barn_get_expr_value(parser, expr_parser->parents);
+    barn_expression_value_t* rhs_value = barn_get_expr_value(parser, expr_parser);
 
     barn_expression_parser_check_rhs_value_null(parser, rhs_value, expr_parser->index);
 
@@ -269,7 +288,7 @@ barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind,
        
         printf("lhs: \"%s\", rhs: \"%s\", op: \"%s\", parents: %d\n",
             curr_expr_node->lhs != NULL
-                ? curr_expr_node->lhs->expr_val_token->value
+                ? (curr_expr_node->lhs->expr_val_token->value)
                 : "(null)",
             curr_expr_node->rhs != NULL
                 ? curr_expr_node->rhs->expr_val_token->value

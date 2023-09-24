@@ -42,7 +42,6 @@ barn_include_tokenize_file_and_append_tokens(barn_include_t* include_struct)
 
         char* filename_with_std = calloc(strlen(std_path) + strlen(filename) + 2, sizeof(char));
         sprintf(filename_with_std, "%s%s", std_path, filename);
-        printf("%s\n", filename_with_std);
 
         if (barn_file_exists(filename_with_std) == true)
             file_value = barn_read_whole_file(filename_with_std);

@@ -1,8 +1,14 @@
-fun foo(i32 plus, i32 mul, i32 num) {
-    
+fun pi() -> f32 {
+    return 3.14
+}
+
+fun print_f32(f32 x) {
+    return
 }
 
 fun main() -> i32 {
-    foo(1 + 1, 4 * 10, 1, 2)
-    return 0
+    print_f32(2) 
+    print_f32(2) 
+
+    return 
 }

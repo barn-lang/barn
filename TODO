@@ -3,8 +3,13 @@
     - [X] Function declaration
     - [X] Mathematical & Logical Expressions
     - [X] Function return
-    - [ ] Function call
+    - [X] Function call
+    - [X] Fix bugs
+    - [ ] __code__
 - [ ] Typechecker
+    - [ ] Check expression nodes types
+    - [ ] Check function returning types
+    - [ ] Check argument types
 - [ ] Codegen
 - [ ] Implement every thing from barngo
 - [ ] Implement structs
