@@ -21,6 +21,7 @@
 #include <barn_core.h>
 
 #include <barn_args_parser.h>
+#include <barn_type_checker.h>
 #include <barn_time_comp.h>
 #include <barn_include.h>
 #include <barn_message.h>
@@ -93,6 +94,8 @@ barn_filename_action(barn_args_parser_t* args_parser)
     BARN_USE(parser);
 
     // Typechecker
+    barn_debug_entry("barn_start_tc", __FILE__, __LINE__);
+    barn_type_checker_start(parser);
 
     // Codegen
 

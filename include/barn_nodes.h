@@ -51,6 +51,7 @@ typedef struct __barn_node_t {
 
     struct {
         barn_node_t* return_value;
+        barn_node_t* return_func;
     } function_return;
 
     struct {

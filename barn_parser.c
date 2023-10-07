@@ -187,6 +187,7 @@ barn_start_parser(barn_lexer_t* lexer)
     parser->actual_function = NULL;
 
     barn_debug_entry("barn_parser_main_loop", __FILE__, __LINE__);
+    barn_initialize_builtin_functions(parser);
     barn_parser_main_loop(parser);
     barn_parser_show_ast(parser);
     return parser;

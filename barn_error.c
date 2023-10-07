@@ -35,6 +35,8 @@ const char* barn_error_codes_string[BARN_ERROR_CODES_LENGTH] = {
 	[BARN_COMPILER_ERROR ] = "CompilerError",
 	[BARN_OVERFLOW_ERROR ] = "OverflowError",
 	[BARN_NAMESPACE_ERROR] = "NamespaceError",
+    [BARN_TYPE_ERROR     ] = "TypeError",
+    [BARN_MATH_ERROR     ] = "MathError",
 };
 
 const char* 
@@ -73,8 +75,21 @@ barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, ch
     printf("%s%d %s| %s", 
             barn_get_color_as_str_code(BARN_COLOR_GREEN), row + 1, 
             barn_get_color_as_str_code(BARN_COLOR_RESET), barn_get_color_as_str_code(BARN_COLOR_GRAY));
+
+    bool was_char_printed = false;
+    int  space_skipped    = 0;
+
     for (int i = 0; i < strlen(line); i++)
     {
+        if (line[i] == ' ' && was_char_printed == false)
+        {
+            space_skipped += 1;
+            continue;
+        }   
+
+        if (was_char_printed == false && line[i] != ' ')
+            was_char_printed = true;
+
         if (i == col)
             printf("%s", barn_get_color_as_str_code(BARN_COLOR_GREEN));
 
@@ -94,7 +109,7 @@ barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, ch
         printf(" ");
     printf("%s|%s",  barn_get_color_as_str_code(BARN_COLOR_RESET),  barn_get_color_as_str_code(BARN_COLOR_GRAY));
 
-    for (int i = 0; i < col + 1; i++)
+    for (int i = 0; i < col + 1 - space_skipped; i++)
         printf(" ");
     printf("%s^~~~%s error occurred here\n", barn_get_color_as_str_code(BARN_COLOR_GREEN), barn_get_color_as_str_code(BARN_COLOR_WHITE));
 

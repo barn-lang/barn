@@ -46,5 +46,6 @@ barn_parser_func_return(barn_parser_t* parser)
     barn_node_t* func_return_node = barn_create_empty_node(BARN_NODE_FUNCTION_RETURN);
 
     func_return_node->function_return.return_value = return_value;
+    func_return_node->function_return.return_func  = parser->actual_function;
     barn_parser_append_node(parser, func_return_node);
 }

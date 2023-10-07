@@ -24,23 +24,6 @@
 #include <barn_core.h>
 #include <barn_parser.h>
 
-static barn_type_t* barn_type_u8_global;
-static barn_type_t* barn_type_u16_global;
-static barn_type_t* barn_type_u32_global;
-static barn_type_t* barn_type_u64_global;
-
-static barn_type_t* barn_type_i8_global;
-static barn_type_t* barn_type_i16_global;
-static barn_type_t* barn_type_i32_global;
-static barn_type_t* barn_type_i64_global;
-
-static barn_type_t* barn_type_ptr_global;
-static barn_type_t* barn_type_str_global;
-static barn_type_t* barn_type_bool_global;
-
-static barn_type_t* barn_type_f32_global;
-static barn_type_t* barn_type_f64_global;
-
 typedef enum __barn_type_kind_t {
     /* Unsigned */
     BARN_TYPE_U8,
@@ -72,7 +55,7 @@ typedef struct __barn_type_t {
     barn_type_kind_t type;
     size_t size;
 
-    bool is_unsgined;
+    bool is_unsigned;
     bool is_signed;
     bool is_string;
     bool is_float;
@@ -84,6 +67,7 @@ typedef struct __barn_type_t {
 barn_type_t* barn_create_type(barn_type_kind_t type);
 
 size_t barn_convert_type_to_size(barn_type_kind_t type);
+const char*barn_convert_type_to_string(barn_type_t* type);
 
 bool barn_is_type_unsigned(barn_type_kind_t type);
 bool barn_is_type_signed(barn_type_kind_t type);
@@ -91,8 +75,24 @@ bool barn_is_type_string(barn_type_kind_t type);
 bool barn_is_type_float(barn_type_kind_t type);
 bool barn_is_type_ptr(barn_type_kind_t type);
 
+bool barn_is_type_number(barn_type_kind_t type);
+
 barn_type_t* barn_parser_current_token_type_representation(barn_parser_t* parser);
 
 void barn_initalize_types();
+
+barn_type_t* barn_get_type_u8_global();
+barn_type_t* barn_get_type_u16_global();
+barn_type_t* barn_get_type_u32_global();
+barn_type_t* barn_get_type_u64_global();
+barn_type_t* barn_get_type_i8_global();
+barn_type_t* barn_get_type_i16_global();
+barn_type_t* barn_get_type_i32_global();
+barn_type_t* barn_get_type_i64_global();
+barn_type_t* barn_get_type_ptr_global();
+barn_type_t* barn_get_type_str_global();
+barn_type_t* barn_get_type_bool_global();
+barn_type_t* barn_get_type_f32_global();
+barn_type_t* barn_get_type_f64_global();
 
 #endif /* __BARN_TYPES__ */

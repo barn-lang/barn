@@ -27,16 +27,13 @@ static barn_type_t* barn_type_u8_global;
 static barn_type_t* barn_type_u16_global;
 static barn_type_t* barn_type_u32_global;
 static barn_type_t* barn_type_u64_global;
-
 static barn_type_t* barn_type_i8_global;
 static barn_type_t* barn_type_i16_global;
 static barn_type_t* barn_type_i32_global;
 static barn_type_t* barn_type_i64_global;
-
 static barn_type_t* barn_type_ptr_global;
 static barn_type_t* barn_type_str_global;
 static barn_type_t* barn_type_bool_global;
-
 static barn_type_t* barn_type_f32_global;
 static barn_type_t* barn_type_f64_global;
 
@@ -66,7 +63,7 @@ barn_create_type(barn_type_kind_t type)
     new_type->type = type;
     new_type->size = barn_convert_type_to_size(type);
 
-    new_type->is_unsgined = barn_is_type_unsigned(type);
+    new_type->is_unsigned = barn_is_type_unsigned(type);
     new_type->is_signed   = barn_is_type_signed(type);
     new_type->is_string   = barn_is_type_string(type);
     new_type->is_float    = barn_is_type_float(type);
@@ -97,6 +94,14 @@ bool
 barn_is_type_string(barn_type_kind_t type)
 {
     return (type == BARN_TYPE_STRING);
+}
+
+bool
+barn_is_type_number(barn_type_kind_t type)
+{
+    return ((barn_is_type_signed(type) || barn_is_type_unsigned(type) || barn_is_type_float(type))
+                ? true
+                : false);
 }
 
 bool 
@@ -182,4 +187,124 @@ barn_parser_current_token_type_representation(barn_parser_t* parser)
     // TODO: implement pointers
 
     return type;
+}
+
+const char*
+barn_convert_type_to_string(barn_type_t* type)
+{
+    switch (type->type)
+    {
+        case BARN_TYPE_U8:
+            return "u8";
+            break;
+        case BARN_TYPE_I8:
+            return "i8";
+            break;
+        case BARN_TYPE_BOOL:
+            return "bool";
+            break;
+        case BARN_TYPE_NONE:
+            return "none";
+            break;
+        case BARN_TYPE_U16:
+            return "u16";
+            break;
+        case BARN_TYPE_I16:
+            return "i16";
+            break;
+        case BARN_TYPE_U32:
+            return "u32";
+            break;
+        case BARN_TYPE_I32:
+            return "i32";
+            break;
+        case BARN_TYPE_F32:
+            return "f32";
+            break;
+        case BARN_TYPE_U64:
+            return "u64";
+            break;
+        case BARN_TYPE_I64:
+            return "i64";
+            break;
+        case BARN_TYPE_F64:
+            return "f64";
+            break;
+        case BARN_TYPE_PTR:
+            return "ptr*";
+            break;
+        case BARN_TYPE_STRING:
+            return "string";
+            break;
+        default:
+            BARN_UNIMPLEMENTED("unhandled type size");
+            break;        
+    }
+
+    return "unknown";
+}
+
+barn_type_t* barn_get_type_u8_global()   
+{ 
+    return barn_type_u8_global; 
+}
+
+barn_type_t* barn_get_type_u16_global()  
+{ 
+    return barn_type_u16_global;
+}
+
+barn_type_t* barn_get_type_u32_global()  
+{ 
+    return barn_type_u32_global;
+}
+
+barn_type_t* barn_get_type_u64_global()  
+{ 
+    return barn_type_u64_global;
+}
+
+barn_type_t* barn_get_type_i8_global()   
+{ 
+    return barn_type_i8_global; 
+}
+
+barn_type_t* barn_get_type_i16_global()  
+{ 
+    return barn_type_i16_global;
+}
+
+barn_type_t* barn_get_type_i32_global()  
+{ 
+    return barn_type_i32_global;
+}
+
+barn_type_t* barn_get_type_i64_global()  
+{ 
+    return barn_type_i64_global;
+}
+
+barn_type_t* barn_get_type_ptr_global()  
+{ 
+    return barn_type_ptr_global;
+}
+
+barn_type_t* barn_get_type_str_global()  
+{ 
+    return barn_type_str_global;
+}
+
+barn_type_t* barn_get_type_bool_global() 
+{ 
+    return barn_type_bool_global;
+}
+
+barn_type_t* barn_get_type_f32_global()  
+{ 
+    return barn_type_f32_global;
+}
+
+barn_type_t* barn_get_type_f64_global()  
+{ 
+    return barn_type_f64_global;
 }

@@ -43,6 +43,21 @@
  })
 #endif /* BARN_PARSER_ERR */
 
+void
+barn_initialize_builtin_functions(barn_parser_t* parser)
+{
+    barn_node_t* __code__function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* __code__args    = barn_create_array(sizeof(barn_func_argument_t));
+    barn_append_element_to_array(__code__args, barn_create_func_argument(barn_get_type_str_global(), "__code__str"));
+
+    __code__function->function_declaration.function_name   = BARN_FUNCTION_INJECTING_CODE;
+    __code__function->function_declaration.function_args   = __code__args;
+    __code__function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    __code__function->function_declaration.function_return = barn_create_type(BARN_TYPE_NONE);
+
+    barn_append_element_to_array(parser->function_nodes, __code__function);
+}
+
 barn_node_t*
 barn_parser_function_get_by_name(barn_parser_t* parser, char* function_name)
 {

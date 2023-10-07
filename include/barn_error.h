@@ -23,7 +23,7 @@
 
 #include <barn_core.h>
 
-#define BARN_ERROR_CODES_LENGTH 9
+#define BARN_ERROR_CODES_LENGTH 11
 
 typedef enum __barn_error_types_t {
 	BARN_ARGUMENT_ERROR,
@@ -31,10 +31,12 @@ typedef enum __barn_error_types_t {
 	BARN_SYNTAX_ERROR,
 	BARN_PARSER_ERROR,
 	BARN_UNDEFINED_ERROR,
+	BARN_TYPE_ERROR,
 	BARN_UNKNOWN_ERROR,
 	BARN_COMPILER_ERROR,
 	BARN_OVERFLOW_ERROR,
-	BARN_NAMESPACE_ERROR
+	BARN_NAMESPACE_ERROR,
+	BARN_MATH_ERROR,
 } barn_error_types_t;
 
 typedef struct __barn_lexer_t barn_lexer_t;

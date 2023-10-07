@@ -68,4 +68,7 @@ barn_node_t*             barn_create_expression_ast_node();
 barn_node_t* barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind, 
                                    barn_token_kind_t end_kind_2, bool function_argument_value);
 
+void barn_expression_division_by_zero(barn_parser_t* parser, barn_expr_parser_t* expr_parser, 
+                                      barn_expression_value_t* expr_value);
+
 #endif /* __BARN_EXPRESSIONS__ */

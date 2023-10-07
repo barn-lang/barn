@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.asm": "barn",
         "__config": "cpp",
         "__locale": "cpp",
         "cstdlib": "cpp",
@@ -18,6 +19,11 @@
         "barn_parser.h": "c",
         "barn_types.h": "c",
         "barn_tokens.h": "c",
-        "barn_func_call.h": "c"
+        "barn_func_call.h": "c",
+        "barn_ast.h": "c",
+        "barn_nodes.h": "c",
+        "barn_type_checker.h": "c",
+        "barn_args_parser.h": "c",
+        "barn_array.h": "c"
     }
 }

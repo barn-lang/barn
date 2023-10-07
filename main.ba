@@ -1,14 +1,4 @@
-fun pi() -> f32 {
-    return 3.14
-}
-
-fun print_f32(f32 x) {
-    return
-}
-
-fun main() -> i32 {
-    print_f32(2) 
-    print_f32(2) 
-
-    return 
+fun main() -> string {
+    __code__("printf(\"Hello, World from new barnc!\")")
+    return 2 * 10 + 20.49
 }

@@ -51,4 +51,6 @@ barn_node_t* barn_parser_function_get_by_name(barn_parser_t* parser, char* funct
 
 barn_func_argument_t* barn_create_func_argument(barn_type_t* argument_type, const char* argument_name);
 
+void barn_initialize_builtin_functions();
+
 #endif /* __BARN_FUNCTIONS__ */

@@ -22,5 +22,20 @@
 #define __BARN_TYPE_CHECKER__
 
 #include <barn_core.h>
+#include <barn_parser.h>
+#include <barn_nodes.h>
+
+typedef struct __barn_type_checker_t {
+    barn_array_t*  nodes;
+    barn_parser_t* parser;
+    barn_node_t*   curr_node;
+    
+    int index;
+} barn_type_checker_t;
+
+void barn_type_checker_start(barn_parser_t* parser);
+
+bool barn_tc_does_types_collide_expr_value(barn_expression_value_t* lhs, barn_expression_value_t* rhs);
+bool barn_tc_does_types_collides(barn_type_t* lhs, barn_type_t* rhs);
 
 #endif /* __BARN_TYPE_CHECKER__ */
