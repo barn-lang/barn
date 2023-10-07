@@ -35,6 +35,7 @@
 #include <barn_tokens.h>
 #include <barn_parser.h>
 #include <barn_types.h>
+#include <barn_codegen.h>
 
 void 
 barn_no_filename_action(char** argv, barn_args_parser_t* args_parser)
@@ -98,6 +99,9 @@ barn_filename_action(barn_args_parser_t* args_parser)
     barn_type_checker_start(parser);
 
     // Codegen
+    barn_debug_entry("barn_start_codegen", __FILE__, __LINE__);
+    barn_codegen_t* codegen = barn_codegen_start(parser);
+    barn_codegen_save_output_to_file(codegen, "barn.c");
 
     barn_end_time_compilation(time_comp);
     barn_print_time_compilation(time_comp);

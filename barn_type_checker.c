@@ -26,6 +26,7 @@
 #include <barn_lexer.h>
 #include <barn_nodes.h>
 
+#include <barn_functions.h>
 #include <barn_expressions.h>
 #include <barn_array.h>
 
@@ -51,12 +52,34 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
 {
     barn_array_t* expr_nodes = expr_node->expression.expression_nodes;
 
+    /* If there is only one node there is not reason for 
+     * getting through this whole function */
+    if (expr_nodes->length == 1 && 
+        ((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
+            ->lhs->is_function_call == false)
+        return;
+    else if (((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
+                ->lhs->is_function_call == true)
+    {
+        barn_tc_func_call_check(tc, ((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
+                                    ->lhs->function_call);
+        return;
+    }
+
     for (int i = 0; i < expr_nodes->length; i++)
     {
         barn_expression_node_t* curr_expr_node = barn_get_element_from_array(expr_nodes, i);
 
+        if (curr_expr_node->rhs != NULL)
+            if (curr_expr_node->rhs->is_function_call == true)
+                barn_tc_func_call_check(tc, curr_expr_node->rhs->function_call);
+
         if (i == 0)
         {
+            if (curr_expr_node->lhs->is_function_call == true)
+                barn_tc_func_call_check(tc, curr_expr_node->lhs->function_call);
+            barn_tc_does_types_collide_expr_value(curr_expr_node->lhs, curr_expr_node->rhs);
+            
             if (barn_tc_does_types_collide_expr_value(curr_expr_node->lhs, curr_expr_node->rhs))
                 BARN_TYPE_CHECKER_ERR(tc, curr_expr_node->lhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s but got %s",
                     barn_convert_type_to_string(curr_expr_node->lhs->expr_val_type), 
@@ -66,12 +89,16 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
         {
             barn_expression_node_t* last_node = barn_get_element_from_array(expr_nodes, i - 1);
 
+            if (last_node->rhs->is_function_call == true)
+                barn_tc_func_call_check(tc, last_node->rhs->function_call);
+
             if (barn_tc_does_types_collide_expr_value(last_node->rhs, curr_expr_node->rhs))
                 BARN_TYPE_CHECKER_ERR(tc, last_node->rhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s but got %s",
                     barn_convert_type_to_string(last_node->rhs->expr_val_type), 
                     barn_convert_type_to_string(curr_expr_node->rhs->expr_val_type)); 
         }
     }
+    printf("ok\n");
 }
 
 barn_type_t*
@@ -94,7 +121,7 @@ barn_tc_does_types_collides(barn_type_t* lhs, barn_type_t* rhs)
     // TODO: Add custom structure comparasion (structures first)
 
     if (rhs == NULL)
-        return false;
+        return true;
 
     if ((lhs->is_string && rhs->is_string) ||
         (lhs->is_ptr    && rhs->is_ptr))
@@ -119,19 +146,23 @@ barn_tc_does_types_collide_expr_value(barn_expression_value_t* lhs, barn_express
 }
 
 void
-barn_tc_func_return_check(barn_type_checker_t* tc)
+barn_tc_func_return_check(barn_type_checker_t* tc, barn_node_t* return_node)
 {
+    barn_node_t* curr_node = tc->curr_node;
+    if (return_node != NULL)
+        curr_node = return_node;
+
     /* To check is function return node correct in terms
      * of types we run couple of functions */
-    barn_tc_expression_check(tc, tc->curr_node->function_return.return_value);
+    barn_tc_expression_check(tc, curr_node->function_return.return_value);
 
-    barn_type_t* func_return_type = tc->curr_node->function_return.return_func
+    barn_type_t* func_return_type = curr_node->function_return.return_func
                                         ->function_declaration.function_return;
-    barn_type_t* expr_type        = barn_tc_expression_get_type(tc, tc->curr_node->function_return.return_value);
+    barn_type_t* expr_type        = barn_tc_expression_get_type(tc, curr_node->function_return.return_value);
     
     if (barn_tc_does_types_collides(func_return_type, expr_type))
     {
-        barn_expression_node_t* first_expr_node = barn_get_element_from_array(tc->curr_node->function_return.return_value
+        barn_expression_node_t* first_expr_node = barn_get_element_from_array(curr_node->function_return.return_value
                                                                                  ->expression.expression_nodes, 0);
                                                                                  
         BARN_TYPE_CHECKER_ERR(tc, first_expr_node->lhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s as return type got %s",
@@ -141,9 +172,31 @@ barn_tc_func_return_check(barn_type_checker_t* tc)
 }
 
 void
-barn_tc_func_call_check(barn_type_checker_t* tc)
+barn_tc_func_call_check(barn_type_checker_t* tc, barn_node_t* call_node)
 {
+    barn_node_t* curr_node = tc->curr_node;
+    if (call_node != NULL)
+        curr_node = call_node;
+        
+    barn_array_t* func_args_expected = curr_node->function_call.function
+                                            ->function_declaration.function_args;
+    barn_array_t* func_args_given    = curr_node->function_call.function_args;
+
+    BARN_ARRAY_FOR(func_args_expected)
+    {
+        barn_func_argument_t* func_argument_expected = barn_get_element_from_array(func_args_expected, i);
+        barn_node_t*          func_argument_given    = barn_get_element_from_array(func_args_given, i);
+
+        barn_tc_expression_check(tc, func_argument_given);
+        barn_type_t* argument_expr_type = barn_tc_expression_get_type(tc, func_argument_given);
     
+        barn_expression_node_t* first_expr_node = barn_get_element_from_array(func_argument_given->expression.expression_nodes, 0);
+
+        if (barn_tc_does_types_collides(argument_expr_type, func_argument_expected->argument_type))
+            BARN_TYPE_CHECKER_ERR(tc, first_expr_node->lhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s as argument type but instead got %s",
+                    barn_convert_type_to_string(func_argument_expected->argument_type),
+                    barn_convert_type_to_string(argument_expr_type)); 
+    }
 }
 
 void
@@ -152,7 +205,6 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
     for (tc->index = 0; tc->index < tc->nodes->length; tc->index++)
     {
         barn_tc_advance(tc, 0);
-        printf("%s\n", barn_node_kind_show(tc->curr_node->node_kind));
 
         if (tc->curr_node->node_kind == BARN_NODE_FUNCTION_DECLARATION)
         {
@@ -167,11 +219,19 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
             // Enter type checker loop and give old nodes to it
             barn_type_checker_main_loop(tc, parser);
             tc->nodes = parser->nodes;
+            tc->index = save_index;
         }
         else if (tc->curr_node->node_kind == BARN_NODE_FUNCTION_CALL)
-            barn_tc_func_call_check(tc);
+            barn_tc_func_call_check(tc, NULL);
         else if (tc->curr_node->node_kind == BARN_NODE_FUNCTION_RETURN)
-            barn_tc_func_return_check(tc);
+            barn_tc_func_return_check(tc, NULL);
+        else if (tc->curr_node->node_kind == BARN_NODE_EXPRESSION)
+            continue;
+        else
+        {
+            printf("%s\n", barn_node_kind_show(tc->curr_node->node_kind));
+            BARN_UNIMPLEMENTED("unimplemenented node kind type check");
+        }
     }
 }
 

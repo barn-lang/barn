@@ -95,13 +95,13 @@ barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, ch
 
         if (line[i] == ' ' || line[i] == '(' || line[i] == '|' || line[i] == ')' || line[i] == '{' || 
             line[i] == '}' || line[i] == '[' || line[i] == ']' || line[i] == ']' || line[i] == ':' ||
-            line[i] == '"' || line[i] == '\'')
+            line[i] == ',')
             printf("%s", barn_get_color_as_str_code(BARN_COLOR_GRAY));
 
         printf("%c", line[i]);
     }
 
-    memset(buf, 512, 0);
+    memset(buf, 0, 512);
     sprintf(buf, "%d ", row + 1);
 
     printf("\n");

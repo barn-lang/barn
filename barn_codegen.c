@@ -18,4 +18,65 @@
  *
 */
 
+#include <barn_codegen.h>
+
 #include <barn_core.h>
+#include <barn_parser.h>
+#include <barn_string.h>
+#include <barn_std.h>
+
+barn_codegen_t*
+barn_codegen_create(barn_parser_t* parser)
+{
+    barn_codegen_t* codegen = (barn_codegen_t*)calloc(1, sizeof(barn_codegen_t));
+    BARN_NO_NULL(codegen);
+
+    codegen->parser = parser;
+    codegen->tabs   = 0;
+
+    codegen->c_file = fopen("barn.c", "w+");
+
+    return codegen;
+}
+
+void
+barn_codegen_add_header(barn_codegen_t* codegen, const char* c_header)
+{
+    fprintf(codegen->c_file, "#include \"");
+    fprintf(codegen->c_file, barn_std_get_path());
+    fprintf(codegen->c_file, c_header);
+    fprintf(codegen->c_file, "\"\n\n");
+}
+
+barn_codegen_t* 
+barn_codegen_start(barn_parser_t* parser)
+{
+    barn_codegen_t* codegen = barn_codegen_create(parser);
+
+    // TODO: if flag --no-stdlib is on don't add barn_header.h
+    barn_codegen_add_header(codegen, "barn_format.h");
+    barn_codegen_add_header(codegen, "barn_header.h");
+
+    
+
+    fclose(codegen->c_file);
+}
+
+const char*
+barn_codegen_save_output_to_file(barn_codegen_t* codegen, const char* filename)
+{
+    // printf("nok\n");
+    // FILE* f = fopen(filename, "w+");
+    // printf("nok\n");
+
+    // fprintf(f, "%s\n%s\n", 
+    //     codegen->c_header, codegen->c_code);
+    // printf("nok\n");
+    // fclose(f);
+}
+
+const char* 
+barn_codegen_type_convert_to_c(barn_codegen_t* codegen)
+{
+
+}

@@ -21,6 +21,20 @@
 #ifndef __BARN_CODEGEN__
 #define __BARN_CODEGEN__
 
-#include <barn_core.h>
+#include <barn_parser.h>
+
+typedef struct __barn_codegen_t {
+    barn_parser_t* parser;
+    barn_node_t*   curr_node;
+
+    int tabs;
+
+    FILE* c_file;
+} barn_codegen_t;
+
+barn_codegen_t* barn_codegen_start(barn_parser_t* parser);
+
+const char* barn_codegen_type_convert_to_c(barn_codegen_t* codegen);
+const char* barn_codegen_save_output_to_file(barn_codegen_t* codegen, const char* filename);
 
 #endif /* __BARN_CODEGEN__ */

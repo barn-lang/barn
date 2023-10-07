@@ -58,6 +58,13 @@ barn_append_char_to_allocated_string(char** str, char c)
     *str = new_str; 
 }
 
+void
+barn_append_string_to_allocated_string(char** str, char* sstr)
+{
+    for (int i = 0; i < strlen(sstr); i++)
+        barn_append_char_to_allocated_string(str, sstr[i]);
+}
+
 char* 
 barn_create_string_from_char(char c)
 {

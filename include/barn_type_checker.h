@@ -38,4 +38,7 @@ void barn_type_checker_start(barn_parser_t* parser);
 bool barn_tc_does_types_collide_expr_value(barn_expression_value_t* lhs, barn_expression_value_t* rhs);
 bool barn_tc_does_types_collides(barn_type_t* lhs, barn_type_t* rhs);
 
-#endif /* __BARN_TYPE_CHECKER__ */
+void barn_tc_func_return_check(barn_type_checker_t* tc, barn_node_t* return_node);
+void barn_tc_func_call_check(barn_type_checker_t* tc, barn_node_t* call_node);
+
+#endif /* __BARN_TYPE_CHECKER__ */  

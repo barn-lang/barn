@@ -24,6 +24,7 @@
         "barn_nodes.h": "c",
         "barn_type_checker.h": "c",
         "barn_args_parser.h": "c",
-        "barn_array.h": "c"
+        "barn_array.h": "c",
+        "variant": "c"
     }
 }

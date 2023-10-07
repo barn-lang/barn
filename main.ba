@@ -1,4 +1,4 @@
-fun main() -> string {
+fun main() -> i32 {
     __code__("printf(\"Hello, World from new barnc!\")")
-    return 2 * 10 + 20.49
+    return 0
 }

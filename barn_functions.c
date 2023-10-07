@@ -194,7 +194,7 @@ barn_create_func_argument(barn_type_t* argument_type, const char* argument_name)
 void
 barn_function_declaration_set_argument_as_variables(barn_parser_t* parser, barn_node_t* node)
 {
-    for (int i = 0; i < node->function_declaration.function_args->length; i++)
+    BARN_ARRAY_FOR(node->function_declaration.function_args)
     {
         // TODO: implement setting arguments as local variables 
     }

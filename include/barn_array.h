@@ -30,6 +30,8 @@ typedef struct __barn_array_t {
     void** ptr;
 } barn_array_t;
 
+#define BARN_ARRAY_FOR(arr) for (int i = 0; i < arr->length; i++)
+
 barn_array_t* barn_create_array(size_t size_of_element);
 barn_array_t* barn_destroy_array(barn_array_t* array);
 

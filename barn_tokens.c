@@ -27,6 +27,8 @@ const char*
 barn_token_kind_to_string(barn_token_kind_t kind)
 {
     switch (kind) {
+        case BARN_TOKEN_NEWLINE:
+            return "NEWLINE";
         case BARN_TOKEN_NONE:
             return "NONE";
         case BARN_TOKEN_INCREMENTATION:
