@@ -20,9 +20,22 @@
 
 #include <barn_core.h>
 
+#include <barn_string.h>
+
 void
 barn_generate_tabs(int tabs)
 {
     for (int i = 0; i < tabs; i++)
         printf("\t");
+}
+
+const char*
+barn_generate_tabs_to_buf(int tabs)
+{
+    char* buf = barn_create_allocated_string();
+
+    for (int i = 0; i < tabs; i++)
+        barn_append_char_to_allocated_string(&buf, '\t');
+
+    return ((const char*)buf);
 }

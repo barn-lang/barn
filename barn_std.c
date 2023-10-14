@@ -24,7 +24,7 @@
 #include <barn_string.h>
 
 #ifndef BARN_STD_FOLDER
-# define BARN_STD_FOLDER ".barn/libs/"
+# define BARN_STD_FOLDER ".barn/"
 #endif /* BARN_STD_FOLDER */
 
 // TODO: make this function more lightweight without each time using

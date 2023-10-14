@@ -31,7 +31,4 @@ clean:
 
 install:
 	mkdir -p $(HOME)/.barn/
-	mkdir -p $(HOME)/.barn/libs/
-	sudo cp ./barn /bin/
-	sudo cp ./barn /usr/bin/
 	sudo cp -r ./libs/ $(HOME)/.barn/

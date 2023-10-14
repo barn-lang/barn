@@ -24,31 +24,31 @@
 fun string_compare(string s1, string s2) -> bool {
 	__code__("return ((bool)((strcmp(s1, s2) == 0) == 1 ? 1 : 0));")
 
-	__use__(s1)
-	__use__(s2)
+	// __use__(s1)
+	// __use__(s2)
 }
 
 // Function for comparing string used in if
 fun __barn_string_compare(string s1, string s2) -> bool {
 	__code__("return ((bool)(string_compare(s1, s2)));")
 
-	__use__(s1)
-	__use__(s2)
+	// __use__(s1)
+	// __use__(s2)
 }
 
 // Function for getting string length
 fun string_length(string s) -> int {	
 	__code__("return ((int)(strlen(s)));")
 
-	__use__(s)
+	// __use__(s)
 }
 
 // Function for changing number to string
 fun iota(int num, int base) -> string {
 	__code__("return iota(num, base);")
 
-	__use__(num)
-	__use__(base)
+	// __use__(num)
+	// __use__(base)
 }
 
 // Function for getting user input from console
@@ -64,63 +64,65 @@ fun input() -> string {
 // Function just for printing
 fun print(string s) {
 	__code__("printf(\"%s\", s);")
-	__use__(s)
+	// __use__(s)
 }
 
 // Function just for printing with newline after it
 fun println(string s) {
 	__code__("printf(\"%s\n\", s);")
-	__use__(s)
+	// __use__(s)
 }
 
 // Function for printing numbers
 fun printnum(int num) {
 	__code__("printf(\"%d\", num);")
-	__use__(num)
+	// __use__(num)
 }
 
 // Function for printing numbers
 fun printbool(bool to_print_bool) {
-	if (to_print_bool == true) { println("true") } else { println("false") }
-	__use__(to_print_bool)
+	// TODO: rewrite this code in barn
+	__code__("if (to_print_bool == true) { printf(\"true\"); } else { printf(\"false\"); }")
+
+	// __use__(to_print_bool)
 }
 
-fun fmt_print(string __format_start__, ...) {
-	__barn_start_format()
+// fun fmt_print(string __format_start__, ...) {
+	// __barn_start_format()
 
-	let strlength: i32 = string_length(__format_start__)
-	for let i: i32 = 0; i < strlength; i++ {
-		let curr_char: char = ' '
-		__code__("curr_char = __format_start__[i];")
+	// let strlength: i32 = string_length(__format_start__)
+	// for let i: i32 = 0; i < strlength; i++ {
+	// 	let curr_char: char = ' '
+	// 	__code__("curr_char = __format_start__[i];")
 
-		if curr_char == '%' {
-			i++
-			__code__("curr_char = __format_start__[i];")
+	// 	if curr_char == '%' {
+	// 		i++
+	// 		__code__("curr_char = __format_start__[i];")
 
-			if curr_char == 's' {
-				let __str: string = __barn_format_get_value_string()
-				print(__str)
-			} elif curr_char == 'd' {
-				let __decimal: i32 = __barn_format_get_value_int()
-				__code__("printf(\"%d\", __decimal);")
-			} elif curr_char == 'x' {
-				let __hexadecimal: i32 = __barn_format_get_value_int()
-				__code__("printf(\"%x\", __hexadecimal);")
-			} elif curr_char == 'o' {
-				let __octal: i32 = __barn_format_get_value_int()
-				__code__("printf(\"%o\", __octal);")
-			} elif curr_char == 'b' {
-				let __binary: i32 = __barn_format_get_value_int()
-				__code__("printf(\"%b\", __binary);")
-			} elif curr_char == 'f' {
-				let __double: f64 = __barn_format_get_value_double()
-				__code__("printf(\"%lf\", __double);")
-			} elif curr_char == 'l' {
-				let __long: i64 = __barn_format_get_value_long()
-				__code__("printf(\"%l\", __long);")
-			}
-		} else {
-			__code__("printf(\"%c\", curr_char);")
-		}
-	}
-}
+	// 		if curr_char == 's' {
+	// 			let __str: string = __barn_format_get_value_string()
+	// 			print(__str)
+	// 		} elif curr_char == 'd' {
+	// 			let __decimal: i32 = __barn_format_get_value_int()
+	// 			__code__("printf(\"%d\", __decimal);")
+	// 		} elif curr_char == 'x' {
+	// 			let __hexadecimal: i32 = __barn_format_get_value_int()
+	// 			__code__("printf(\"%x\", __hexadecimal);")
+	// 		} elif curr_char == 'o' {
+	// 			let __octal: i32 = __barn_format_get_value_int()
+	// 			__code__("printf(\"%o\", __octal);")
+	// 		} elif curr_char == 'b' {
+	// 			let __binary: i32 = __barn_format_get_value_int()
+	// 			__code__("printf(\"%b\", __binary);")
+	// 		} elif curr_char == 'f' {
+	// 			let __double: f64 = __barn_format_get_value_double()
+	// 			__code__("printf(\"%lf\", __double);")
+	// 		} elif curr_char == 'l' {
+	// 			let __long: i64 = __barn_format_get_value_long()
+	// 			__code__("printf(\"%l\", __long);")
+	// 		}
+	// 	} else {
+	// 		__code__("printf(\"%c\", curr_char);")
+	// 	}
+	// }
+// }

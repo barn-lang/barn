@@ -25,6 +25,11 @@
         "barn_type_checker.h": "c",
         "barn_args_parser.h": "c",
         "barn_array.h": "c",
-        "variant": "c"
+        "variant": "c",
+        "barn_string.h": "c",
+        "barn_std.h": "c",
+        "barn_functions.h": "c",
+        "barn_config.h": "c",
+        "barn_codegen.h": "c"
     }
 }

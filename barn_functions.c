@@ -56,6 +56,17 @@ barn_initialize_builtin_functions(barn_parser_t* parser)
     __code__function->function_declaration.function_return = barn_create_type(BARN_TYPE_NONE);
 
     barn_append_element_to_array(parser->function_nodes, __code__function);
+
+    barn_node_t* __use__function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* __use__args    = barn_create_array(sizeof(barn_func_argument_t));
+    barn_append_element_to_array(__use__args, barn_create_func_argument(barn_get_type_str_global(), "__use__str"));
+
+    __use__function->function_declaration.function_name   = BARN_FUNCTION_USE_CODE;
+    __use__function->function_declaration.function_args   = __use__args;
+    __use__function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    __use__function->function_declaration.function_return = barn_create_type(BARN_TYPE_NONE);
+
+    barn_append_element_to_array(parser->function_nodes, __use__function);
 }
 
 barn_node_t*

@@ -1,4 +1,5 @@
+@import "std.ba"
+
 fun main() -> i32 {
-    __code__("printf(\"Hello, World from new barnc!\")")
-    return 0
-}
+    println("Hello, World!")
+}   

@@ -27,6 +27,7 @@ typedef struct __barn_codegen_t {
     barn_parser_t* parser;
     barn_node_t*   curr_node;
 
+    int index;
     int tabs;
 
     FILE* c_file;
@@ -34,7 +35,10 @@ typedef struct __barn_codegen_t {
 
 barn_codegen_t* barn_codegen_start(barn_parser_t* parser);
 
-const char* barn_codegen_type_convert_to_c(barn_codegen_t* codegen);
+const char* barn_codegen_type_convert_to_c(barn_codegen_t* codegen, barn_type_t* type);
 const char* barn_codegen_save_output_to_file(barn_codegen_t* codegen, const char* filename);
+
+void barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, 
+                                bool colon, bool tabs);
 
 #endif /* __BARN_CODEGEN__ */

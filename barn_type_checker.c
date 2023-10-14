@@ -56,7 +56,9 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
      * getting through this whole function */
     if (expr_nodes->length == 1 && 
         ((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
-            ->lhs->is_function_call == false)
+            ->lhs->is_function_call == false &&
+        ((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
+            ->rhs == NULL)
         return;
     else if (((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
                 ->lhs->is_function_call == true)
@@ -65,17 +67,25 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
                                     ->lhs->function_call);
         return;
     }
+    printf("5ok2\n");
 
     for (int i = 0; i < expr_nodes->length; i++)
     {
         barn_expression_node_t* curr_expr_node = barn_get_element_from_array(expr_nodes, i);
 
+        printf("lhs: %p, rhs: %p\n", curr_expr_node->lhs, curr_expr_node->rhs);
+
         if (curr_expr_node->rhs != NULL)
             if (curr_expr_node->rhs->is_function_call == true)
                 barn_tc_func_call_check(tc, curr_expr_node->rhs->function_call);
 
-        if (i == 0)
+        if (i == 0 || (curr_expr_node->lhs != NULL && curr_expr_node->rhs != NULL))
         {
+            if (curr_expr_node->rhs == NULL)
+            {
+                continue;
+            }
+
             if (curr_expr_node->lhs->is_function_call == true)
                 barn_tc_func_call_check(tc, curr_expr_node->lhs->function_call);
             barn_tc_does_types_collide_expr_value(curr_expr_node->lhs, curr_expr_node->rhs);
@@ -89,8 +99,52 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
         {
             barn_expression_node_t* last_node = barn_get_element_from_array(expr_nodes, i - 1);
 
-            if (last_node->rhs->is_function_call == true)
-                barn_tc_func_call_check(tc, last_node->rhs->function_call);
+            // Situation where lhs and rhs is NULL this can happend in expressions
+            // like this underneath:
+            //              y
+            // (1 + 2) * (3 + 4)
+            //    x    ^~~~
+            //           LHS and RHS is being filled with parents so we can't 
+            //           check them
+            //
+            // In this case we need to take last element of "x" expression 
+            // and first of "y" expression and check do these types collides
+            if (curr_expr_node->lhs == NULL && curr_expr_node->rhs == NULL)
+            {
+                // Now we are doing "we need to take last element of "x" expression"
+                // so this is last element of "x"
+                barn_expression_value_t* last_element_in_x = last_node->rhs;
+
+                // Then we need to collect first element of "y"
+                barn_expression_node_t* next_node = barn_get_element_from_array(expr_nodes, i + 1);
+                barn_expression_value_t* first_element_in_y = next_node->lhs != NULL 
+                                                                ? next_node->lhs : next_node->rhs;
+
+                BARN_NO_NULL(last_element_in_x);
+                BARN_NO_NULL(first_element_in_y);
+
+                if (last_element_in_x->is_function_call == true)
+                    barn_tc_func_call_check(tc, last_element_in_x->function_call);
+
+                if (first_element_in_y->is_function_call == true)
+                    barn_tc_func_call_check(tc, first_element_in_y->function_call);
+
+                printf("%s %s\n", last_element_in_x->expr_val_token->value, first_element_in_y->expr_val_token->value);
+
+                if (barn_tc_does_types_collide_expr_value(last_element_in_x, first_element_in_y))
+                    BARN_TYPE_CHECKER_ERR(tc, last_element_in_x->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s but got %s",
+                        barn_convert_type_to_string(last_element_in_x->expr_val_type), 
+                        barn_convert_type_to_string(first_element_in_y->expr_val_type)); 
+
+                continue;
+            }
+
+            if (last_node->rhs == NULL)
+                continue;
+
+            if (curr_expr_node->rhs != NULL)
+                if (last_node->rhs->is_function_call == true)
+                    barn_tc_func_call_check(tc, last_node->rhs->function_call);
 
             if (barn_tc_does_types_collide_expr_value(last_node->rhs, curr_expr_node->rhs))
                 BARN_TYPE_CHECKER_ERR(tc, last_node->rhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s but got %s",

@@ -5,12 +5,28 @@
     - [X] Function return
     - [X] Function call
     - [X] Fix bugs
-    - [ ] __code__
-- [ ] Typechecker
-    - [ ] Check expression nodes types
-    - [ ] Check function returning types
-    - [ ] Check argument types
-- [ ] Codegen
+    - [X] __code__
+    - [ ] Char
+    - [ ] Variable declaration
+    - [ ] Variable use
+    - [ ] Variable value modifications
+- [X] Typechecker
+    - [X] Check expression nodes types
+    - [X] Check function returning types
+    - [X] Check argument types
+    - [ ] Char
+    - [ ] Variable declaration type checking
+    - [ ] Variable use type checking
+    - [ ] Variable value modifications type checking
+- [X] Codegen
+    - [X] Function declaration
+    - [X] Function call
+    - [X] Function return
+    - [X] Working HELLO WORLD!!!
+    - [ ] Char
+    - [ ] Variable declaration
+    - [ ] Variable use
+    - [ ] Variable value modifications
 - [ ] Implement every thing from barngo
 - [ ] Implement structs
 - [ ] Implement pointers

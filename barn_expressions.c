@@ -97,7 +97,6 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
     else if (parser->curr_token->kind == BARN_TOKEN_OPENPARENT)
     {
         barn_parser_skip(parser, 1);
-        expr_parser->parents++;
         return NULL;
     }
     else if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER)
@@ -152,13 +151,14 @@ barn_expression_parser_check_parents(barn_parser_t* parser, barn_expr_parser_t* 
         if (expr_parser->index == 0)
             expr_parser->index = -1;
 
+        printf("parents ++; %d\n", __LINE__);
         expr_parser->parents++;
         barn_parser_skip(parser, 1);
         return 1;
     }
     
     if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
-    {
+    { 
         if (expr_parser->parents == 0)
         {
             if (expr_parser->function_argument_value == true)
@@ -168,6 +168,7 @@ barn_expression_parser_check_parents(barn_parser_t* parser, barn_expr_parser_t* 
         }
 
         expr_parser->parents--; 
+        printf("closing one parent %d\n", expr_parser->parents);
         barn_parser_skip(parser, 1);
         return 1;
     }
@@ -217,6 +218,12 @@ barn_expression_parser_not_full_op_rhs(barn_parser_t* parser, barn_expr_parser_t
     // Append new mathematical expression node
     barn_expression_node_t* append_expr_node = barn_create_expression_node(NULL, rhs_value, operator, expr_parser->parents);
     barn_append_element_to_array(expr_parser->main_expr_node->expression.expression_nodes, append_expr_node);
+
+    if (rhs_value == NULL)
+    {
+        printf("parents ++; %d\n", __LINE__);
+        // expr_parser->parents++;
+    }
 }
 
 void
@@ -241,7 +248,9 @@ barn_expression_division_by_zero(barn_parser_t* parser, barn_expr_parser_t* expr
         if (converted_value != 0)
             return;
     }
-    
+    else
+        return;
+
     barn_parser_skip(parser, -1);
     BARN_PARSER_ERR(parser, BARN_MATH_ERROR, "division by 0 is not allowed", 0);
 }
@@ -285,6 +294,12 @@ barn_expression_parser_full_lhs_op_rhs(barn_parser_t* parser,  barn_expr_parser_
     // Append new mathematical expression node
     barn_expression_node_t* append_expr_node = barn_create_expression_node(lhs_value, rhs_value, operator, expr_parser->parents);
     barn_append_element_to_array(expr_parser->main_expr_node->expression.expression_nodes, append_expr_node);
+
+    if (rhs_value == NULL || lhs_value == NULL)
+    {
+        expr_parser->parents++;
+        printf("parents ++; %d\n", __LINE__);
+    }
 }
 
 barn_expr_parser_t*
@@ -319,6 +334,8 @@ barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind,
 
     for (; ; expr_parser->index++)
     {
+        printf("%s\n", parser->curr_token->value);
+
         int parents_ret = barn_expression_parser_check_parents(parser, expr_parser);
 
         if (parents_ret == 1)
@@ -342,15 +359,15 @@ barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind,
     {
         barn_expression_node_t* curr_expr_node = barn_get_element_from_array(expr_node->expression.expression_nodes, i);
        
-        printf("lhs: \"%s\", rhs: \"%s\", op: \"%s\", parents: %d\n",
-            curr_expr_node->lhs != NULL
-                ? (curr_expr_node->lhs->expr_val_token->value)
-                : "(null)",
-            curr_expr_node->rhs != NULL
-                ? curr_expr_node->rhs->expr_val_token->value
-                : "(null)",
-            barn_token_kind_to_string(curr_expr_node->operator),
-            curr_expr_node->parents);
+        // printf("lhs: \"%s\", rhs: \"%s\", op: \"%s\", parents: %d\n",
+        //     curr_expr_node->lhs != NULL
+        //         ? (curr_expr_node->lhs->expr_val_token->value)
+        //         : "(null)",
+        //     curr_expr_node->rhs != NULL
+        //         ? curr_expr_node->rhs->expr_val_token->value
+        //         : "(null)",
+        //     barn_token_kind_to_string(curr_expr_node->operator),
+        //     curr_expr_node->parents);
     }
 
     return expr_node;

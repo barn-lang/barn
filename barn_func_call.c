@@ -29,6 +29,7 @@ barn_parse_function_call_arguments(barn_parser_t* parser)
 {
     barn_array_t* func_call_args = barn_create_array(sizeof(barn_node_t*));
 
+    barn_parser_skip(parser, 1);
     while (true)
     {
         if (parser->curr_token->kind == BARN_TOKEN_EOF)

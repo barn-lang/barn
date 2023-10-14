@@ -23,7 +23,17 @@
 #include <barn_core.h>
 #include <barn_parser.h>
 #include <barn_string.h>
+#include <barn_functions.h>
 #include <barn_std.h>
+
+#include <config/barn_config.h>
+
+#ifdef BARN_CODEGEN_PRETTIER_CODE
+# define BARN_CODEGEN_GENERATE_TABS(codegen)                                         \
+     ({ fprintf(codegen->c_file, "%s", barn_generate_tabs_to_buf(codegen->tabs)); }) 
+#else
+# define BARN_CODEGEN_GENERATE_TABS(codegen) ("")
+#endif /* BARN_CODEGEN_PRETTIER_CODE */
 
 barn_codegen_t*
 barn_codegen_create(barn_parser_t* parser)
@@ -43,9 +53,237 @@ void
 barn_codegen_add_header(barn_codegen_t* codegen, const char* c_header)
 {
     fprintf(codegen->c_file, "#include \"");
-    fprintf(codegen->c_file, barn_std_get_path());
-    fprintf(codegen->c_file, c_header);
+    fprintf(codegen->c_file, "%s", barn_std_get_path());
+    fprintf(codegen->c_file, "%s", c_header);
+#ifdef BARN_CODEGEN_PRETTIER_CODE
     fprintf(codegen->c_file, "\"\n\n");
+#else
+    fprintf(codegen->c_file, "\"\n");
+#endif
+}
+
+char*
+barn_codegen_operator_to_code(barn_token_kind_t op)
+{
+    switch (op)
+    {
+        case BARN_TOKEN_PLUS:
+            return "+";
+            break;
+        case BARN_TOKEN_MINUS:
+            return "-";
+            break;
+        case BARN_TOKEN_MUL:
+            return "*";
+            break;
+        case BARN_TOKEN_DIV:
+            return "/";
+            break;
+        default:
+            BARN_UNIMPLEMENTED("unknown operator to code generate");
+            break;
+    }
+
+    return "unknown";
+}
+
+const char* 
+barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expression_node)
+{
+    barn_array_t* expression_arr = expression_node->expression.expression_nodes;
+
+    char* expression_buf = barn_create_allocated_string();
+    int   last_parent    = 0;
+
+    BARN_ARRAY_FOR(expression_arr)
+    {
+        barn_expression_node_t* curr_expr_node = barn_get_element_from_array(expression_arr, i);
+
+        if (last_parent != curr_expr_node->parents)
+        {
+            if (last_parent > curr_expr_node->parents)
+            {
+                for (int j = 0; j < last_parent - curr_expr_node->parents; j++)
+                    barn_append_char_to_allocated_string(&expression_buf, ')');
+            }
+            else if (last_parent < curr_expr_node->parents) 
+            {
+                for (int j = 0; j < curr_expr_node->parents - last_parent; j++)
+                    barn_append_char_to_allocated_string(&expression_buf, '(');
+            }
+
+            last_parent = curr_expr_node->parents;
+        }
+
+        if (curr_expr_node->lhs != NULL)
+        {
+            if (curr_expr_node->lhs->is_function_call == true)
+                barn_codegen_function_call(codegen, curr_expr_node->lhs->function_call, false, false);
+            else
+            {
+                if (curr_expr_node->lhs->expr_val_type->is_string)
+                {
+                    barn_append_char_to_allocated_string(  &expression_buf, '\"');
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
+                    barn_append_char_to_allocated_string(  &expression_buf, '\"');
+                }
+                else
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
+            }
+        }
+
+        if (curr_expr_node->operator != BARN_TOKEN_NONE)
+        {
+#ifdef BARN_CODEGEN_PRETTIER_CODE
+            barn_append_char_to_allocated_string(  &expression_buf, ' ');
+#endif /* BARN_CODEGEN_PRETTIER_CODE */
+            barn_append_string_to_allocated_string(&expression_buf, barn_codegen_operator_to_code(curr_expr_node->operator));
+#ifdef BARN_CODEGEN_PRETTIER_CODE
+            barn_append_char_to_allocated_string(  &expression_buf, ' ');
+#endif /* BARN_CODEGEN_PRETTIER_CODE */
+        }
+
+        if (curr_expr_node->rhs != NULL)
+        {
+            if (curr_expr_node->rhs->is_function_call == true)
+                barn_codegen_function_call(codegen, curr_expr_node->rhs->function_call, false, false);
+            else
+            {
+                if (curr_expr_node->rhs->expr_val_type->is_string)
+                {
+                    barn_append_char_to_allocated_string(  &expression_buf, '\"');
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->rhs->expr_val_token->value);
+                    barn_append_char_to_allocated_string(  &expression_buf, '\"');
+                }
+                else
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->rhs->expr_val_token->value);
+            }
+        }
+    }
+
+    printf("okoko- > %d\n", last_parent);
+    for (int i = 0; i < last_parent; i++)
+    {
+        barn_append_char_to_allocated_string(&expression_buf, ')');
+    }
+
+    return ((const char*)expression_buf);
+}
+
+void
+barn_codegen_function_return(barn_codegen_t* codegen, barn_node_t* curr_node)
+{
+    BARN_CODEGEN_GENERATE_TABS(codegen);
+
+    const char* expr_code = barn_codegen_expression_generate(codegen, curr_node->function_return.return_value);
+    fprintf(codegen->c_file, "return %s;", expr_code);
+}
+
+void
+barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, bool colon, bool tabs)
+{
+    if (tabs)
+        BARN_CODEGEN_GENERATE_TABS(codegen);
+
+    if (strcmp(curr_node->function_call.function_name, BARN_FUNCTION_INJECTING_CODE) == 0)
+    {
+        barn_node_t* argument_expr = barn_get_element_from_array(curr_node->function_call.function_args, 0);
+        char* expr_code = (char*)barn_codegen_expression_generate(codegen, argument_expr);
+        
+        *expr_code++;
+        expr_code[strlen(expr_code) - 1] = '\0';
+        
+        fprintf(codegen->c_file, "%s", expr_code);
+        return;
+    }
+
+    fprintf(codegen->c_file, "%s(", 
+        curr_node->function_call.function_name);
+
+    BARN_ARRAY_FOR(curr_node->function_call.function_args)
+    {
+        barn_node_t* argument_expr = barn_get_element_from_array(curr_node->function_call.function_args, i);
+
+        const char* expr_code = barn_codegen_expression_generate(codegen, argument_expr);
+
+        if (curr_node->function_call.function_args->length == (i + 1))
+            fprintf(codegen->c_file,"%s", expr_code);
+        else
+            fprintf(codegen->c_file,"%s, ", expr_code);
+    }
+
+    fprintf(codegen->c_file, ")");
+
+    if (colon)
+        fprintf(codegen->c_file, ";"); 
+}
+
+void
+barn_codegen_generate_function_body(barn_codegen_t* codegen, barn_node_t* curr_node)
+{
+    switch (curr_node->node_kind)
+    {
+        case BARN_NODE_FUNCTION_DECLARATION:
+            BARN_UNIMPLEMENTED("compiler error, function declaration can't happend inside a funciton");
+            break;
+        case BARN_NODE_FUNCTION_RETURN:
+            barn_codegen_function_return(codegen, curr_node);
+            break;
+        case BARN_NODE_FUNCTION_CALL:
+            barn_codegen_function_call(codegen, curr_node, true, true);
+            break;
+        default:
+            printf("unimplemented node kind -> %s\n", barn_node_kind_show(curr_node->node_kind));
+            BARN_UNIMPLEMENTED("generating code for given node kind in function body is unimplemented feauter");
+            break;
+    }
+}
+
+void 
+barn_codegen_skip(barn_codegen_t* codegen, int count)
+{
+    codegen->index += count;
+    codegen->curr_node = barn_get_element_from_array(codegen->parser->nodes, codegen->index);
+}
+
+void
+barn_codegen_function_declaration(barn_codegen_t* codegen)
+{
+    barn_node_t* fn_decl = codegen->curr_node;
+
+    fprintf(codegen->c_file, "__BARN_FUNCTION__ %s %s(",
+        barn_codegen_type_convert_to_c(codegen, fn_decl->function_declaration.function_return),
+        fn_decl->function_declaration.function_name);
+
+    BARN_ARRAY_FOR(fn_decl->function_declaration.function_args)
+    {
+        barn_func_argument_t* argument = barn_get_element_from_array(
+                                            fn_decl->function_declaration.function_args, i);
+        
+        const char* ctype = barn_codegen_type_convert_to_c(codegen, argument->argument_type);
+
+        if (fn_decl->function_declaration.function_args->length == (i + 1))
+            fprintf(codegen->c_file, "%s %s",
+                ctype, argument->argument_name);
+        else
+            fprintf(codegen->c_file, "%s %s, ",
+                ctype, argument->argument_name);
+    }
+
+    fprintf(codegen->c_file, ")\n{\n");
+    codegen->tabs += 1;
+
+    BARN_ARRAY_FOR(fn_decl->function_declaration.function_nodes)
+    {
+        barn_codegen_generate_function_body(codegen, 
+                                            barn_get_element_from_array(fn_decl->function_declaration.function_nodes, i));
+
+        if ((i + 1) != fn_decl->function_declaration.function_nodes->length)
+            fprintf(codegen->c_file, "\n");
+    }
+
+    fprintf(codegen->c_file, "\n}\n\n");
+    codegen->tabs -= 1;
 }
 
 barn_codegen_t* 
@@ -54,12 +292,19 @@ barn_codegen_start(barn_parser_t* parser)
     barn_codegen_t* codegen = barn_codegen_create(parser);
 
     // TODO: if flag --no-stdlib is on don't add barn_header.h
-    barn_codegen_add_header(codegen, "barn_format.h");
-    barn_codegen_add_header(codegen, "barn_header.h");
+    barn_codegen_add_header(codegen, "std-c/barn_format.h");
+    barn_codegen_add_header(codegen, "std-c/barn_header.h");
 
-    
+    for (codegen->index = 0; codegen->index < parser->nodes->length; codegen->index++)
+    {
+        barn_codegen_skip(codegen, 0);
+        
+        if (codegen->curr_node->node_kind == BARN_NODE_FUNCTION_DECLARATION)
+            barn_codegen_function_declaration(codegen);
+    }
 
     fclose(codegen->c_file);
+    return codegen;
 }
 
 const char*
@@ -76,7 +321,53 @@ barn_codegen_save_output_to_file(barn_codegen_t* codegen, const char* filename)
 }
 
 const char* 
-barn_codegen_type_convert_to_c(barn_codegen_t* codegen)
+barn_codegen_type_convert_to_c(barn_codegen_t* codegen, barn_type_t* type)
 {
+    switch (type->type)
+    {
+        case BARN_TYPE_U8:
+            return "unsigned char";
+            break;
+        case BARN_TYPE_I8:
+            return "char";
+            break;
+        case BARN_TYPE_BOOL:
+            return "bool";
+            break;
+        case BARN_TYPE_U16:
+            return "unsigned short";
+            break;
+        case BARN_TYPE_I16:
+            return "short";
+            break;
+        case BARN_TYPE_U32:
+            return "unsigned int";
+            break;
+        case BARN_TYPE_I32:
+            return "int";
+            break;
+        case BARN_TYPE_F32:
+            return "float";
+            break;
+        case BARN_TYPE_U64:
+            return "unsgined long";
+            break;
+        case BARN_TYPE_I64:
+            return "longs";
+            break;
+        case BARN_TYPE_F64:
+            return "double";
+            break;
+        case BARN_TYPE_STRING:
+            return "char*";
+            break;
+        case BARN_TYPE_NONE:
+            return "void";
+            break;
+        default:
+            BARN_UNIMPLEMENTED("unhandled type size");
+            break;        
+    }
 
+    return "unknown";
 }

@@ -25,6 +25,7 @@
 #include <barn_parser.h>
 
 #define BARN_FUNCTION_INJECTING_CODE "__code__"
+#define BARN_FUNCTION_USE_CODE       "__use__"
 
 typedef struct __barn_func_argument_t {
     barn_type_t* argument_type;
