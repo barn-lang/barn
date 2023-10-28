@@ -31,6 +31,8 @@
 #include <barn_array.h>
 #include <barn_io.h>
 
+#include <barn_variables.h>
+
 #include <barn_lexer.h>
 #include <barn_nodes.h>
 
@@ -130,6 +132,8 @@ barn_parser_identifier(barn_parser_t* parser)
         barn_parser_function_declaration(parser);
     if (BARN_TOKEN_CMP("return"))
         barn_parser_func_return(parser);
+    if (BARN_TOKEN_CMP("let"))
+        barn_parser_variable_declaration(parser);
 }
 
 void 
@@ -202,6 +206,17 @@ barn_parser_show_ast_child(barn_parser_t* parser, barn_array_t* nodes, int tabs)
 
         barn_generate_tabs(tabs);
         printf("parser->nodes[%d]={ node_kind: %s, ", i, barn_node_kind_show(curr_node->node_kind));
+        
+        if (curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
+            printf("variable_declaration: { var_name: \"%s\", var_type: \"%s\" }, ",
+                curr_node->variable_declaration.variable->var_name,
+                barn_convert_type_to_string(curr_node->variable_declaration.variable->var_type));
+
+        if (curr_node->node_kind == BARN_NODE_FUNCTION_CALL)
+            printf("function_call: { func_name: \"%s\", func_args->len: %lu }, ",
+                curr_node->function_call.function_name,
+                curr_node->function_call.function_args->length);
+
         printf("}\n");
     }
 }
@@ -221,6 +236,11 @@ barn_parser_show_ast(barn_parser_t* parser)
             printf("function_declaration: { function_name: \"%s\", function_nodes: %p }, ",
                 curr_node->function_declaration.function_name,
                 curr_node->function_declaration.function_nodes);
+
+        if (curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
+            printf("variable_declaration: { var_name: \"%s\", var_type: \"%s\" }, ",
+                curr_node->variable_declaration.variable->var_name,
+                barn_convert_type_to_string(curr_node->variable_declaration.variable->var_type));
 
         printf("}\n");
 

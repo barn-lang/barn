@@ -6,27 +6,30 @@
     - [X] Function call
     - [X] Fix bugs
     - [X] __code__
-    - [ ] Char
-    - [ ] Variable declaration
-    - [ ] Variable use
+    - [X] Char
+    - [X] Variable declaration
+    - [X] Variable use
     - [ ] Variable value modifications
+    - [ ] Static variables
 - [X] Typechecker
     - [X] Check expression nodes types
     - [X] Check function returning types
     - [X] Check argument types
-    - [ ] Char
-    - [ ] Variable declaration type checking
-    - [ ] Variable use type checking
+    - [X] Char
+    - [X] Variable declaration type checking
+    - [X] Variable use type checking
     - [ ] Variable value modifications type checking
+    - [ ] Static variables
 - [X] Codegen
     - [X] Function declaration
     - [X] Function call
     - [X] Function return
     - [X] Working HELLO WORLD!!!
-    - [ ] Char
-    - [ ] Variable declaration
-    - [ ] Variable use
+    - [X] Char
+    - [X] Variable declaration
+    - [X] Variable use
     - [ ] Variable value modifications
+    - [ ] Static variables
 - [ ] Implement every thing from barngo
 - [ ] Implement structs
 - [ ] Implement pointers

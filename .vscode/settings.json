@@ -30,6 +30,7 @@
         "barn_std.h": "c",
         "barn_functions.h": "c",
         "barn_config.h": "c",
-        "barn_codegen.h": "c"
+        "barn_codegen.h": "c",
+        "barn_variables.h": "c"
     }
 }

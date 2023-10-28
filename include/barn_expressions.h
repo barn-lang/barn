@@ -36,6 +36,8 @@ typedef struct __barn_expression_value_t {
     barn_token_t* expr_val_token;
     barn_type_t*  expr_val_type;
 
+    bool is_variable;
+    
     bool is_function_call;
     barn_node_t* function_call;
 } barn_expression_value_t;

@@ -23,16 +23,20 @@
 
 typedef struct __barn_node_t barn_node_t;
 typedef struct __barn_type_t barn_type_t;
+typedef struct __barn_variable_t barn_variable_t;
 
 #include <barn_core.h>
 #include <barn_array.h>
 #include <barn_types.h>
 #include <barn_expressions.h>
+#include <barn_variables.h>
 
 typedef enum __barn_node_kind_t {
     BARN_NODE_FUNCTION_DECLARATION,
     BARN_NODE_FUNCTION_RETURN,
     BARN_NODE_FUNCTION_CALL,
+
+    BARN_NODE_VARIABLE_DECLARATION,
 
     BARN_NODE_EXPRESSION,
 } barn_node_kind_t;
@@ -53,6 +57,11 @@ typedef struct __barn_node_t {
         barn_node_t* return_value;
         barn_node_t* return_func;
     } function_return;
+
+    struct {
+        barn_node_t*     variable_value;
+        barn_variable_t* variable;
+    } variable_declaration;
 
     struct {
         barn_array_t* expression_nodes;

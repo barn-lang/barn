@@ -88,6 +88,13 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
         expr_value->expr_val_token = parser->curr_token;
         expr_value->expr_val_type = barn_get_type_str_global();
     }
+    else if (parser->curr_token->kind == BARN_TOKEN_CHAR)
+    {
+        expr_value->expr_val_token = parser->curr_token;
+        expr_value->expr_val_type = barn_create_type(BARN_TYPE_I8);
+        
+        expr_value->expr_val_type->is_char = true;
+    }
     else if (parser->curr_token->kind == BARN_TOKEN_EOF)
     {
         barn_parser_skip(parser, -1);
@@ -110,7 +117,26 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
             expr_value->function_call = func_call;
             expr_value->is_function_call = true;
         }
-            
+        else if (barn_parser_is_variable_defined_lg(parser, parser->curr_token->value))
+        {
+            barn_variable_t* variable = barn_parser_get_variable_by_name(parser, parser->curr_token->value);
+
+            expr_value->expr_val_token   = parser->curr_token;
+            expr_value->expr_val_type    = variable->var_type;
+            expr_value->is_function_call = false;
+            expr_value->is_variable      = true;
+        }
+        else if (BARN_STR_CMP(parser->curr_token->value, "true")  || 
+                 BARN_STR_CMP(parser->curr_token->value, "false"))
+        {
+            expr_value->expr_val_token   = parser->curr_token;
+            expr_value->expr_val_type    = barn_get_type_bool_global();
+            expr_value->is_function_call = false;
+            expr_value->is_variable      = true; 
+        }
+        else
+            BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "given identifier \"%s\" is undefined", 
+                            parser->curr_token->value);
     }
     else 
     {
@@ -201,7 +227,7 @@ barn_expression_parser_not_full_op_rhs(barn_parser_t* parser, barn_expr_parser_t
     {
         barn_expression_value_t* lhs_value = barn_get_element_from_array(expr_parser->main_expr_node->expression.expression_nodes, 
                                                                          expr_parser->main_expr_node->expression.expression_nodes->length - 1);
-
+        printf("%p\n", lhs_value->expr_val_token);
         barn_expression_division_by_zero(parser, expr_parser, lhs_value);
     }
 
@@ -230,6 +256,9 @@ void
 barn_expression_division_by_zero(barn_parser_t* parser, barn_expr_parser_t* expr_parser, 
                                  barn_expression_value_t* expr_value)
 {
+    if (expr_value->expr_val_token == NULL)
+        return;
+
     if (expr_value->expr_val_token->kind == BARN_TOKEN_INT)
     {
         /* Convert string value of int token into 

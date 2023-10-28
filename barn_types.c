@@ -67,6 +67,7 @@ barn_create_type(barn_type_kind_t type)
     new_type->is_signed   = barn_is_type_signed(type);
     new_type->is_string   = barn_is_type_string(type);
     new_type->is_float    = barn_is_type_float(type);
+    new_type->is_bool     = barn_is_type_bool(type);
     new_type->is_ptr      = barn_is_type_ptr(type);
 
     return new_type;
@@ -109,6 +110,12 @@ barn_is_type_float(barn_type_kind_t type)
 {
     return ((type == BARN_TYPE_F32) || 
             (type == BARN_TYPE_F64));
+}
+
+bool
+barn_is_type_bool(barn_type_kind_t type)
+{
+    return ((type == BARN_TYPE_BOOL));
 }
 
 bool 

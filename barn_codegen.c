@@ -99,6 +99,8 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
     {
         barn_expression_node_t* curr_expr_node = barn_get_element_from_array(expression_arr, i);
 
+        printf("%p %p\n", curr_expr_node->lhs, curr_expr_node->rhs);
+
         if (last_parent != curr_expr_node->parents)
         {
             if (last_parent > curr_expr_node->parents)
@@ -115,10 +117,13 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
             last_parent = curr_expr_node->parents;
         }
 
-        if (curr_expr_node->lhs != NULL)
+        if (curr_expr_node->lhs != NULL && curr_expr_node->lhs->expr_val_token != NULL)
         {
             if (curr_expr_node->lhs->is_function_call == true)
-                barn_codegen_function_call(codegen, curr_expr_node->lhs->function_call, false, false);
+                barn_append_string_to_allocated_string(&expression_buf, 
+                    barn_codegen_function_call(codegen, curr_expr_node->lhs->function_call, false, false));
+            else if (curr_expr_node->lhs->is_variable == true)
+                barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
             else
             {
                 if (curr_expr_node->lhs->expr_val_type->is_string)
@@ -127,8 +132,16 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
                     barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
                     barn_append_char_to_allocated_string(  &expression_buf, '\"');
                 }
-                else
+                else if (curr_expr_node->lhs->expr_val_type->is_char)
+                {
+                    barn_append_char_to_allocated_string(  &expression_buf, '\'');
                     barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
+                    barn_append_char_to_allocated_string(  &expression_buf, '\'');
+                }
+                else
+                {
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
+                }
             }
         }
 
@@ -143,10 +156,13 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
 #endif /* BARN_CODEGEN_PRETTIER_CODE */
         }
 
-        if (curr_expr_node->rhs != NULL)
+        if (curr_expr_node->rhs != NULL && curr_expr_node->rhs->expr_val_token != NULL)
         {
             if (curr_expr_node->rhs->is_function_call == true)
-                barn_codegen_function_call(codegen, curr_expr_node->rhs->function_call, false, false);
+                barn_append_string_to_allocated_string(&expression_buf, 
+                    barn_codegen_function_call(codegen, curr_expr_node->rhs->function_call, false, false));
+            else if (curr_expr_node->rhs->is_variable == true)
+                barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->rhs->expr_val_token->value);
             else
             {
                 if (curr_expr_node->rhs->expr_val_type->is_string)
@@ -154,6 +170,12 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
                     barn_append_char_to_allocated_string(  &expression_buf, '\"');
                     barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->rhs->expr_val_token->value);
                     barn_append_char_to_allocated_string(  &expression_buf, '\"');
+                }
+                else if (curr_expr_node->rhs->expr_val_type->is_char)
+                {
+                    barn_append_char_to_allocated_string(  &expression_buf, '\'');
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->rhs->expr_val_token->value);
+                    barn_append_char_to_allocated_string(  &expression_buf, '\'');
                 }
                 else
                     barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->rhs->expr_val_token->value);
@@ -167,6 +189,8 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
         barn_append_char_to_allocated_string(&expression_buf, ')');
     }
 
+    printf("%s\n", expression_buf);
+
     return ((const char*)expression_buf);
 }
 
@@ -179,9 +203,11 @@ barn_codegen_function_return(barn_codegen_t* codegen, barn_node_t* curr_node)
     fprintf(codegen->c_file, "return %s;", expr_code);
 }
 
-void
+const char*
 barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, bool colon, bool tabs)
 {
+    char* buf = barn_create_allocated_string();
+
     if (tabs)
         BARN_CODEGEN_GENERATE_TABS(codegen);
 
@@ -193,12 +219,12 @@ barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, bool
         *expr_code++;
         expr_code[strlen(expr_code) - 1] = '\0';
         
-        fprintf(codegen->c_file, "%s", expr_code);
-        return;
+        barn_append_string_to_allocated_string(&buf, expr_code);
+        return buf;
     }
 
-    fprintf(codegen->c_file, "%s(", 
-        curr_node->function_call.function_name);
+    barn_append_string_to_allocated_string(&buf, curr_node->function_call.function_name);
+    barn_append_char_to_allocated_string(&buf, '(');
 
     BARN_ARRAY_FOR(curr_node->function_call.function_args)
     {
@@ -207,15 +233,34 @@ barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, bool
         const char* expr_code = barn_codegen_expression_generate(codegen, argument_expr);
 
         if (curr_node->function_call.function_args->length == (i + 1))
-            fprintf(codegen->c_file,"%s", expr_code);
+            barn_append_string_to_allocated_string(&buf, expr_code);
         else
-            fprintf(codegen->c_file,"%s, ", expr_code);
+            barn_append_string_to_allocated_string(&buf, expr_code);
     }
 
-    fprintf(codegen->c_file, ")");
+    barn_append_char_to_allocated_string(&buf, ')');
 
     if (colon)
-        fprintf(codegen->c_file, ";"); 
+        barn_append_char_to_allocated_string(&buf, ';');
+
+    return buf;
+}
+
+void
+barn_codegen_variable_declaration(barn_codegen_t* codegen, barn_node_t* curr_node)
+{
+
+    BARN_CODEGEN_GENERATE_TABS(codegen);
+    fprintf(codegen->c_file, "%s %s = ", 
+        barn_codegen_type_convert_to_c(codegen, curr_node->variable_declaration.variable->var_type),
+        curr_node->variable_declaration.variable->var_name);
+
+    printf("%s\n", curr_node->variable_declaration.variable->var_name);
+    const char* variable_value = barn_codegen_expression_generate(codegen, curr_node->variable_declaration.variable_value);
+
+    printf("co kurwa\n", variable_value);
+    fprintf(codegen->c_file, "%s", variable_value);
+    fprintf(codegen->c_file, ";");
 }
 
 void
@@ -230,7 +275,10 @@ barn_codegen_generate_function_body(barn_codegen_t* codegen, barn_node_t* curr_n
             barn_codegen_function_return(codegen, curr_node);
             break;
         case BARN_NODE_FUNCTION_CALL:
-            barn_codegen_function_call(codegen, curr_node, true, true);
+            fprintf(codegen->c_file, "%s", barn_codegen_function_call(codegen, curr_node, true, true));
+            break;
+        case BARN_NODE_VARIABLE_DECLARATION:
+            barn_codegen_variable_declaration(codegen, curr_node);
             break;
         default:
             printf("unimplemented node kind -> %s\n", barn_node_kind_show(curr_node->node_kind));

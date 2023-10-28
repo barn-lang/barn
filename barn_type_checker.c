@@ -178,12 +178,16 @@ barn_tc_does_types_collides(barn_type_t* lhs, barn_type_t* rhs)
         return true;
 
     if ((lhs->is_string && rhs->is_string) ||
+        (lhs->is_char   && rhs->is_char)   ||
         (lhs->is_ptr    && rhs->is_ptr))
         return false;
 
     if ((lhs->is_float    && rhs->is_float)   ||
         (lhs->is_signed   && rhs->is_signed)  ||
         (lhs->is_unsigned && rhs->is_unsigned))
+        return false;
+
+    if ((lhs->is_bool && rhs->is_bool))
         return false;
 
     if (barn_is_type_number(lhs->type) &&
@@ -222,6 +226,29 @@ barn_tc_func_return_check(barn_type_checker_t* tc, barn_node_t* return_node)
         BARN_TYPE_CHECKER_ERR(tc, first_expr_node->lhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s as return type got %s",
                     barn_convert_type_to_string(func_return_type), 
                     barn_convert_type_to_string(expr_type)); 
+    }
+}
+
+void
+barn_tc_variable_declaration(barn_type_checker_t* tc, barn_node_t* var_node)
+{
+    barn_node_t* curr_node = tc->curr_node;
+    if (var_node != NULL)
+        curr_node = var_node;
+
+    barn_tc_expression_check(tc, curr_node->variable_declaration.variable_value);
+
+    barn_type_t* var_expected_value_type = curr_node->variable_declaration.variable->var_type;
+    barn_type_t* var_value_expr_type     = barn_tc_expression_get_type(tc, curr_node->variable_declaration.variable_value);
+    
+    if (barn_tc_does_types_collides(var_expected_value_type, var_value_expr_type))
+    {
+        barn_expression_node_t* first_expr_node = barn_get_element_from_array(curr_node->variable_declaration.variable_value
+                                                                                ->expression.expression_nodes, 0);
+                                                                                 
+        BARN_TYPE_CHECKER_ERR(tc, first_expr_node->lhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, variable type is %s not %s",
+                    barn_convert_type_to_string(var_expected_value_type),
+                    barn_convert_type_to_string(var_value_expr_type)); 
     }
 }
 
@@ -281,6 +308,8 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
             barn_tc_func_return_check(tc, NULL);
         else if (tc->curr_node->node_kind == BARN_NODE_EXPRESSION)
             continue;
+        else if (tc->curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
+            barn_tc_variable_declaration(tc, NULL);
         else
         {
             printf("%s\n", barn_node_kind_show(tc->curr_node->node_kind));

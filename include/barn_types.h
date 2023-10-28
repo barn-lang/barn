@@ -59,6 +59,8 @@ typedef struct __barn_type_t {
     bool is_signed;
     bool is_string;
     bool is_float;
+    bool is_bool;
+    bool is_char;
     bool is_ptr;
 
     // TODO: structure fields
@@ -73,6 +75,7 @@ bool barn_is_type_unsigned(barn_type_kind_t type);
 bool barn_is_type_signed(barn_type_kind_t type);
 bool barn_is_type_string(barn_type_kind_t type);
 bool barn_is_type_float(barn_type_kind_t type);
+bool barn_is_type_bool(barn_type_kind_t type);
 bool barn_is_type_ptr(barn_type_kind_t type);
 
 bool barn_is_type_number(barn_type_kind_t type);

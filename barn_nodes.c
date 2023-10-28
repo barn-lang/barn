@@ -35,6 +35,8 @@ barn_node_kind_show(barn_node_kind_t kind)
             return "FunctionCall";
         case BARN_NODE_EXPRESSION:
             return "Expression";
+        case BARN_NODE_VARIABLE_DECLARATION:
+            return "VariableDeclaration";
     }
 
     BARN_UNIMPLEMENTED("unhandled node type");
