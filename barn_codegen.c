@@ -232,10 +232,10 @@ barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, bool
 
         const char* expr_code = barn_codegen_expression_generate(codegen, argument_expr);
 
-        if (curr_node->function_call.function_args->length == (i + 1))
-            barn_append_string_to_allocated_string(&buf, expr_code);
-        else
-            barn_append_string_to_allocated_string(&buf, expr_code);
+        barn_append_string_to_allocated_string(&buf, expr_code);
+
+        if (curr_node->function_call.function_args->length != (i + 1))
+            barn_append_char_to_allocated_string(&buf, ',');
     }
 
     barn_append_char_to_allocated_string(&buf, ')');
@@ -249,8 +249,8 @@ barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, bool
 void
 barn_codegen_variable_declaration(barn_codegen_t* codegen, barn_node_t* curr_node)
 {
-
     BARN_CODEGEN_GENERATE_TABS(codegen);
+
     fprintf(codegen->c_file, "%s %s = ", 
         barn_codegen_type_convert_to_c(codegen, curr_node->variable_declaration.variable->var_type),
         curr_node->variable_declaration.variable->var_name);
@@ -261,6 +261,46 @@ barn_codegen_variable_declaration(barn_codegen_t* codegen, barn_node_t* curr_nod
     printf("co kurwa\n", variable_value);
     fprintf(codegen->c_file, "%s", variable_value);
     fprintf(codegen->c_file, ";");
+}
+
+void
+barn_codegen_variable_modification(barn_codegen_t* codegen, barn_node_t* curr_node)
+{
+    BARN_CODEGEN_GENERATE_TABS(codegen);
+    
+    const char* variable_name = curr_node->variable_modification.variable->var_name;
+    fprintf(codegen->c_file, "%s ", variable_name);
+
+    switch (curr_node->node_kind)
+    {
+        case BARN_NODE_VARIABLE_ASN:
+            fprintf(codegen->c_file, "= ");
+            break;
+        case BARN_NODE_VARIABLE_ASNMINUS:
+            fprintf(codegen->c_file, "-= ");
+            break;
+        case BARN_NODE_VARIABLE_ASNPLUS:
+            fprintf(codegen->c_file, "+= ");
+            break;
+        case BARN_NODE_VARIABLE_ASNMUL:
+            fprintf(codegen->c_file, "*= ");
+            break;
+        case BARN_NODE_VARIABLE_ASNDIV:
+            fprintf(codegen->c_file, "/= ");
+            break;
+        default:
+            printf("%s", barn_node_kind_show(curr_node->node_kind));
+            BARN_UNIMPLEMENTED("unimplemented variable modification in codegen");
+            break;
+    }
+
+    // This means that we are generating a variable modification node
+    // that's doesn't use new value like incrementation or decrementation
+    if (curr_node->variable_modification.variable_value == NULL)
+        return;
+
+    fprintf(codegen->c_file, "%s;",
+        barn_codegen_expression_generate(codegen, curr_node->variable_modification.variable_value));
 }
 
 void
@@ -279,6 +319,13 @@ barn_codegen_generate_function_body(barn_codegen_t* codegen, barn_node_t* curr_n
             break;
         case BARN_NODE_VARIABLE_DECLARATION:
             barn_codegen_variable_declaration(codegen, curr_node);
+            break;
+        case BARN_NODE_VARIABLE_ASN:
+        case BARN_NODE_VARIABLE_ASNDIV:
+        case BARN_NODE_VARIABLE_ASNMINUS:
+        case BARN_NODE_VARIABLE_ASNPLUS:
+        case BARN_NODE_VARIABLE_ASNMUL:
+            barn_codegen_variable_modification(codegen, curr_node);
             break;
         default:
             printf("unimplemented node kind -> %s\n", barn_node_kind_show(curr_node->node_kind));
@@ -349,6 +396,11 @@ barn_codegen_start(barn_parser_t* parser)
         
         if (codegen->curr_node->node_kind == BARN_NODE_FUNCTION_DECLARATION)
             barn_codegen_function_declaration(codegen);
+        else if (codegen->curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
+        {
+            barn_codegen_variable_declaration(codegen, codegen->curr_node);
+            fprintf(codegen->c_file, "\n\n");
+        }
     }
 
     fclose(codegen->c_file);

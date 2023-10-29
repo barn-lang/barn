@@ -49,8 +49,16 @@ barn_create_variable(const char* var_name, barn_type_t* var_type,
 bool
 barn_parser_is_variable_defined_lg(barn_parser_t* parser, const char* variable_name)
 {
-    return barn_parser_is_variable_defined_l(parser, variable_name) ||
-           barn_parser_is_variable_defined_g(parser, variable_name);
+    printf("ok1\n");
+    if (barn_parser_is_variable_defined_l(parser, variable_name))
+        return true;
+    printf("ok2\n");
+    
+    if (barn_parser_is_variable_defined_g(parser, variable_name))
+        return true;
+    printf("ok3\n");
+
+    return false;
 }
 
 // barn_parser_is_variable_defined_lg function is checking does
@@ -81,7 +89,7 @@ barn_parser_is_variable_defined_g(barn_parser_t* parser, const char* variable_na
     BARN_ARRAY_FOR(parser->global_variables)
     {
         if (BARN_STR_CMP(
-                ((barn_variable_t*)barn_get_element_from_array(parser->local_variables, i))
+                ((barn_variable_t*)barn_get_element_from_array(parser->global_variables, i))
                 ->var_name, variable_name))
             return true;
     }
@@ -119,7 +127,7 @@ barn_parser_variable_declaration(barn_parser_t* parser)
 
     if (barn_parser_is_variable_defined_lg(parser, variable_name))
         BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "variable named '%s' already exists", variable_name);
-    
+
     // let example_var: type = <expression>
     //                ^
     if (!barn_parser_is_next_token(parser, BARN_TOKEN_COLON))
@@ -136,7 +144,9 @@ barn_parser_variable_declaration(barn_parser_t* parser)
     if (variable_type == NULL)
         BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "undefined variable type '%s'", 
                         parser->curr_token->value);
-        
+            printf(
+        "ok3\n"
+    );
     // let example_var: type = <expression>
     //                       ^
     if (!barn_parser_is_next_token(parser, BARN_TOKEN_ASN))
@@ -151,12 +161,16 @@ barn_parser_variable_declaration(barn_parser_t* parser)
     // TODO: auto type variables
     if (variable->var_name[0] == '_')
         variable->is_used = true;
-
+    printf(
+        "ok4\n"
+    );
     barn_node_t* variable_decl = barn_create_empty_node(BARN_NODE_VARIABLE_DECLARATION);
     variable_decl->variable_declaration.variable_value = variable_value;
     variable_decl->variable_declaration.variable       = variable;
     barn_parser_append_node(parser, variable_decl);
-
+    printf(
+        "ok5\n"
+    );
     if (barn_parser_is_function_opened(parser))
         barn_append_element_to_array(parser->local_variables, variable);
     else

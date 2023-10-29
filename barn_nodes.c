@@ -37,6 +37,16 @@ barn_node_kind_show(barn_node_kind_t kind)
             return "Expression";
         case BARN_NODE_VARIABLE_DECLARATION:
             return "VariableDeclaration";
+        case BARN_NODE_VARIABLE_ASN:
+            return "VariableAssignment";
+        case BARN_NODE_VARIABLE_ASNDIV:
+            return "VariableAssignmentDivide";
+        case BARN_NODE_VARIABLE_ASNPLUS:
+            return "VariableAssignmentPlus";
+        case BARN_NODE_VARIABLE_ASNMINUS:
+            return "VariableAssignmentMinus";
+        case BARN_NODE_VARIABLE_ASNMUL:
+            return "VariableAssignmentMultiply";
     }
 
     BARN_UNIMPLEMENTED("unhandled node type");

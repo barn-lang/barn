@@ -1,13 +1,13 @@
 @import "std.ba"
 
+let hello: string = "Hello, World!"
+
 fun get_message_string() -> string {
     return "okokok"
 }
 
 fun main() -> i32 {
     let msg: string = get_message_string()
+    msg = hello
     println(msg)
-
-    let code: i32 = 0 // Success code
-    return code
 }   

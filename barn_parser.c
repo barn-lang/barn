@@ -31,6 +31,7 @@
 #include <barn_array.h>
 #include <barn_io.h>
 
+#include <barn_variable_modification.h>
 #include <barn_variables.h>
 
 #include <barn_lexer.h>
@@ -112,10 +113,12 @@ barn_parser_is_id_correct_namespace(char* id_namespace)
     if (barn_parser_is_id_keyword(id_namespace) == true)
         return false;
 
-    // TODO: check is namespace already taken by a constant variable
+    if (BARN_STR_CMP(id_namespace, "true") || BARN_STR_CMP(id_namespace, "false"))
+        return false;
 
     return true;
 }
+   
 
 void
 barn_parser_identifier(barn_parser_t* parser)
@@ -124,8 +127,21 @@ barn_parser_identifier(barn_parser_t* parser)
     {
         if (barn_parser_is_next_token(parser, BARN_TOKEN_OPENPARENT))
             barn_parser_func_call(parser);
+        else if (barn_parser_is_next_token(parser, BARN_TOKEN_ASN))
+            barn_parser_variable_asn(parser);
+        else if (barn_parser_is_next_token(parser, BARN_TOKEN_PLUSASN))
+            barn_parser_variable_plusasn(parser);
+        else if (barn_parser_is_next_token(parser, BARN_TOKEN_MINUSASN))
+            barn_parser_variable_minusasn(parser);
+        else if (barn_parser_is_next_token(parser, BARN_TOKEN_MULASN))
+            barn_parser_variable_mulasn(parser);
+        else if (barn_parser_is_next_token(parser, BARN_TOKEN_DIVASN))
+            barn_parser_variable_divasn(parser);
         else
+        {
+            printf("%s\n", parser->curr_token->value);
             BARN_UNIMPLEMENTED("statements like +=, -=, *= etc. are not implemented");
+        }
     }
 
     if (BARN_TOKEN_CMP("fun"))
@@ -156,6 +172,7 @@ barn_parser_main_loop(barn_parser_t* parser)
     for (; parser->index < parser->lexer->tokens->length; parser->index++)
     {
         barn_parser_skip(parser, 0);
+        printf("curr_token = %s\n", parser->curr_token->value);
 
         if (parser->curr_token->kind == BARN_TOKEN_EOF)
             break;
@@ -176,9 +193,9 @@ barn_start_parser(barn_lexer_t* lexer)
 {
     barn_parser_t* parser = (barn_parser_t*)calloc(1, sizeof(barn_parser_t));
     
-    parser->global_variables = barn_create_array(sizeof(barn_node_t));
+    parser->global_variables = barn_create_array(sizeof(barn_variable_t));
+    parser->local_variables  = barn_create_array(sizeof(barn_variable_t));
     parser->structure_nodes  = barn_create_array(sizeof(barn_node_t));
-    parser->local_variables  = barn_create_array(sizeof(barn_node_t));
     parser->function_nodes   = barn_create_array(sizeof(barn_node_t));
     parser->nodes            = barn_create_array(sizeof(barn_node_t));
 

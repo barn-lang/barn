@@ -38,6 +38,12 @@ typedef enum __barn_node_kind_t {
 
     BARN_NODE_VARIABLE_DECLARATION,
 
+    BARN_NODE_VARIABLE_ASN,
+    BARN_NODE_VARIABLE_ASNPLUS,
+    BARN_NODE_VARIABLE_ASNMINUS,
+    BARN_NODE_VARIABLE_ASNMUL,
+    BARN_NODE_VARIABLE_ASNDIV,
+
     BARN_NODE_EXPRESSION,
 } barn_node_kind_t;
 
@@ -62,6 +68,11 @@ typedef struct __barn_node_t {
         barn_node_t*     variable_value;
         barn_variable_t* variable;
     } variable_declaration;
+
+    struct {
+        barn_variable_t* variable;
+        barn_node_t* variable_value;
+    } variable_modification;
 
     struct {
         barn_array_t* expression_nodes;

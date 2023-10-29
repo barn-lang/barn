@@ -107,7 +107,8 @@ barn_parser_collect_function_name(barn_parser_t* parser)
     if (barn_parser_function_get_by_name(parser, (char*)function_name) != NULL)
         BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "function with this name already exists", 0);
 
-    // TODO: does function name equal to variable name
+    if (barn_parser_is_variable_defined_g(parser, function_name))
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "variable with this name already exists", 0);
 
     return function_name;
 }
@@ -207,7 +208,12 @@ barn_function_declaration_set_argument_as_variables(barn_parser_t* parser, barn_
 {
     BARN_ARRAY_FOR(node->function_declaration.function_args)
     {
-        // TODO: implement setting arguments as local variables 
+        barn_func_argument_t* func_argument 
+            = barn_get_element_from_array(node->function_declaration.function_args, i);
+        
+        barn_variable_t* var = barn_create_variable(
+            func_argument->argument_name, func_argument->argument_type, true, false);
+        barn_append_element_to_array(parser->local_variables, var);
     }
 }
 

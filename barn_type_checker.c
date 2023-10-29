@@ -281,6 +281,29 @@ barn_tc_func_call_check(barn_type_checker_t* tc, barn_node_t* call_node)
 }
 
 void
+barn_tc_value_modification(barn_type_checker_t* tc, barn_node_t* value_mod)
+{
+    barn_node_t* curr_node = tc->curr_node;
+    if (value_mod != NULL)
+        curr_node = value_mod;
+        
+    // curr_node->variable_modification.variable
+    barn_tc_expression_check(tc, curr_node->variable_modification.variable_value);
+
+    barn_type_t* new_value_type = barn_tc_expression_get_type(tc, curr_node->variable_modification.variable_value);
+
+    if (barn_tc_does_types_collides(curr_node->variable_modification.variable->var_type,
+                                    new_value_type))
+    {
+        barn_expression_node_t* first_expr_node = barn_get_element_from_array(curr_node->variable_modification.variable_value
+                                                    ->expression.expression_nodes, 0);
+        BARN_TYPE_CHECKER_ERR(tc, first_expr_node->lhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s as new variable value but instead got %s",
+                    barn_convert_type_to_string(curr_node->variable_modification.variable->var_type),
+                    barn_convert_type_to_string(new_value_type)); 
+    }
+}
+
+void
 barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
 {
     for (tc->index = 0; tc->index < tc->nodes->length; tc->index++)
@@ -310,6 +333,12 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
             continue;
         else if (tc->curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
             barn_tc_variable_declaration(tc, NULL);
+        else if (tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASN      || 
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNPLUS  ||
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNMINUS ||
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNDIV   ||
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNMUL)
+            barn_tc_value_modification(tc, NULL);
         else
         {
             printf("%s\n", barn_node_kind_show(tc->curr_node->node_kind));

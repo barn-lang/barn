@@ -10,6 +10,14 @@
     - [X] Variable declaration
     - [X] Variable use
     - [ ] Variable value modifications
+        - [ ] =
+        - [ ] +=
+        - [ ] -=
+        - [ ] *=
+        - [ ] /=
+        - [ ] /=
+        - [ ] ++
+        - [ ] --
     - [ ] Static variables
 - [X] Typechecker
     - [X] Check expression nodes types
