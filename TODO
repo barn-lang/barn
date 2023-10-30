@@ -1,5 +1,5 @@
 - [X] Lexer
-- [ ] Parser
+- [X] Parser
     - [X] Function declaration
     - [X] Mathematical & Logical Expressions
     - [X] Function return
@@ -9,16 +9,23 @@
     - [X] Char
     - [X] Variable declaration
     - [X] Variable use
-    - [ ] Variable value modifications
-        - [ ] =
-        - [ ] +=
-        - [ ] -=
-        - [ ] *=
-        - [ ] /=
-        - [ ] /=
-        - [ ] ++
-        - [ ] --
-    - [ ] Static variables
+    - [X] Variable value modifications
+        - [X] =
+        - [X] +=
+        - [X] -=
+        - [X] *=
+        - [X] /=
+        - [X] /=
+        - [X] ++
+        - [X] --
+    - [X] Static & constant variables
+    - [ ] Conditions
+    - [ ] Statements
+        - [ ] If
+        - [ ] Else
+        - [ ] Elif
+        - [ ] While
+        - [ ] For
 - [X] Typechecker
     - [X] Check expression nodes types
     - [X] Check function returning types
@@ -26,8 +33,8 @@
     - [X] Char
     - [X] Variable declaration type checking
     - [X] Variable use type checking
-    - [ ] Variable value modifications type checking
-    - [ ] Static variables
+    - [X] Variable value modifications type checking
+    - [X] Static & constant variables
 - [X] Codegen
     - [X] Function declaration
     - [X] Function call
@@ -36,8 +43,8 @@
     - [X] Char
     - [X] Variable declaration
     - [X] Variable use
-    - [ ] Variable value modifications
-    - [ ] Static variables
+    - [X] Variable value modifications
+    - [X] Static & constant variables
 - [ ] Implement every thing from barngo
 - [ ] Implement structs
 - [ ] Implement pointers

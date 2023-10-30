@@ -43,6 +43,8 @@ typedef enum __barn_node_kind_t {
     BARN_NODE_VARIABLE_ASNMINUS,
     BARN_NODE_VARIABLE_ASNMUL,
     BARN_NODE_VARIABLE_ASNDIV,
+    BARN_NODE_VARIABLE_INCREMENTATION,
+    BARN_NODE_VARIABLE_DECREMENTATION,
 
     BARN_NODE_EXPRESSION,
 } barn_node_kind_t;
@@ -72,6 +74,7 @@ typedef struct __barn_node_t {
     struct {
         barn_variable_t* variable;
         barn_node_t* variable_value;
+        barn_token_t* variable_token;
     } variable_modification;
 
     struct {

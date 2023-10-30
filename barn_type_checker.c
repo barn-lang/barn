@@ -287,6 +287,23 @@ barn_tc_value_modification(barn_type_checker_t* tc, barn_node_t* value_mod)
     if (value_mod != NULL)
         curr_node = value_mod;
         
+    if (curr_node->node_kind == BARN_NODE_VARIABLE_ASNPLUS        ||
+        curr_node->node_kind == BARN_NODE_VARIABLE_ASNMINUS       ||
+        curr_node->node_kind == BARN_NODE_VARIABLE_ASNDIV         ||
+        curr_node->node_kind == BARN_NODE_VARIABLE_ASNMUL         || 
+        curr_node->node_kind == BARN_NODE_VARIABLE_INCREMENTATION || 
+        curr_node->node_kind == BARN_NODE_VARIABLE_DECREMENTATION)
+    {
+        if (!barn_is_type_number(curr_node->variable_modification.variable->var_type->type))
+            BARN_TYPE_CHECKER_ERR(tc, curr_node->variable_modification.variable_token, BARN_TYPE_ERROR, 
+                    "type mismatch, only number types or pointers can be modified like this not %s",
+                    barn_convert_type_to_string(curr_node->variable_modification.variable->var_type)); 
+    }
+
+    if (curr_node->node_kind == BARN_NODE_VARIABLE_INCREMENTATION || 
+        curr_node->node_kind == BARN_NODE_VARIABLE_DECREMENTATION)
+        return;
+
     // curr_node->variable_modification.variable
     barn_tc_expression_check(tc, curr_node->variable_modification.variable_value);
 
@@ -309,6 +326,8 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
     for (tc->index = 0; tc->index < tc->nodes->length; tc->index++)
     {
         barn_tc_advance(tc, 0);
+
+        printf("%s\n", barn_node_kind_show(tc->curr_node->node_kind));
 
         if (tc->curr_node->node_kind == BARN_NODE_FUNCTION_DECLARATION)
         {
@@ -333,11 +352,13 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
             continue;
         else if (tc->curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
             barn_tc_variable_declaration(tc, NULL);
-        else if (tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASN      || 
-                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNPLUS  ||
-                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNMINUS ||
-                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNDIV   ||
-                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNMUL)
+        else if (tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASN            || 
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNPLUS        ||
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNMINUS       ||
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNDIV         ||
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNMUL         || 
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_INCREMENTATION || 
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_DECREMENTATION)
             barn_tc_value_modification(tc, NULL);
         else
         {

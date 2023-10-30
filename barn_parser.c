@@ -51,7 +51,7 @@
  })
 #endif /* BARN_PARSER_ERR */
 
-#define BARN_KEYWORDS_LEN 15
+#define BARN_KEYWORDS_LEN 16
 
 static const char* barn_const_keywords[BARN_KEYWORDS_LEN] = {
     [0 ] = "fun",
@@ -69,6 +69,7 @@ static const char* barn_const_keywords[BARN_KEYWORDS_LEN] = {
     [12] = "break",
     [13] = "for",
     [14] = "struct",
+    [15] = "static",
 };
 
 /* Function for skipping tokens */
@@ -137,6 +138,10 @@ barn_parser_identifier(barn_parser_t* parser)
             barn_parser_variable_mulasn(parser);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_DIVASN))
             barn_parser_variable_divasn(parser);
+        else if (barn_parser_is_next_token(parser, BARN_TOKEN_INCREMENTATION))
+            barn_parser_variable_incrementation(parser);
+        else if (barn_parser_is_next_token(parser, BARN_TOKEN_DECREMENTATION))
+            barn_parser_variable_decrementation(parser);
         else
         {
             printf("%s\n", parser->curr_token->value);
@@ -144,12 +149,14 @@ barn_parser_identifier(barn_parser_t* parser)
         }
     }
 
-    if (BARN_TOKEN_CMP("fun"))
+    if      (BARN_TOKEN_CMP("fun"))
         barn_parser_function_declaration(parser);
-    if (BARN_TOKEN_CMP("return"))
+    else if (BARN_TOKEN_CMP("return"))
         barn_parser_func_return(parser);
-    if (BARN_TOKEN_CMP("let"))
-        barn_parser_variable_declaration(parser);
+    else if (BARN_TOKEN_CMP("let") || BARN_TOKEN_CMP("const"))
+        barn_parser_variable_declaration(parser, BARN_TOKEN_CMP("const"), false);
+    else if (BARN_TOKEN_CMP("static"))
+        barn_parser_static_variable_declaration(parser);
 }
 
 void 

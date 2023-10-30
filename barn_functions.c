@@ -212,7 +212,7 @@ barn_function_declaration_set_argument_as_variables(barn_parser_t* parser, barn_
             = barn_get_element_from_array(node->function_declaration.function_args, i);
         
         barn_variable_t* var = barn_create_variable(
-            func_argument->argument_name, func_argument->argument_type, true, false);
+            func_argument->argument_name, func_argument->argument_type, true, false, false);
         barn_append_element_to_array(parser->local_variables, var);
     }
 }

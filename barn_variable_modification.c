@@ -154,11 +154,47 @@ barn_parser_variable_divasn(barn_parser_t* parser)
 void 
 barn_parser_variable_incrementation(barn_parser_t* parser)
 {
+    const char* variable_name = BARN_COLLECT_CURR_TOK_VAL(parser);
+    
+    if (!barn_parser_is_variable_defined_lg(parser, variable_name))
+        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "'%s' is undefined", 
+                        parser->curr_token->value);
 
+    barn_variable_t* variable = barn_parser_get_variable_by_name(parser, variable_name);
+    if (variable->is_const == true)
+        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be incremented", 
+                        parser->curr_token->value);
+
+    barn_parser_skip(parser, 1);
+
+    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_INCREMENTATION);
+    node->variable_modification.variable_value = NULL;
+    node->variable_modification.variable       = variable;
+    node->variable_modification.variable_token = parser->curr_token;
+
+    barn_parser_append_node(parser, node);
 } 
 
 void 
 barn_parser_variable_decrementation(barn_parser_t* parser)
 {
+    const char* variable_name = BARN_COLLECT_CURR_TOK_VAL(parser);
+    
+    if (!barn_parser_is_variable_defined_lg(parser, variable_name))
+        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "'%s' is undefined", 
+                        parser->curr_token->value);
 
+    barn_variable_t* variable = barn_parser_get_variable_by_name(parser, variable_name);
+    if (variable->is_const == true)
+        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be decremented", 
+                        parser->curr_token->value);
+
+    barn_parser_skip(parser, 1);
+
+    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_DECREMENTATION);
+    node->variable_modification.variable_value = NULL;
+    node->variable_modification.variable       = variable;
+    node->variable_modification.variable_token = parser->curr_token;
+
+    barn_parser_append_node(parser, node);
 }

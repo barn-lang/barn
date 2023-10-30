@@ -47,6 +47,10 @@ barn_node_kind_show(barn_node_kind_t kind)
             return "VariableAssignmentMinus";
         case BARN_NODE_VARIABLE_ASNMUL:
             return "VariableAssignmentMultiply";
+        case BARN_NODE_VARIABLE_INCREMENTATION:
+            return "VariableIncrementation";
+        case BARN_NODE_VARIABLE_DECREMENTATION:
+            return "VariableDecrementation";
     }
 
     BARN_UNIMPLEMENTED("unhandled node type");

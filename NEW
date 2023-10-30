@@ -1,0 +1,16 @@
+NEW THINGS ADDED WITH BARNC
+-----
+
+- We are adding static variables. Example in ./examples/44-static-variables.ba. Underneath you can see how to use them:
+```
+@import "std.ba"
+
+static let apples: int = 0
+
+fun main() -> i32  {
+    apples++
+    printnum(apples)
+    
+    return 0 // Success
+}
+```

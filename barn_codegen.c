@@ -251,14 +251,18 @@ barn_codegen_variable_declaration(barn_codegen_t* codegen, barn_node_t* curr_nod
 {
     BARN_CODEGEN_GENERATE_TABS(codegen);
 
+    if (curr_node->variable_declaration.variable->is_static)
+        fprintf(codegen->c_file, "static ");
+
+    if (curr_node->variable_declaration.variable->is_const)
+        fprintf(codegen->c_file, "const ");
+
     fprintf(codegen->c_file, "%s %s = ", 
         barn_codegen_type_convert_to_c(codegen, curr_node->variable_declaration.variable->var_type),
         curr_node->variable_declaration.variable->var_name);
 
-    printf("%s\n", curr_node->variable_declaration.variable->var_name);
     const char* variable_value = barn_codegen_expression_generate(codegen, curr_node->variable_declaration.variable_value);
 
-    printf("co kurwa\n", variable_value);
     fprintf(codegen->c_file, "%s", variable_value);
     fprintf(codegen->c_file, ";");
 }
@@ -288,13 +292,19 @@ barn_codegen_variable_modification(barn_codegen_t* codegen, barn_node_t* curr_no
         case BARN_NODE_VARIABLE_ASNDIV:
             fprintf(codegen->c_file, "/= ");
             break;
+        case BARN_NODE_VARIABLE_INCREMENTATION:
+            fprintf(codegen->c_file, "++;");
+            break;
+        case BARN_NODE_VARIABLE_DECREMENTATION:
+            fprintf(codegen->c_file, "--;");
+            break;
         default:
             printf("%s", barn_node_kind_show(curr_node->node_kind));
             BARN_UNIMPLEMENTED("unimplemented variable modification in codegen");
             break;
     }
 
-    // This means that we are generating a variable modification node
+    // This means that we are dealing with a variable modification node
     // that's doesn't use new value like incrementation or decrementation
     if (curr_node->variable_modification.variable_value == NULL)
         return;
@@ -325,6 +335,8 @@ barn_codegen_generate_function_body(barn_codegen_t* codegen, barn_node_t* curr_n
         case BARN_NODE_VARIABLE_ASNMINUS:
         case BARN_NODE_VARIABLE_ASNPLUS:
         case BARN_NODE_VARIABLE_ASNMUL:
+        case BARN_NODE_VARIABLE_INCREMENTATION:
+        case BARN_NODE_VARIABLE_DECREMENTATION:
             barn_codegen_variable_modification(codegen, curr_node);
             break;
         default:

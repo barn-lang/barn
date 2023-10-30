@@ -4,4 +4,7 @@ fun main() {
     var1 -= 2
     var1 *= 2
     var1 /= 2
+
+    var1++
+    var1--
 }

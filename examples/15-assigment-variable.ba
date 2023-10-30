@@ -5,8 +5,7 @@ fun pow2(float x) -> float {
 fun main() -> int {
     let pi: float = 3.15
     pi = 3.14 // Whoops my bad
-    let circle: float = 0
-    circle = pi * (20*20)
 
+    let area: float = pi * pow2(pi)
     return 0 // Success
 }
