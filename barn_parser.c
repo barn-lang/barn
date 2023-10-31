@@ -34,6 +34,8 @@
 #include <barn_variable_modification.h>
 #include <barn_variables.h>
 
+#include <barn_if.h>
+
 #include <barn_lexer.h>
 #include <barn_nodes.h>
 
@@ -157,6 +159,8 @@ barn_parser_identifier(barn_parser_t* parser)
         barn_parser_variable_declaration(parser, BARN_TOKEN_CMP("const"), false);
     else if (BARN_TOKEN_CMP("static"))
         barn_parser_static_variable_declaration(parser);
+    else if (BARN_TOKEN_CMP("if"))
+        barn_parser_if_statement(parser);
 }
 
 void 

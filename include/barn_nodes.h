@@ -47,6 +47,8 @@ typedef enum __barn_node_kind_t {
     BARN_NODE_VARIABLE_DECREMENTATION,
 
     BARN_NODE_EXPRESSION,
+
+    BARN_NODE_IF_STATEMENT,
 } barn_node_kind_t;
 
 typedef struct __barn_expression_value_t barn_expression_value_t;
@@ -60,6 +62,10 @@ typedef struct __barn_node_t {
         barn_type_t*  function_return;
         char*         function_name;
     } function_declaration;
+
+    struct {
+        barn_node_t* if_condition_expr;
+    } if_statement;
 
     struct {
         barn_node_t* return_value;

@@ -1,6 +1,7 @@
 @import "std.ba"
 
-fun main()
-{
-    
+fun main() {
+    if 1 + 1 {
+        
+    }   
 }
