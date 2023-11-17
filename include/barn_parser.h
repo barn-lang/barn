@@ -40,6 +40,7 @@ typedef struct __barn_parser_t {
     barn_token_t* curr_token;
     
     int statement_open;
+    int loop_open;
     int index;
 
     barn_array_t* function_nodes;
@@ -74,6 +75,7 @@ bool barn_parser_is_function_opened(barn_parser_t* parser);
 bool barn_parser_is_next_token(barn_parser_t* parser, barn_token_kind_t kind);
 bool barn_parser_is_id_keyword(char* id_keyword);
 bool barn_parser_is_id_correct_namespace(char* id_namespace);
+bool barn_parser_is_statement_opened(barn_parser_t* parser);
 
 void barn_parser_reset_local_variables(barn_parser_t* parser);
 void barn_parser_append_node(barn_parser_t* parser, barn_node_t* node);

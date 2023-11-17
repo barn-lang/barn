@@ -43,9 +43,11 @@ fun string_length(string s) -> int {
 	// __use__(s)
 }
 
+// TODO: fix int_to_string function
+
 // Function for changing number to string
-fun iota(int num, int base) -> string {
-	__code__("return iota(num, base);")
+fun int_to_string(int num, int base) -> string {
+	// __code__("return itoa(num, base);")
 
 	// __use__(num)
 	// __use__(base)
@@ -87,42 +89,44 @@ fun printbool(bool to_print_bool) {
 	// __use__(to_print_bool)
 }
 
-// fun fmt_print(string __format_start__, ...) {
-	// __barn_start_format()
+fun fmt_print(string __format_start__, ...) {
+	__barn_start_format()
 
-	// let strlength: i32 = string_length(__format_start__)
-	// for let i: i32 = 0; i < strlength; i++ {
-	// 	let curr_char: char = ' '
-	// 	__code__("curr_char = __format_start__[i];")
+	let strlength: i32 = string_length(__format_start__)
+	let i: i32 = 0
 
-	// 	if curr_char == '%' {
-	// 		i++
-	// 		__code__("curr_char = __format_start__[i];")
+	while i < strlength {
+		let curr_char: char = ' '
+		__code__("curr_char = __format_start__[i];")
 
-	// 		if curr_char == 's' {
-	// 			let __str: string = __barn_format_get_value_string()
-	// 			print(__str)
-	// 		} elif curr_char == 'd' {
-	// 			let __decimal: i32 = __barn_format_get_value_int()
-	// 			__code__("printf(\"%d\", __decimal);")
-	// 		} elif curr_char == 'x' {
-	// 			let __hexadecimal: i32 = __barn_format_get_value_int()
-	// 			__code__("printf(\"%x\", __hexadecimal);")
-	// 		} elif curr_char == 'o' {
-	// 			let __octal: i32 = __barn_format_get_value_int()
-	// 			__code__("printf(\"%o\", __octal);")
-	// 		} elif curr_char == 'b' {
-	// 			let __binary: i32 = __barn_format_get_value_int()
-	// 			__code__("printf(\"%b\", __binary);")
-	// 		} elif curr_char == 'f' {
-	// 			let __double: f64 = __barn_format_get_value_double()
-	// 			__code__("printf(\"%lf\", __double);")
-	// 		} elif curr_char == 'l' {
-	// 			let __long: i64 = __barn_format_get_value_long()
-	// 			__code__("printf(\"%l\", __long);")
-	// 		}
-	// 	} else {
-	// 		__code__("printf(\"%c\", curr_char);")
-	// 	}
-	// }
-// }
+		if curr_char == '%' {
+			i++
+			__code__("curr_char = __format_start__[i];")
+
+			if curr_char == 's' {
+				let __str: string = __barn_format_get_value_string()
+				print(__str)
+			} elif curr_char == 'd' {
+				let __decimal: i32 = __barn_format_get_value_int()
+				__code__("printf(\"%d\", __decimal);")
+			} elif curr_char == 'x' {
+				let __hexadecimal: i32 = __barn_format_get_value_int()
+				__code__("printf(\"%x\", __hexadecimal);")
+			} elif curr_char == 'o' {
+				let __octal: i32 = __barn_format_get_value_int()
+				__code__("printf(\"%o\", __octal);")
+			// TODO: implement binary printing
+			} elif curr_char == 'f' {
+				let __double: f64 = __barn_format_get_value_double()
+				__code__("printf(\"%lf\", __double);")
+			} elif curr_char == 'l' {
+				let __long: i64 = __barn_format_get_value_long()
+				__code__("printf(\"%ld\", __long);")
+			}
+		} else {
+			__code__("printf(\"%c\", curr_char);")
+		}
+
+		i++
+	}
+}

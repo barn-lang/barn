@@ -54,9 +54,10 @@ fun floor32(f32 __floor_num) -> i32 {
 
 }
 
-fun floor(f32 __floor_num) -> i32 { 
-    return floor32(__floor_num) 
-}
+// TODO: Extern floor function
+// fun floor(f32 __floor_num) -> i32 { 
+//     return floor32(__floor_num) 
+// }
 
 /* ---    Sqrt   --- */
 
@@ -64,9 +65,10 @@ fun sqrt64(f64 __sqrt_num) -> f64 {}
 
 fun sqrt32(f32 __sqrt_num) -> f32 {}
 
-fun sqrt(f32 __sqrt_num) -> f32 {
-    return sqrt32(__sqrt_num)
-}
+// TODO: Extern sqrt function
+// fun sqrt(f32 __sqrt_num) -> f32 {
+//     return sqrt32(__sqrt_num)
+// }
 
 /* --- Min & Max --- */
 
@@ -74,17 +76,19 @@ fun minf(f64 __first_min, f64 __second_min) -> f64 {
 
 }
 
-fun min(i64 __first_min, i64 __second_min) -> i64 {
+// TODO: Extern min function
+// fun min(i64 __first_min, i64 __second_min) -> i64 {
     
-}
+// }
 
 fun maxf(f64 __first_max, f64 __second_max) -> f64 {
 
 }
 
-fun max(i64 __first_max, i64 __second_max) -> i64 {
+// TODO: Extern max function
+// fun max(i64 __first_max, i64 __second_max) -> i64 {
     
-}
+// }
 
 /*
  *

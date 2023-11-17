@@ -51,8 +51,18 @@ barn_node_kind_show(barn_node_kind_t kind)
             return "VariableIncrementation";
         case BARN_NODE_VARIABLE_DECREMENTATION:
             return "VariableDecrementation";
-        case BARN_NODE_IF_STATEMENT:
-            return "IfStatement";
+        case BARN_NODE_CONDITION_STATEMENT:
+            return "ConditionStatement";
+        case BARN_NODE_END_STATEMENT:
+            return "EndStatement";
+        case BARN_NODE_FOR_LOOP:
+            return "ForLoop";
+        case BARN_NODE_WHILE_LOOP:
+            return "WhileLoop";
+        case BARN_NODE_BREAK_LOOP:
+            return "BreakLoop";
+        case BARN_NODE_CONTINUE_LOOP:
+            return "ContinueLoop";
     }
 
     BARN_UNIMPLEMENTED("unhandled node type");

@@ -18,32 +18,17 @@
  *
 */
 
+#ifndef __BARN_CONDITIONS__
+#define __BARN_CONDITIONS__
+
 #include <barn_core.h>
-#include <barn_if.h>
 
 #include <barn_expressions.h>
 #include <barn_parser.h>
 #include <barn_types.h>
 
-void 
-barn_parser_if_statement(barn_parser_t* parser)
-{
-    if (!barn_parser_is_function_opened(parser))
-        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "function should be opened to use \"if\" keyword", 0);
+void barn_parser_if_statement  (barn_parser_t* parser);
+void barn_parser_elif_statement(barn_parser_t* parser);
+void barn_parser_else_statement(barn_parser_t* parser);
 
-    barn_parser_skip(parser, 1);    
-    barn_node_t* if_statement = barn_parse_expression(parser, BARN_TOKEN_OPENBRACE, BARN_TOKEN_OPENBRACE, false);
-
-    barn_node_t* if_node = barn_create_empty_node(BARN_NODE_IF_STATEMENT);
-    if_node->if_statement.if_condition_expr = if_statement;
-
-    barn_parser_append_node(parser, if_node);
-
-    if (parser->curr_token->kind == BARN_TOKEN_OPENBRACE)
-    {
-        parser->statement_open += 1;
-        parser->statement_node =  if_node;
-    }
-    else
-        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"{\" after if condition", 0);
-}
+#endif /* __BARN_CONDITIONS__ */

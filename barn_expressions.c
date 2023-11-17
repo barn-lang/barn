@@ -97,13 +97,18 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
     }
     else if (parser->curr_token->kind == BARN_TOKEN_EOF)
     {
-        barn_parser_skip(parser, -1);
+        // barn_parser_skip(parser, -1);
+        parser->index += -1;
+        parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
+
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected value token not EOF", 
                         parser->curr_token->value);
     }
     else if (parser->curr_token->kind == BARN_TOKEN_OPENPARENT)
     {
-        barn_parser_skip(parser, 1);
+        // barn_parser_skip(parser, 1);
+        parser->index += 1;
+        parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
         return NULL;
     }
     else if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER)
@@ -144,7 +149,10 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
                         parser->curr_token->value);
     }
 
-    barn_parser_skip(parser, 1);
+    // barn_parser_skip(parser, 1);
+    parser->index += 1;
+    parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
+
     return expr_value;
 }
 
@@ -153,12 +161,20 @@ barn_expression_is_curr_operator(barn_parser_t* parser)
 {
     switch (parser->curr_token->kind)
     {
-        case BARN_TOKEN_PLUS:
+        case BARN_TOKEN_PLUS: // normal operators
         case BARN_TOKEN_MINUS:
         case BARN_TOKEN_MUL:
         case BARN_TOKEN_OPENPARENT:
         case BARN_TOKEN_CLOSEPARENT:
         case BARN_TOKEN_DIV:
+            return true;
+            break;
+        case BARN_TOKEN_GT: // condiction operators
+        case BARN_TOKEN_GTE:
+        case BARN_TOKEN_LT:
+        case BARN_TOKEN_LTE:
+        case BARN_TOKEN_EQ:
+        case BARN_TOKEN_NEQ:
             return true;
             break;
         default:
@@ -179,7 +195,9 @@ barn_expression_parser_check_parents(barn_parser_t* parser, barn_expr_parser_t* 
 
         printf("parents ++; %d\n", __LINE__);
         expr_parser->parents++;
-        barn_parser_skip(parser, 1);
+        parser->index += 1;
+        parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
+
         return 1;
     }
     
@@ -195,7 +213,10 @@ barn_expression_parser_check_parents(barn_parser_t* parser, barn_expr_parser_t* 
 
         expr_parser->parents--; 
         printf("closing one parent %d\n", expr_parser->parents);
-        barn_parser_skip(parser, 1);
+        // barn_parser_skip(parser, 1);
+        parser->index += 1;
+        parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
+
         return 1;
     }
 
@@ -209,7 +230,9 @@ barn_expression_parser_check_rhs_value_null(barn_parser_t* parser, barn_expressi
     if (rhs == NULL)
     {
         expr_parser->index = -1;
-        barn_parser_skip(parser, -1);
+        // barn_parser_skip(parser, -1);
+        parser->index -= 1;
+        parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
     }
 }
 
@@ -221,7 +244,10 @@ barn_expression_parser_not_full_op_rhs(barn_parser_t* parser, barn_expr_parser_t
     if (!barn_expression_is_curr_operator(parser))
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected operator not \"%s\"", 
                         barn_token_kind_to_string(parser->curr_token->kind));
-    barn_parser_skip(parser, 1);
+    // barn_parser_skip(parser, 1);
+    parser->index += 1;
+    parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
+
 
     if (operator == BARN_TOKEN_DIV)
     {
@@ -280,7 +306,10 @@ barn_expression_division_by_zero(barn_parser_t* parser, barn_expr_parser_t* expr
     else
         return;
 
-    barn_parser_skip(parser, -1);
+    // barn_parser_skip(parser, -1);
+    parser->index += -1;
+    parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
+
     BARN_PARSER_ERR(parser, BARN_MATH_ERROR, "division by 0 is not allowed", 0);
 }
 
@@ -305,7 +334,9 @@ barn_expression_parser_full_lhs_op_rhs(barn_parser_t* parser,  barn_expr_parser_
     if (!barn_expression_is_curr_operator(parser))
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected operator not \"%s\"", 
                         barn_token_kind_to_string(parser->curr_token->kind));
-    barn_parser_skip(parser, 1);
+    // barn_parser_skip(parser, 1);
+    parser->index += 1;
+    parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
 
     if (operator == BARN_TOKEN_DIV)
         barn_expression_division_by_zero(parser, expr_parser, lhs_value);
@@ -398,6 +429,12 @@ barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind,
         //     barn_token_kind_to_string(curr_expr_node->operator),
         //     curr_expr_node->parents);
     }
+
+    // if (parser->curr_token->kind == BARN_TOKEN_NEWLINE)
+    // {
+    //     parser->index += 1;
+    //     parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
+    // }
 
     return expr_node;
 }

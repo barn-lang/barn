@@ -61,7 +61,7 @@ barn_create_type(barn_type_kind_t type)
     barn_type_t* new_type = (barn_type_t*)calloc(1, sizeof(barn_type_t));
 
     new_type->type = type;
-    new_type->size = barn_convert_type_to_size(type);
+    new_type->size = type == BARN_TYPE_FORMAT ? 0 : barn_convert_type_to_size(type);
 
     new_type->is_unsigned = barn_is_type_unsigned(type);
     new_type->is_signed   = barn_is_type_signed(type);
@@ -242,6 +242,9 @@ barn_convert_type_to_string(barn_type_t* type)
             break;
         case BARN_TYPE_STRING:
             return "string";
+            break;
+        case BARN_TYPE_FORMAT:
+            return "format";
             break;
         default:
             BARN_UNIMPLEMENTED("unhandled type size");

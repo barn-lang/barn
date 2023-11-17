@@ -1,7 +1,11 @@
 @import "std.ba"
+@import "math.ba"
 
 fun main() {
-    if 1 + 1 {
-        
-    }   
+    fmt_print("string \\\"%s\\\"\n", "Just a string")
+    fmt_print("10 in decimal: %d\n", 10)
+    fmt_print("255 in hex: %x\n", 255)
+    fmt_print("8 in octal: %o\n", 8)
+    fmt_print("π: %f\n", _MATH_PI)
+    fmt_print("long number: %l\n", 1000304040)
 }

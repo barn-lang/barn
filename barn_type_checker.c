@@ -268,9 +268,12 @@ barn_tc_func_call_check(barn_type_checker_t* tc, barn_node_t* call_node)
         barn_func_argument_t* func_argument_expected = barn_get_element_from_array(func_args_expected, i);
         barn_node_t*          func_argument_given    = barn_get_element_from_array(func_args_given, i);
 
+        if (func_argument_expected->argument_type->type == BARN_TYPE_FORMAT)
+            break;
+
         barn_tc_expression_check(tc, func_argument_given);
         barn_type_t* argument_expr_type = barn_tc_expression_get_type(tc, func_argument_given);
-    
+
         barn_expression_node_t* first_expr_node = barn_get_element_from_array(func_argument_given->expression.expression_nodes, 0);
 
         if (barn_tc_does_types_collides(argument_expr_type, func_argument_expected->argument_type))
@@ -281,11 +284,26 @@ barn_tc_func_call_check(barn_type_checker_t* tc, barn_node_t* call_node)
 }
 
 void
+barn_tc_condition_statement(barn_type_checker_t* tc, barn_node_t* cond_node)
+{
+    barn_node_t* curr_node = cond_node == NULL ? tc->curr_node : cond_node;
+
+    if (curr_node->condition_statement.kind_of_cond != BARN_ELSE_CONDITION)
+        barn_tc_expression_check(tc, curr_node->condition_statement.condition_expr);
+}
+
+void
+barn_tc_while_loop(barn_type_checker_t* tc, barn_node_t* cond_node)
+{
+    barn_node_t* curr_node = cond_node == NULL ? tc->curr_node : cond_node;
+
+    barn_tc_expression_check(tc, curr_node->while_loop.condition_expr);
+}
+
+void
 barn_tc_value_modification(barn_type_checker_t* tc, barn_node_t* value_mod)
 {
-    barn_node_t* curr_node = tc->curr_node;
-    if (value_mod != NULL)
-        curr_node = value_mod;
+    barn_node_t* curr_node = value_mod == NULL ? tc->curr_node : value_mod;
         
     if (curr_node->node_kind == BARN_NODE_VARIABLE_ASNPLUS        ||
         curr_node->node_kind == BARN_NODE_VARIABLE_ASNMINUS       ||
@@ -348,7 +366,10 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
             barn_tc_func_call_check(tc, NULL);
         else if (tc->curr_node->node_kind == BARN_NODE_FUNCTION_RETURN)
             barn_tc_func_return_check(tc, NULL);
-        else if (tc->curr_node->node_kind == BARN_NODE_EXPRESSION)
+        else if (tc->curr_node->node_kind == BARN_NODE_EXPRESSION    ||
+                 tc->curr_node->node_kind == BARN_NODE_END_STATEMENT ||
+                 tc->curr_node->node_kind == BARN_NODE_BREAK_LOOP    ||
+                 tc->curr_node->node_kind == BARN_NODE_CONTINUE_LOOP)
             continue;
         else if (tc->curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
             barn_tc_variable_declaration(tc, NULL);
@@ -360,6 +381,10 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
                  tc->curr_node->node_kind == BARN_NODE_VARIABLE_INCREMENTATION || 
                  tc->curr_node->node_kind == BARN_NODE_VARIABLE_DECREMENTATION)
             barn_tc_value_modification(tc, NULL);
+        else if (tc->curr_node->node_kind == BARN_NODE_CONDITION_STATEMENT)
+            barn_tc_condition_statement(tc, NULL);
+        else if (tc->curr_node->node_kind == BARN_NODE_WHILE_LOOP)
+            barn_tc_while_loop(tc, NULL);
         else
         {
             printf("%s\n", barn_node_kind_show(tc->curr_node->node_kind));

@@ -29,7 +29,7 @@ barn_parser_func_return(barn_parser_t* parser)
     if (!barn_parser_is_function_opened(parser))
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"return\" inside function body", 0);
 
-    barn_parser_skip(parser, 1);    
+    barn_parser_skip(parser, 1);
     if (parser->curr_token->kind == BARN_TOKEN_EOF)
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected return expression value not EOF", 0);  
 

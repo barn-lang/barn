@@ -54,4 +54,6 @@ barn_func_argument_t* barn_create_func_argument(barn_type_t* argument_type, cons
 
 void barn_initialize_builtin_functions();
 
+bool barn_parser_function_is_argument_list_with_format(barn_array_t* function_args);
+
 #endif /* __BARN_FUNCTIONS__ */

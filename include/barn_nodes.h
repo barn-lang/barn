@@ -48,10 +48,29 @@ typedef enum __barn_node_kind_t {
 
     BARN_NODE_EXPRESSION,
 
-    BARN_NODE_IF_STATEMENT,
+    BARN_NODE_CONDITION_STATEMENT,
+    BARN_NODE_END_STATEMENT,
+    BARN_NODE_WHILE_LOOP,
+    BARN_NODE_FOR_LOOP,
+    BARN_NODE_BREAK_LOOP,
+    BARN_NODE_CONTINUE_LOOP,
 } barn_node_kind_t;
 
 typedef struct __barn_expression_value_t barn_expression_value_t;
+
+typedef enum __barn_condition_statement_t {
+    BARN_IF_CONDITION,
+    BARN_ELIF_CONDITION,
+    BARN_ELSE_CONDITION,
+
+    BARN_WHILE_LOOP
+} barn_condition_statement_t;
+
+static const char* barn_condition_statement_string[] = {
+    [BARN_IF_CONDITION]   = "BARN_IF_CONDITION",
+    [BARN_ELIF_CONDITION] = "BARN_ELIF_CONDITION",
+    [BARN_ELSE_CONDITION] = "BARN_ELSE_CONDITION",
+};
 
 typedef struct __barn_node_t {
     barn_node_kind_t node_kind;
@@ -64,13 +83,22 @@ typedef struct __barn_node_t {
     } function_declaration;
 
     struct {
-        barn_node_t* if_condition_expr;
-    } if_statement;
+        barn_node_t* condition_expr;
+        barn_condition_statement_t kind_of_cond;
+    } condition_statement;
 
     struct {
         barn_node_t* return_value;
         barn_node_t* return_func;
     } function_return;
+
+    struct {
+        barn_condition_statement_t kind_of_cond;
+    } end_statement;
+
+    struct {
+        barn_node_t* condition_expr;
+    } while_loop;
 
     struct {
         barn_node_t*     variable_value;

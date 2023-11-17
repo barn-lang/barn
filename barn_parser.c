@@ -34,10 +34,12 @@
 #include <barn_variable_modification.h>
 #include <barn_variables.h>
 
-#include <barn_if.h>
+#include <barn_conditions.h>
+#include <barn_loop.h>
 
 #include <barn_lexer.h>
 #include <barn_nodes.h>
+#include <barn_warning.h>
 
 #ifndef BARN_TOKEN_CMP
 # define BARN_TOKEN_CMP(str) (strcmp(parser->curr_token->value, str) == 0)
@@ -53,12 +55,12 @@
  })
 #endif /* BARN_PARSER_ERR */
 
-#define BARN_KEYWORDS_LEN 16
+#define BARN_KEYWORDS_LEN 17
 
 static const char* barn_const_keywords[BARN_KEYWORDS_LEN] = {
     [0 ] = "fun",
-    [1 ] = "extern",
-    [2 ] = "@import_c",
+    [1 ] = "extern", // to implement
+    [2 ] = "@import_c", // to implement
     [3 ] = "@import",
     [4 ] = "let",
     [5 ] = "const",
@@ -70,8 +72,9 @@ static const char* barn_const_keywords[BARN_KEYWORDS_LEN] = {
     [11] = "continue",
     [12] = "break",
     [13] = "for",
-    [14] = "struct",
+    [14] = "struct", // to implement
     [15] = "static",
+    [16] = "enum", // to implement
 };
 
 /* Function for skipping tokens */
@@ -80,6 +83,9 @@ barn_parser_skip(barn_parser_t* parser, int n)
 {
     parser->index += n;
     parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
+
+    // if (parser->curr_token->kind == BARN_TOKEN_NEWLINE)
+    //     barn_parser_skip(parser, 1);
 }
 
 bool
@@ -146,9 +152,12 @@ barn_parser_identifier(barn_parser_t* parser)
             barn_parser_variable_decrementation(parser);
         else
         {
+            barn_parser_skip(parser, 1);
             printf("%s\n", parser->curr_token->value);
             BARN_UNIMPLEMENTED("statements like +=, -=, *= etc. are not implemented");
         }
+
+        return;
     }
 
     if      (BARN_TOKEN_CMP("fun"))
@@ -161,6 +170,23 @@ barn_parser_identifier(barn_parser_t* parser)
         barn_parser_static_variable_declaration(parser);
     else if (BARN_TOKEN_CMP("if"))
         barn_parser_if_statement(parser);
+    else if (BARN_TOKEN_CMP("elif"))
+        barn_parser_elif_statement(parser);
+    else if (BARN_TOKEN_CMP("else"))
+        barn_parser_else_statement(parser);
+    else if (BARN_TOKEN_CMP("while"))
+        barn_parser_while_loop(parser);
+    else if (BARN_TOKEN_CMP("for"))
+        barn_parser_for_loop(parser);
+    else if (BARN_TOKEN_CMP("break"))
+        barn_parser_break_loop(parser);
+    else if (BARN_TOKEN_CMP("continue"))
+        barn_parser_continue_loop(parser);
+    else
+    {
+        barn_token_print(parser->curr_token);
+        BARN_UNIMPLEMENTED("this keyword is not implemented");
+    }
 }
 
 void 
@@ -170,11 +196,50 @@ barn_parser_reset_local_variables(barn_parser_t* parser)
     parser->local_variables = barn_create_array(sizeof(barn_node_t));
 }
 
+bool 
+barn_parser_is_statement_opened(barn_parser_t* parser)
+{
+    return (parser->statement_open >= 1);
+}
+
+void
+barn_parser_check_usage_of_local_variables(barn_parser_t* parser)
+{
+    BARN_ARRAY_FOR(parser->local_variables)
+    {
+        barn_variable_t* local_var = barn_get_element_from_array(parser->local_variables, i);
+        if (local_var->is_used == false)
+            barn_warning_show("[disable with --w-disable-unused] variable named \"%s\" is not use", local_var->var_name);
+    }
+}
+
 void 
 barn_parser_close_brace(barn_parser_t* parser)
 {
-    parser->actual_function = NULL;
-    barn_parser_reset_local_variables(parser);
+    if (!barn_parser_is_function_opened(parser))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unexpected use of '}'", 0);
+
+    if (!barn_parser_is_statement_opened(parser))
+    {
+        parser->actual_function = NULL;
+        barn_parser_check_usage_of_local_variables(parser);
+        barn_parser_reset_local_variables(parser);
+        return;
+    }
+
+    barn_condition_statement_t kind_of_conf = -1;
+    if (parser->statement_node->node_kind == BARN_NODE_CONDITION_STATEMENT)
+        kind_of_conf = parser->statement_node->condition_statement.kind_of_cond;
+    else if (parser->statement_node->node_kind == BARN_NODE_WHILE_LOOP)
+        kind_of_conf = BARN_WHILE_LOOP;
+    else
+        BARN_UNIMPLEMENTED("u probably implemented for loop and forgot 'bout it..");
+
+    barn_node_t* end_node = barn_create_empty_node(BARN_NODE_END_STATEMENT);
+    end_node->end_statement.kind_of_cond = kind_of_conf;
+    barn_parser_append_node(parser, end_node);
+    
+    parser->statement_open--;
 }
 
 void 
@@ -244,6 +309,10 @@ barn_parser_show_ast_child(barn_parser_t* parser, barn_array_t* nodes, int tabs)
             printf("function_call: { func_name: \"%s\", func_args->len: %lu }, ",
                 curr_node->function_call.function_name,
                 curr_node->function_call.function_args->length);
+
+        if (curr_node->node_kind == BARN_NODE_END_STATEMENT)
+            printf("end_statement: { condition_kind: \"%s\" }", 
+                barn_condition_statement_string[curr_node->end_statement.kind_of_cond]);
 
         printf("}\n");
     }

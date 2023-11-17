@@ -1,4 +1,10 @@
+/* C string does't work in barnc. Why? 
+ * beacuse it's pointless and i don't see
+ * any reason to implement it */
+
+/*
 fun main() {
     let _real_string: cstr = "This is an char* string yeah"
     __code__("printf(\"%s\", _real_string);")
 }
+*/

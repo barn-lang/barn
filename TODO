@@ -19,12 +19,14 @@
         - [X] ++
         - [X] --
     - [X] Static & constant variables
-    - [ ] Conditions
-    - [ ] Statements
-        - [ ] If
-        - [ ] Else
-        - [ ] Elif
-        - [ ] While
+    - [X] Conditions
+    - [X] Statements
+        - [X] If
+        - [X] Else
+        - [X] Elif
+        - [X] While
+            - [X] Break
+            - [X] Continue
         - [ ] For
 - [X] Typechecker
     - [X] Check expression nodes types
@@ -45,6 +47,18 @@
     - [X] Variable use
     - [X] Variable value modifications
     - [X] Static & constant variables
+- [X] ... Arguments
+- [ ] Implement printf
+- [ ] Extern
 - [ ] Implement every thing from barngo
 - [ ] Implement structs
 - [ ] Implement pointers
+- [ ] Implement modulus (forgot about it)
+
+BUGS:
+    - [ ] Make numbers act like booleans vice versa 
+    - [ ] __use__
+    - [ ] Variable use so warning doesnt come up
+    - [ ] Conditions with string
+    - [ ] Seg fault with using int_to_string from std.ba
+    - [ ] \\\" bug 

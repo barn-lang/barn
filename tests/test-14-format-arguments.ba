@@ -1,7 +1,7 @@
 @import "format.ba"
 @import "std.ba"
 
-fun test_printf(string __format_start__, ...) {
+fun test_print(string __format_start__, ...) {
 	__barn_start_format()
 
 	// We expect that the first format is string
@@ -14,5 +14,6 @@ fun test_printf(string __format_start__, ...) {
 }
 
 fun main() {
-	test_printf("Hello %s", "World", "ahahH")
+	// This should output "Hello World ahahH"
+	test_print("Hello ", "World ", "ahahH")
 }

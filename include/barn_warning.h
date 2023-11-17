@@ -18,15 +18,11 @@
  *
 */
 
-#ifndef __BARN_IF__
-#define __BARN_IF__
+#ifndef __BARN_WARNING__
+#define __BARN_WARNING__
 
 #include <barn_core.h>
 
-#include <barn_expressions.h>
-#include <barn_parser.h>
-#include <barn_types.h>
+void barn_warning_show(char* message, ...);
 
-void barn_parser_if_statement(barn_parser_t* parser);
-
-#endif /* __BARN_IF__ */
+#endif /* __BARN_WARNING__ */

@@ -79,6 +79,24 @@ barn_codegen_operator_to_code(barn_token_kind_t op)
         case BARN_TOKEN_DIV:
             return "/";
             break;
+        case BARN_TOKEN_GT: 
+            return ">";
+            break;
+        case BARN_TOKEN_GTE:
+            return ">=";
+            break;
+        case BARN_TOKEN_LT:
+            return "<";
+            break;
+        case BARN_TOKEN_LTE:
+            return "<=";
+            break;
+        case BARN_TOKEN_EQ:
+            return "==";
+            break;
+        case BARN_TOKEN_NEQ:
+            return "!=";
+            break;
         default:
             BARN_UNIMPLEMENTED("unknown operator to code generate");
             break;
@@ -268,6 +286,36 @@ barn_codegen_variable_declaration(barn_codegen_t* codegen, barn_node_t* curr_nod
 }
 
 void
+barn_codegen_condition_statement(barn_codegen_t* codegen, barn_node_t* curr_node)
+{
+    BARN_CODEGEN_GENERATE_TABS(codegen);
+    codegen->tabs++;
+
+    char* condition_keyword = NULL;
+    if (curr_node->condition_statement.kind_of_cond == BARN_IF_CONDITION)
+        condition_keyword = "if";
+    else if (curr_node->condition_statement.kind_of_cond == BARN_ELIF_CONDITION)
+        condition_keyword = "else if";
+
+    if (curr_node->condition_statement.kind_of_cond == BARN_ELSE_CONDITION)
+        fprintf(codegen->c_file, "else {");
+    else
+        fprintf(codegen->c_file, "%s (%s) {",
+            condition_keyword,
+            barn_codegen_expression_generate(codegen, curr_node->condition_statement.condition_expr));
+}
+
+void
+barn_codegen_while_loop(barn_codegen_t* codegen, barn_node_t* curr_node)
+{
+    BARN_CODEGEN_GENERATE_TABS(codegen);
+    codegen->tabs++;
+
+    fprintf(codegen->c_file, "while (%s) {",
+        barn_codegen_expression_generate(codegen, curr_node->while_loop.condition_expr));
+}
+
+void
 barn_codegen_variable_modification(barn_codegen_t* codegen, barn_node_t* curr_node)
 {
     BARN_CODEGEN_GENERATE_TABS(codegen);
@@ -316,6 +364,8 @@ barn_codegen_variable_modification(barn_codegen_t* codegen, barn_node_t* curr_no
 void
 barn_codegen_generate_function_body(barn_codegen_t* codegen, barn_node_t* curr_node)
 {
+    printf("%s\n", barn_node_kind_show(curr_node->node_kind));
+
     switch (curr_node->node_kind)
     {
         case BARN_NODE_FUNCTION_DECLARATION:
@@ -338,6 +388,24 @@ barn_codegen_generate_function_body(barn_codegen_t* codegen, barn_node_t* curr_n
         case BARN_NODE_VARIABLE_INCREMENTATION:
         case BARN_NODE_VARIABLE_DECREMENTATION:
             barn_codegen_variable_modification(codegen, curr_node);
+            break;
+        case BARN_NODE_CONDITION_STATEMENT:
+            barn_codegen_condition_statement(codegen, curr_node);
+            break;
+        case BARN_NODE_WHILE_LOOP:
+            barn_codegen_while_loop(codegen, curr_node);
+            break;
+        case BARN_NODE_END_STATEMENT:
+            codegen->tabs--;
+            BARN_CODEGEN_GENERATE_TABS(codegen);
+            fprintf(codegen->c_file, "}");
+            break;
+        case BARN_NODE_BREAK_LOOP:
+        case BARN_NODE_CONTINUE_LOOP:
+            BARN_CODEGEN_GENERATE_TABS(codegen);
+            fprintf(codegen->c_file, "%s;", (curr_node->node_kind == BARN_NODE_BREAK_LOOP 
+                                                ? "break" 
+                                                : "continue"));
             break;
         default:
             printf("unimplemented node kind -> %s\n", barn_node_kind_show(curr_node->node_kind));
@@ -406,6 +474,7 @@ barn_codegen_start(barn_parser_t* parser)
     {
         barn_codegen_skip(codegen, 0);
         
+        printf("%s\n", barn_node_kind_show(codegen->curr_node->node_kind));
         if (codegen->curr_node->node_kind == BARN_NODE_FUNCTION_DECLARATION)
             barn_codegen_function_declaration(codegen);
         else if (codegen->curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
@@ -465,7 +534,7 @@ barn_codegen_type_convert_to_c(barn_codegen_t* codegen, barn_type_t* type)
             return "unsgined long";
             break;
         case BARN_TYPE_I64:
-            return "longs";
+            return "long";
             break;
         case BARN_TYPE_F64:
             return "double";
@@ -475,6 +544,9 @@ barn_codegen_type_convert_to_c(barn_codegen_t* codegen, barn_type_t* type)
             break;
         case BARN_TYPE_NONE:
             return "void";
+            break;
+        case BARN_TYPE_FORMAT:
+            return "...";
             break;
         default:
             BARN_UNIMPLEMENTED("unhandled type size");

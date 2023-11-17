@@ -43,6 +43,20 @@
  })
 #endif /* BARN_PARSER_ERR */
 
+bool 
+barn_parser_function_is_argument_list_with_format(barn_array_t* function_args)
+{
+    BARN_ARRAY_FOR(function_args)
+    {
+        barn_func_argument_t* argument = barn_get_element_from_array(function_args, i);
+
+        if (argument->argument_type->type == BARN_TYPE_FORMAT)
+            return true;
+    }
+
+    return false;
+}
+
 void
 barn_initialize_builtin_functions(barn_parser_t* parser)
 {
@@ -67,6 +81,66 @@ barn_initialize_builtin_functions(barn_parser_t* parser)
     __use__function->function_declaration.function_return = barn_create_type(BARN_TYPE_NONE);
 
     barn_append_element_to_array(parser->function_nodes, __use__function);
+
+    barn_node_t* __barn_start_format_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* __barn_start_format_args    = barn_create_array(sizeof(barn_func_argument_t));
+
+    __barn_start_format_function->function_declaration.function_name   = "__barn_start_format";
+    __barn_start_format_function->function_declaration.function_args   = __barn_start_format_args;
+    __barn_start_format_function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    __barn_start_format_function->function_declaration.function_return = barn_create_type(BARN_TYPE_NONE);
+
+    barn_append_element_to_array(parser->function_nodes, __barn_start_format_function);
+
+    barn_node_t* __barn_end_format_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* __barn_end_format_args    = barn_create_array(sizeof(barn_func_argument_t));
+
+    __barn_end_format_function->function_declaration.function_name   = "__barn_end_format";
+    __barn_end_format_function->function_declaration.function_args   = __barn_end_format_args;
+    __barn_end_format_function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    __barn_end_format_function->function_declaration.function_return = barn_create_type(BARN_TYPE_NONE);
+
+    barn_append_element_to_array(parser->function_nodes, __barn_end_format_function);
+
+    barn_node_t* __barn_format_get_value_string_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* __barn_format_get_value_string_args    = barn_create_array(sizeof(barn_func_argument_t));
+
+    __barn_format_get_value_string_function->function_declaration.function_name   = "__barn_format_get_value_string";
+    __barn_format_get_value_string_function->function_declaration.function_args   = __barn_format_get_value_string_args;
+    __barn_format_get_value_string_function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    __barn_format_get_value_string_function->function_declaration.function_return = barn_create_type(BARN_TYPE_STRING);
+
+    barn_append_element_to_array(parser->function_nodes, __barn_format_get_value_string_function);
+
+    barn_node_t* __barn_format_get_value_int_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* __barn_format_get_value_int_args    = barn_create_array(sizeof(barn_func_argument_t));
+
+    __barn_format_get_value_int_function->function_declaration.function_name   = "__barn_format_get_value_int";
+    __barn_format_get_value_int_function->function_declaration.function_args   = __barn_format_get_value_int_args;
+    __barn_format_get_value_int_function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    __barn_format_get_value_int_function->function_declaration.function_return = barn_create_type(BARN_TYPE_I32);
+
+    barn_append_element_to_array(parser->function_nodes, __barn_format_get_value_int_function);
+
+    barn_node_t* __barn_format_get_value_long_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* __barn_format_get_value_long_args    = barn_create_array(sizeof(barn_func_argument_t));
+
+    __barn_format_get_value_long_function->function_declaration.function_name   = "__barn_format_get_value_long";
+    __barn_format_get_value_long_function->function_declaration.function_args   = __barn_format_get_value_long_args;
+    __barn_format_get_value_long_function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    __barn_format_get_value_long_function->function_declaration.function_return = barn_create_type(BARN_TYPE_I64);
+
+    barn_append_element_to_array(parser->function_nodes, __barn_format_get_value_long_function);
+
+    barn_node_t* __barn_format_get_value_double_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* __barn_format_get_value_double_args    = barn_create_array(sizeof(barn_func_argument_t));
+
+    __barn_format_get_value_double_function->function_declaration.function_name   = "__barn_format_get_value_double";
+    __barn_format_get_value_double_function->function_declaration.function_args   = __barn_format_get_value_double_args;
+    __barn_format_get_value_double_function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    __barn_format_get_value_double_function->function_declaration.function_return = barn_create_type(BARN_TYPE_F64);
+
+    barn_append_element_to_array(parser->function_nodes, __barn_format_get_value_double_function);
 }
 
 barn_node_t*
@@ -149,7 +223,13 @@ barn_parser_function_args_parse_type(barn_parser_t* parser, barn_parse_function_
     else if (parser->curr_token->kind == BARN_TOKEN_TRIPLEDOT)
     {  
         // TODO: implement tripledot arguments
-        BARN_UNIMPLEMENTED("unimplemented tripledot arguments");
+        barn_type_t* format_type = barn_create_type(BARN_TYPE_FORMAT);
+        barn_append_element_to_array(args, barn_create_func_argument(format_type, ""));
+
+        func_args_parser->expect_type  = false;
+        func_args_parser->expect_name  = false;
+        func_args_parser->expect_comma = false;
+        barn_parser_skip(parser, 1); 
         return;
     }
 
