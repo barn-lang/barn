@@ -48,7 +48,7 @@
     - [X] Variable value modifications
     - [X] Static & constant variables
 - [X] ... Arguments
-- [ ] Implement printf
+- [X] Implement printf
 - [ ] Extern
 - [ ] Implement every thing from barngo
 - [ ] Implement structs

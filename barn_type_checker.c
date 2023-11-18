@@ -167,8 +167,8 @@ barn_tc_expression_get_type(barn_type_checker_t* tc, barn_node_t* expr_node)
 bool
 barn_tc_does_types_collides(barn_type_t* lhs, barn_type_t* rhs)
 {
-    // A very simple function that checks does two given type don't collide
-    // with each other, for example if lhs=typeof(string) and rhs=typeof(i32)
+    // A very simple function that checks does two given types don't collide
+    // with each other, for example if lhs=T<string> and rhs=T<i32>
     // these two types will gonna collide because we can't make any action
     // with them.
     //

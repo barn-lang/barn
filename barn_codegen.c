@@ -426,7 +426,10 @@ barn_codegen_function_declaration(barn_codegen_t* codegen)
 {
     barn_node_t* fn_decl = codegen->curr_node;
 
-    fprintf(codegen->c_file, "__BARN_FUNCTION__ %s %s(",
+    if (fn_decl->function_declaration.function_extern)
+        fprintf(codegen->c_file, "extern ");
+
+    fprintf(codegen->c_file, "%s %s(",
         barn_codegen_type_convert_to_c(codegen, fn_decl->function_declaration.function_return),
         fn_decl->function_declaration.function_name);
 
@@ -445,20 +448,25 @@ barn_codegen_function_declaration(barn_codegen_t* codegen)
                 ctype, argument->argument_name);
     }
 
-    fprintf(codegen->c_file, ")\n{\n");
-    codegen->tabs += 1;
-
-    BARN_ARRAY_FOR(fn_decl->function_declaration.function_nodes)
+    if (!fn_decl->function_declaration.function_extern)
     {
-        barn_codegen_generate_function_body(codegen, 
-                                            barn_get_element_from_array(fn_decl->function_declaration.function_nodes, i));
+        fprintf(codegen->c_file, ")\n{\n");
+        codegen->tabs += 1;
 
-        if ((i + 1) != fn_decl->function_declaration.function_nodes->length)
-            fprintf(codegen->c_file, "\n");
-    }
+        BARN_ARRAY_FOR(fn_decl->function_declaration.function_nodes)
+        {
+            barn_codegen_generate_function_body(codegen, 
+                                                barn_get_element_from_array(fn_decl->function_declaration.function_nodes, i));
 
-    fprintf(codegen->c_file, "\n}\n\n");
-    codegen->tabs -= 1;
+            if ((i + 1) != fn_decl->function_declaration.function_nodes->length)
+                fprintf(codegen->c_file, "\n");
+        }
+
+        fprintf(codegen->c_file, "\n}\n\n");
+        codegen->tabs -= 1;
+    } else
+        fprintf(codegen->c_file, ");\n\n");
+
 }
 
 barn_codegen_t* 

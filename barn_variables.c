@@ -163,7 +163,6 @@ barn_parser_variable_declaration(barn_parser_t* parser, bool is_constant, bool i
 
     barn_variable_t* variable = barn_create_variable(variable_name, variable_type, is_constant, false, is_static);
 
-    // TODO: auto type variables
     if (variable->var_name[0] == '_')
         variable->is_used = true;
 

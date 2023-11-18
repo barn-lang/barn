@@ -68,8 +68,8 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
     barn_expression_value_t* expr_value = barn_create_expression_value(NULL, barn_get_type_i32_global());
 
     // TODO: implement:
-    //          - [ ] variables
-    //          - [ ] setting expr_val_type by checking the token value length
+    //          - [X] variables
+    //          - [X] setting expr_val_type by checking the token value length
     //          - [ ] casting ("(type)value")
 
     if (parser->curr_token->kind == BARN_TOKEN_INT)

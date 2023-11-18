@@ -2,27 +2,27 @@
 
 #include "/Users/bruno/.barn/std-c/barn_header.h"
 
-__BARN_FUNCTION__ bool string_compare(char* s1, char* s2)
+bool string_compare(char* s1, char* s2)
 {
 	return ((bool)((strcmp(s1, s2) == 0) == 1 ? 1 : 0));
 }
 
-__BARN_FUNCTION__ bool __barn_string_compare(char* s1, char* s2)
+bool __barn_string_compare(char* s1, char* s2)
 {
 	return ((bool)(string_compare(s1, s2)));
 }
 
-__BARN_FUNCTION__ int string_length(char* s)
+int string_length(char* s)
 {
 	return ((int)(strlen(s)));
 }
 
-__BARN_FUNCTION__ char* int_to_string(int num, int base)
+char* int_to_string(int num, int base)
 {
 
 }
 
-__BARN_FUNCTION__ char* input()
+char* input()
 {
 	char c;
 	char* str = (char*)malloc(2048);
@@ -32,27 +32,32 @@ __BARN_FUNCTION__ char* input()
 	return str;
 }
 
-__BARN_FUNCTION__ void print(char* s)
+void print(char* s)
 {
 	printf("%s", s);
 }
 
-__BARN_FUNCTION__ void println(char* s)
+void println(char* s)
 {
 	printf("%s\n", s);
 }
 
-__BARN_FUNCTION__ void printnum(int num)
+void printnum(int num)
 {
 	printf("%d", num);
 }
 
-__BARN_FUNCTION__ void printbool(bool to_print_bool)
+void printbool(bool to_print_bool)
 {
-	if (to_print_bool == true) { printf("true"); } else { printf("false"); }
+	if (to_print_bool == true) {
+		print("true");
+	}
+	else {
+		print("false");
+	}
 }
 
-__BARN_FUNCTION__ void fmt_print(char* __format_start__, ... )
+void fmt_print(char* __format_start__, ... )
 {
 	__barn_start_format();
 	int strlength = string_length(__format_start__);
@@ -95,7 +100,53 @@ __BARN_FUNCTION__ void fmt_print(char* __format_start__, ... )
 	}
 }
 
-__BARN_FUNCTION__ void main()
+const double _MATH_EULER = 2.71828182845904523536028747135266250;
+
+const double _MATH_LOG2 = 1.44269504088896340735992468100189214;
+
+const double _MATH_LOG10 = 0.43429448190325182765112891891660508;
+
+const double _MATH_PI = 3.14159265358979323846264338327950288;
+
+const double _MATH_PI_2 = 1.57079632679489661923132169163975144;
+
+const double _MATH_PI_4 = 0.78539816339744830961566084581987572;
+
+long floor64(double __floor_num)
+{
+
+}
+
+int floor32(float __floor_num)
+{
+
+}
+
+double sqrt64(double __sqrt_num)
+{
+
+}
+
+float sqrt32(float __sqrt_num)
+{
+
+}
+
+double minf(double __first_min, double __second_min)
+{
+
+}
+
+double maxf(double __first_max, double __second_max)
+{
+
+}
+
+extern long max(long __first_max, long __second_max);
+
+extern int okok();
+
+void main()
 {
 	int i = 0;
 	char* auto_str = "ok";

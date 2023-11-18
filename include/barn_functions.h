@@ -46,6 +46,7 @@ typedef struct __barn_parse_function_args_t {
  */
 const char* barn_parser_collect_function_name(barn_parser_t* parser);
 
+void barn_parser_extern_function_declaration(barn_parser_t* parser);
 void barn_parser_function_declaration(barn_parser_t* parser);
 
 barn_node_t* barn_parser_function_get_by_name(barn_parser_t* parser, char* function_name);

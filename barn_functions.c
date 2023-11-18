@@ -222,7 +222,6 @@ barn_parser_function_args_parse_type(barn_parser_t* parser, barn_parse_function_
     } 
     else if (parser->curr_token->kind == BARN_TOKEN_TRIPLEDOT)
     {  
-        // TODO: implement tripledot arguments
         barn_type_t* format_type = barn_create_type(BARN_TYPE_FORMAT);
         barn_append_element_to_array(args, barn_create_func_argument(format_type, ""));
 
@@ -338,13 +337,14 @@ barn_parser_function_args_parse(barn_parser_t* parser)
 
 barn_node_t*
 barn_function_declaration_create_node(const char* function_name, barn_array_t* function_args,
-                                      barn_type_t* function_return_type)
+                                      barn_type_t* function_return_type, bool function_extern)
 {
     barn_node_t* function_decl = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
 
     function_decl->function_declaration.function_name   = function_name;
     function_decl->function_declaration.function_args   = function_args;
     function_decl->function_declaration.function_return = function_return_type;
+    function_decl->function_declaration.function_extern = function_extern;
     function_decl->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
 
     return function_decl;
@@ -411,8 +411,73 @@ barn_parser_function_declaration(barn_parser_t* parser)
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected '{' to open function body", 0);
 
     barn_node_t* node = barn_function_declaration_create_node(function_name, function_args, 
-                                                              function_return_type);
+                                                              function_return_type, false);
     barn_parser_append_node(parser, node);
     barn_function_declaration_set_values(parser, node);
     barn_function_declaration_set_argument_as_variables(parser, node);
+}
+
+void
+barn_parser_extern_function_declaration(barn_parser_t* parser)
+{
+    if (!barn_parser_is_next_token(parser, BARN_TOKEN_IDENTIFIER))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"fun\" identifier after \"extern\" keyword", 0);
+
+    barn_parser_skip(parser, 1);
+    if (!BARN_STR_CMP(parser->curr_token->value, "fun"))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"fun\" identifier after \"extern\" keyword", 0);
+
+    if (barn_parser_is_function_opened(parser))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "function is already opened", 0);
+
+    if (!barn_parser_is_next_token(parser, BARN_TOKEN_IDENTIFIER))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected function name after 'func' keyword", 0);
+    barn_parser_skip(parser, 1);
+
+    const char* function_name = barn_parser_collect_function_name(parser);
+
+    if (!barn_parser_is_next_token(parser, BARN_TOKEN_OPENPARENT))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected '(' after function name", 0);
+    barn_parser_skip(parser, 1);
+
+    barn_array_t* function_args = barn_parser_function_args_parse(parser);
+
+    if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
+        barn_parser_skip(parser, 1);
+
+    for (int i = 0; i < function_args->length; i++)
+        printf("[%d]=argument_name:\"%s\", argument_type->size:\"%lu\"\n", 
+            i, ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_name,
+            ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_type->size);
+
+    if (parser->curr_token->kind == BARN_TOKEN_EOF)
+    {
+        barn_parser_skip(parser, -1);
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected '->' after externing a function not EOF", 0);
+    }
+
+    if (parser->curr_token->kind != BARN_TOKEN_OPENBRACE && parser->curr_token->kind != BARN_TOKEN_ARROW)
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected '->' after externing a function", 0);
+
+    barn_type_t* function_return_type = barn_create_type(BARN_TYPE_NONE);
+    if (parser->curr_token->kind == BARN_TOKEN_ARROW)
+    {
+        barn_parser_skip(parser, 1);
+        if (parser->curr_token->kind != BARN_TOKEN_IDENTIFIER)
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected type name after '->' arrow", 0);
+
+        function_return_type = barn_parser_current_token_type_representation(parser);
+        if (function_return_type == NULL)
+            BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "undefined and unknown type name '%s'", 
+                            parser->curr_token->value);
+        
+        barn_parser_skip(parser, 1);
+    }
+
+    if (parser->curr_token->kind == BARN_TOKEN_OPENBRACE)
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "you can't implement an externed function", 0);
+
+    barn_node_t* node = barn_function_declaration_create_node(function_name, function_args, 
+                                                              function_return_type, true);
+    barn_parser_append_node(parser, node);
 }

@@ -83,10 +83,10 @@ fun printnum(int num) {
 
 // Function for printing numbers
 fun printbool(bool to_print_bool) {
-	if (to_print_bool) {
-		print("true");
+	if to_print_bool == true {
+		print("true")
 	} else {
-		print("false");
+		print("false")
 	}
 
 	// __use__(to_print_bool)

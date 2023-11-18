@@ -89,6 +89,7 @@ fun maxf(f64 __first_max, f64 __second_max) -> f64 {
 // fun max(i64 __first_max, i64 __second_max) -> i64 {
     
 // }
+extern fun max(i64 __first_max, i64 __second_max) -> i64
 
 /*
  *

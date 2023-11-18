@@ -534,8 +534,6 @@ barn_lexer_create_float_last_token_no_null(barn_lexer_t* lexer, char* current_li
     {
         if (lexer->next_char == '.')
         {
-            /* TODO: Call barn_lexer_detect_symbol function and create
-            * a new symbol token */
             barn_lexer_symbol_t symbol = barn_lexer_create_symbol(lexer);
 
             if (symbol.symbol_kind != BARN_TOKEN_NONE)
@@ -570,8 +568,6 @@ barn_lexer_create_float_number(barn_lexer_t* lexer)
 
     if (lexer->next_char == '.')
     {
-        /* TODO: Call barn_lexer_detect_symbol function and create
-         * a new symbol token */
         barn_lexer_symbol_t symbol = barn_lexer_create_symbol(lexer);
 
         if (symbol.symbol_kind != BARN_TOKEN_NONE)

@@ -168,6 +168,8 @@ barn_parser_identifier(barn_parser_t* parser)
         barn_parser_variable_declaration(parser, BARN_TOKEN_CMP("const"), false);
     else if (BARN_TOKEN_CMP("static"))
         barn_parser_static_variable_declaration(parser);
+    else if (BARN_TOKEN_CMP("extern"))
+        barn_parser_extern_function_declaration(parser);
     else if (BARN_TOKEN_CMP("if"))
         barn_parser_if_statement(parser);
     else if (BARN_TOKEN_CMP("elif"))

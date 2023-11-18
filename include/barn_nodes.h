@@ -79,6 +79,7 @@ typedef struct __barn_node_t {
         barn_array_t* function_args;
         barn_array_t* function_nodes;
         barn_type_t*  function_return;
+        bool          function_extern;
         char*         function_name;
     } function_declaration;
 

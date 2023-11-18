@@ -1,4 +1,7 @@
 @import "std.ba"
+@import "math.ba"
+
+extern fun okok() -> i32
 
 fun main() {
     // i<T> (T = i32)
@@ -6,6 +9,5 @@ fun main() {
 
     let auto_str: string = "ok"
     let auto_flt: f32 = 4.5 * 2
-
-    let first_var_in_barn_without_type = 1 + 2 + 3 + 4
+    // let max_val: auto = max(1, 2)
 }
