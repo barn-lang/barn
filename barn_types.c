@@ -134,6 +134,7 @@ barn_convert_type_to_size(barn_type_kind_t type)
         case BARN_TYPE_I8:
         case BARN_TYPE_BOOL:
         case BARN_TYPE_NONE:
+        case BARN_TYPE_AUTO:
             return 1;
             break;
         case BARN_TYPE_U16:
@@ -201,6 +202,9 @@ barn_convert_type_to_string(barn_type_t* type)
 {
     switch (type->type)
     {
+        case BARN_TYPE_AUTO:
+            return "auto";
+            break;
         case BARN_TYPE_U8:
             return "u8";
             break;

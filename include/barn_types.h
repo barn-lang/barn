@@ -49,7 +49,8 @@ typedef enum __barn_type_kind_t {
     /* Other */
     BARN_TYPE_STRUCT,
     BARN_TYPE_NONE,
-    BARN_TYPE_FORMAT
+    BARN_TYPE_FORMAT,
+    BARN_TYPE_AUTO
 } barn_type_kind_t;
 
 typedef struct __barn_type_t {

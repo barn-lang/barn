@@ -83,8 +83,11 @@ fun printnum(int num) {
 
 // Function for printing numbers
 fun printbool(bool to_print_bool) {
-	// TODO: rewrite this code in barn
-	__code__("if (to_print_bool == true) { printf(\"true\"); } else { printf(\"false\"); }")
+	if (to_print_bool) {
+		print("true");
+	} else {
+		print("false");
+	}
 
 	// __use__(to_print_bool)
 }

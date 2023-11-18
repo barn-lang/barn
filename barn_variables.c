@@ -27,6 +27,7 @@
 #include <barn_expressions.h>
 #include <barn_tokens.h>
 #include <barn_functions.h>
+#include <barn_type_checker.h>
 
 barn_variable_t* 
 barn_create_variable(const char* var_name, barn_type_t* var_type, 
@@ -143,8 +144,14 @@ barn_parser_variable_declaration(barn_parser_t* parser, bool is_constant, bool i
 
     barn_type_t* variable_type = barn_parser_current_token_type_representation(parser);
     if (variable_type == NULL)
-        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "undefined variable type '%s'", 
-                        parser->curr_token->value);
+    {
+        if (strcmp(parser->curr_token->value, "auto") == 0)
+            variable_type = barn_create_type(BARN_TYPE_AUTO);
+        else
+            BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "undefined variable type '%s'", 
+                            parser->curr_token->value);
+    }
+
 
     // let/const example_var: type = <expression>
     //                                ^
@@ -156,7 +163,6 @@ barn_parser_variable_declaration(barn_parser_t* parser, bool is_constant, bool i
 
     barn_variable_t* variable = barn_create_variable(variable_name, variable_type, is_constant, false, is_static);
 
-    // TODO: used/unused variables
     // TODO: auto type variables
     if (variable->var_name[0] == '_')
         variable->is_used = true;

@@ -241,6 +241,14 @@ barn_tc_variable_declaration(barn_type_checker_t* tc, barn_node_t* var_node)
     barn_type_t* var_expected_value_type = curr_node->variable_declaration.variable->var_type;
     barn_type_t* var_value_expr_type     = barn_tc_expression_get_type(tc, curr_node->variable_declaration.variable_value);
     
+    /* This code make auto variables work, how? Uhh we just take 
+     * expression type and swap it into the variable. */
+    if (var_expected_value_type->type == BARN_TYPE_AUTO)
+    {
+        curr_node->variable_declaration.variable->var_type = barn_create_type(var_value_expr_type->type);
+        return;
+    }
+
     if (barn_tc_does_types_collides(var_expected_value_type, var_value_expr_type))
     {
         barn_expression_node_t* first_expr_node = barn_get_element_from_array(curr_node->variable_declaration.variable_value

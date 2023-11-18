@@ -41,4 +41,6 @@ bool barn_tc_does_types_collides(barn_type_t* lhs, barn_type_t* rhs);
 void barn_tc_func_return_check(barn_type_checker_t* tc, barn_node_t* return_node);
 void barn_tc_func_call_check(barn_type_checker_t* tc, barn_node_t* call_node);
 
+barn_type_t* barn_tc_expression_get_type(barn_type_checker_t* tc, barn_node_t* expr_node);
+
 #endif /* __BARN_TYPE_CHECKER__ */  

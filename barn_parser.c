@@ -303,7 +303,8 @@ barn_parser_show_ast_child(barn_parser_t* parser, barn_array_t* nodes, int tabs)
         if (curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
             printf("variable_declaration: { var_name: \"%s\", var_type: \"%s\" }, ",
                 curr_node->variable_declaration.variable->var_name,
-                barn_convert_type_to_string(curr_node->variable_declaration.variable->var_type));
+                curr_node->variable_declaration.variable->var_type == NULL ? "auto/none" :
+                    barn_convert_type_to_string(curr_node->variable_declaration.variable->var_type));
 
         if (curr_node->node_kind == BARN_NODE_FUNCTION_CALL)
             printf("function_call: { func_name: \"%s\", func_args->len: %lu }, ",
@@ -337,7 +338,8 @@ barn_parser_show_ast(barn_parser_t* parser)
         if (curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
             printf("variable_declaration: { var_name: \"%s\", var_type: \"%s\" }, ",
                 curr_node->variable_declaration.variable->var_name,
-                barn_convert_type_to_string(curr_node->variable_declaration.variable->var_type));
+                curr_node->variable_declaration.variable->var_type == NULL ? "auto/none" :
+                    barn_convert_type_to_string(curr_node->variable_declaration.variable->var_type));
 
         printf("}\n");
 

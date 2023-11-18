@@ -95,55 +95,10 @@ __BARN_FUNCTION__ void fmt_print(char* __format_start__, ... )
 	}
 }
 
-const double _MATH_EULER = 2.71828182845904523536028747135266250;
-
-const double _MATH_LOG2 = 1.44269504088896340735992468100189214;
-
-const double _MATH_LOG10 = 0.43429448190325182765112891891660508;
-
-const double _MATH_PI = 3.14159265358979323846264338327950288;
-
-const double _MATH_PI_2 = 1.57079632679489661923132169163975144;
-
-const double _MATH_PI_4 = 0.78539816339744830961566084581987572;
-
-__BARN_FUNCTION__ long floor64(double __floor_num)
-{
-
-}
-
-__BARN_FUNCTION__ int floor32(float __floor_num)
-{
-
-}
-
-__BARN_FUNCTION__ double sqrt64(double __sqrt_num)
-{
-
-}
-
-__BARN_FUNCTION__ float sqrt32(float __sqrt_num)
-{
-
-}
-
-__BARN_FUNCTION__ double minf(double __first_min, double __second_min)
-{
-
-}
-
-__BARN_FUNCTION__ double maxf(double __first_max, double __second_max)
-{
-
-}
-
 __BARN_FUNCTION__ void main()
 {
-	fmt_print("string \"%s\"\n","Just a string");
-	fmt_print("10 in decimal: %d\n",10);
-	fmt_print("255 in hex: %x\n",255);
-	fmt_print("8 in octal: %o\n",8);
-	fmt_print("π: %f\n",_MATH_PI);
-	fmt_print("long number: %l\n",1000304040);
+	int i = 0;
+	char* auto_str = "ok";
+	float auto_flt = 4.5 * 2;
 }
 
