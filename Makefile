@@ -7,7 +7,7 @@ ifeq ($(UNAME_S),Linux)
 endif
 
 BUILD_DIR := build
-SRC_DIR := .
+SRC_DIR := ./src
 TARGET := barn
 
 SRCS := $(wildcard $(SRC_DIR)/*.c)
