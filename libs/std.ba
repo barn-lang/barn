@@ -43,6 +43,16 @@ fun string_length(string s) -> int {
 	__use__(s)
 }
 
+// TODO: implement these functions
+fun parse_float(string s) -> f32 {
+}
+
+fun parse_int(string s) -> i32 {
+}
+
+fun parse_double(string s) -> f64 {
+}
+
 // TODO: fix int_to_string function
 
 // Function for changing number to string
@@ -54,7 +64,7 @@ fun int_to_string(int num, int base) -> string {
 }
 
 // Function for getting user input from console
-fun input() -> string {
+fun read_line_stdin() -> string {
 	__code__("char c;")
 	__code__("char* str = (char*)malloc(2048);")
 	__code__("while((c = getchar()) != '\n') {")
