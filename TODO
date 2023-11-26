@@ -49,16 +49,19 @@
     - [X] Static & constant variables
 - [X] ... Arguments
 - [X] Implement printf
-- [ ] Extern
+- [X] Implement Extern
+- [ ] Implement enum
 - [ ] Implement every thing from barngo
 - [ ] Implement structs
 - [ ] Implement pointers
+- [ ] Implement match
 - [ ] Implement modulus (forgot about it)
 
 BUGS:
-    - [ ] Make numbers act like booleans vice versa 
+    - [X] Make numbers act like booleans vice versa 
     - [ ] __use__
     - [ ] Variable use so warning doesnt come up
     - [ ] Conditions with string
     - [ ] Seg fault with using int_to_string from std.ba
     - [ ] \\\" bug 
+    - [ ] constant variables and enums can't use runtime values like functions

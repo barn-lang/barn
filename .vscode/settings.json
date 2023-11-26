@@ -36,6 +36,7 @@
         "barn_colors.h": "c",
         "stdio.h": "c",
         "stdlib.h": "c",
-        "barn_func_return.h": "c"
+        "barn_func_return.h": "c",
+        "barn_enum.h": "c"
     }
 }

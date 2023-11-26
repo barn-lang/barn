@@ -76,7 +76,6 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
     {
         expr_value->expr_val_token = parser->curr_token;
         expr_value->expr_val_type  = barn_get_type_i32_global();
-        printf("%s\n", parser->curr_token->value);
     } 
     else if (parser->curr_token->kind == BARN_TOKEN_FLOAT)
     {
@@ -130,6 +129,8 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
             expr_value->expr_val_type    = variable->var_type;
             expr_value->is_function_call = false;
             expr_value->is_variable      = true;
+
+            variable->is_used = true;
         }
         else if (BARN_STR_CMP(parser->curr_token->value, "true")  || 
                  BARN_STR_CMP(parser->curr_token->value, "false"))
@@ -193,7 +194,6 @@ barn_expression_parser_check_parents(barn_parser_t* parser, barn_expr_parser_t* 
         if (expr_parser->index == 0)
             expr_parser->index = -1;
 
-        printf("parents ++; %d\n", __LINE__);
         expr_parser->parents++;
         parser->index += 1;
         parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
@@ -212,7 +212,6 @@ barn_expression_parser_check_parents(barn_parser_t* parser, barn_expr_parser_t* 
         }
 
         expr_parser->parents--; 
-        printf("closing one parent %d\n", expr_parser->parents);
         // barn_parser_skip(parser, 1);
         parser->index += 1;
         parser->curr_token = barn_get_element_from_array(parser->lexer->tokens, parser->index);
@@ -253,7 +252,6 @@ barn_expression_parser_not_full_op_rhs(barn_parser_t* parser, barn_expr_parser_t
     {
         barn_expression_value_t* lhs_value = barn_get_element_from_array(expr_parser->main_expr_node->expression.expression_nodes, 
                                                                          expr_parser->main_expr_node->expression.expression_nodes->length - 1);
-        printf("%p\n", lhs_value->expr_val_token);
         barn_expression_division_by_zero(parser, expr_parser, lhs_value);
     }
 
@@ -273,7 +271,6 @@ barn_expression_parser_not_full_op_rhs(barn_parser_t* parser, barn_expr_parser_t
 
     if (rhs_value == NULL)
     {
-        printf("parents ++; %d\n", __LINE__);
         // expr_parser->parents++;
     }
 }
@@ -356,10 +353,7 @@ barn_expression_parser_full_lhs_op_rhs(barn_parser_t* parser,  barn_expr_parser_
     barn_append_element_to_array(expr_parser->main_expr_node->expression.expression_nodes, append_expr_node);
 
     if (rhs_value == NULL || lhs_value == NULL)
-    {
         expr_parser->parents++;
-        printf("parents ++; %d\n", __LINE__);
-    }
 }
 
 barn_expr_parser_t*
@@ -394,8 +388,6 @@ barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind,
 
     for (; ; expr_parser->index++)
     {
-        printf("%s\n", parser->curr_token->value);
-
         int parents_ret = barn_expression_parser_check_parents(parser, expr_parser);
 
         if (parents_ret == 1)

@@ -36,6 +36,6 @@
 
 #define __BARN_FUNCTION__
 #define __BARN_GLOBAL_VARIABLE__
-#define __use__(x) {x;}
+#define __use__(x) ({(void)x;})
 
 #endif /* __BARN_HEADER_h__ */

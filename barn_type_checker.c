@@ -67,13 +67,10 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
                                     ->lhs->function_call);
         return;
     }
-    printf("5ok2\n");
 
     for (int i = 0; i < expr_nodes->length; i++)
     {
         barn_expression_node_t* curr_expr_node = barn_get_element_from_array(expr_nodes, i);
-
-        printf("lhs: %p, rhs: %p\n", curr_expr_node->lhs, curr_expr_node->rhs);
 
         if (curr_expr_node->rhs != NULL)
             if (curr_expr_node->rhs->is_function_call == true)
@@ -129,8 +126,6 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
                 if (first_element_in_y->is_function_call == true)
                     barn_tc_func_call_check(tc, first_element_in_y->function_call);
 
-                printf("%s %s\n", last_element_in_x->expr_val_token->value, first_element_in_y->expr_val_token->value);
-
                 if (barn_tc_does_types_collide_expr_value(last_element_in_x, first_element_in_y))
                     BARN_TYPE_CHECKER_ERR(tc, last_element_in_x->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s but got %s",
                         barn_convert_type_to_string(last_element_in_x->expr_val_type), 
@@ -152,7 +147,6 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
                     barn_convert_type_to_string(curr_expr_node->rhs->expr_val_type)); 
         }
     }
-    printf("ok\n");
 }
 
 barn_type_t*
@@ -173,6 +167,9 @@ barn_tc_does_types_collides(barn_type_t* lhs, barn_type_t* rhs)
     // with them.
     //
     // TODO: Add custom structure comparasion (structures first)
+
+    if (lhs->is_any || rhs->is_any)
+        return false;
 
     if (rhs == NULL)
         return true;
@@ -352,8 +349,6 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
     for (tc->index = 0; tc->index < tc->nodes->length; tc->index++)
     {
         barn_tc_advance(tc, 0);
-
-        printf("%s\n", barn_node_kind_show(tc->curr_node->node_kind));
 
         if (tc->curr_node->node_kind == BARN_NODE_FUNCTION_DECLARATION)
         {

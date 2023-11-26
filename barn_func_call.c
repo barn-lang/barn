@@ -86,7 +86,7 @@ barn_parser_func_call_arugments_length(barn_parser_t* parser, barn_node_t* menti
 {
     if (function_call_args->length != mentioned_function->function_declaration.function_args->length)
     {   
-        if (function_call_args->length < mentioned_function->function_declaration.function_args->length)
+        if ((function_call_args->length < mentioned_function->function_declaration.function_args->length))
             BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "too few arguments to call function \"%s\", expected %d, got %d",
                 mentioned_function->function_declaration.function_name,
                 mentioned_function->function_declaration.function_args->length,

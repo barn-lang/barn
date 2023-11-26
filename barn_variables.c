@@ -51,14 +51,11 @@ barn_create_variable(const char* var_name, barn_type_t* var_type,
 bool
 barn_parser_is_variable_defined_lg(barn_parser_t* parser, const char* variable_name)
 {
-    printf("ok1\n");
     if (barn_parser_is_variable_defined_l(parser, variable_name))
         return true;
-    printf("ok2\n");
     
     if (barn_parser_is_variable_defined_g(parser, variable_name))
         return true;
-    printf("ok3\n");
 
     return false;
 }

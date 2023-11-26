@@ -37,7 +37,7 @@
 #include <barn_error.h>
 
 #ifndef __BARN_SHOW_DEBUG__
-# define __BARN_SHOW_DEBUG__ (0x0001)
+// # define __BARN_SHOW_DEBUG__ (0x0001)
 #endif /* __BARN_SHOW_DEBUG__ */
 
 #ifdef __BARN_SHOW_DEBUG__

@@ -57,10 +57,10 @@ barn_start_lexer(const char* file_content, barn_args_parser_t* args_parser)
     barn_lexer_main(lexer);
 
     // TODO: barn_is_flag function is really bugged. need to fix it.
-    // if (barn_is_flag(args_parser, "--tokens") == false || barn_is_flag(args_parser, "-t") == false)
+    // if (barn_is_flag(args_parser, "--tokens") == true || barn_is_flag(args_parser, "-t") == true)
     // {
-        // barn_debug_entry("barn_lexer_show_all_tokens", __FILE__, __LINE__);
-        barn_lexer_show_all_tokens(lexer);   
+    //     barn_debug_entry("barn_lexer_show_all_tokens", __FILE__, __LINE__);
+    //     barn_lexer_show_all_tokens(lexer);   
     // }
 
     return lexer;
@@ -112,12 +112,6 @@ barn_lexer_store_file_lines(barn_lexer_t* lexer, const char* filename)
     barn_append_element_to_array(lexer->file_lines, line_copy);
 
     fclose(f);
-    
-    // printf("lexer->file_lines->length=%d\n",lexer->file_lines->length);
-    // for (int i = 0; i < lexer->file_lines->length; i++)
-    // {
-    //     printf("file_lines[%d]: \"%s\"\n", i, barn_get_element_from_array(lexer->file_lines, i));
-    // }
 }
 
 char 
@@ -257,7 +251,6 @@ barn_lexer_create_string(barn_lexer_t* lexer)
                                             current_line, lexer->col, lexer->row, BARN_TOKEN_STRING);
 
     BARN_TRY(barn_append_element_to_array(lexer->tokens, token));
-    // printf("%s\n", token->value);
 }
 
 void 
@@ -712,7 +705,7 @@ barn_lexer_create_symbol(barn_lexer_t* lexer)
             barn_error_show_with_line(lexer,
                 BARN_SYNTAX_ERROR, (char*)lexer->filename, lexer->row, lexer->col - 1, true, 
                 barn_get_element_from_array(lexer->file_lines, lexer->row - 1),
-                "expected '&&' to create OR token");
+                "expected '&&' to create AND token");
             exit(1);
         }
         case '!':
@@ -858,7 +851,6 @@ barn_lexer_main(barn_lexer_t* lexer)
     for (lexer->index = 0; lexer->index < strlen(lexer->file_content); lexer->index++)
     {
         barn_lexer_advance(lexer, 0);
-        // printf("%c %d\n", lexer->curr_char, lexer->curr_char);
 
         if (lexer->curr_char == '\n')
             barn_lexer_new_line(lexer);

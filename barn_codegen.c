@@ -117,8 +117,6 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
     {
         barn_expression_node_t* curr_expr_node = barn_get_element_from_array(expression_arr, i);
 
-        printf("%p %p\n", curr_expr_node->lhs, curr_expr_node->rhs);
-
         if (last_parent != curr_expr_node->parents)
         {
             if (last_parent > curr_expr_node->parents)
@@ -201,13 +199,10 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
         }
     }
 
-    printf("okoko- > %d\n", last_parent);
     for (int i = 0; i < last_parent; i++)
     {
         barn_append_char_to_allocated_string(&expression_buf, ')');
     }
-
-    printf("%s\n", expression_buf);
 
     return ((const char*)expression_buf);
 }
@@ -364,8 +359,6 @@ barn_codegen_variable_modification(barn_codegen_t* codegen, barn_node_t* curr_no
 void
 barn_codegen_generate_function_body(barn_codegen_t* codegen, barn_node_t* curr_node)
 {
-    printf("%s\n", barn_node_kind_show(curr_node->node_kind));
-
     switch (curr_node->node_kind)
     {
         case BARN_NODE_FUNCTION_DECLARATION:
@@ -482,7 +475,6 @@ barn_codegen_start(barn_parser_t* parser)
     {
         barn_codegen_skip(codegen, 0);
         
-        printf("%s\n", barn_node_kind_show(codegen->curr_node->node_kind));
         if (codegen->curr_node->node_kind == BARN_NODE_FUNCTION_DECLARATION)
             barn_codegen_function_declaration(codegen);
         else if (codegen->curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
@@ -494,19 +486,6 @@ barn_codegen_start(barn_parser_t* parser)
 
     fclose(codegen->c_file);
     return codegen;
-}
-
-const char*
-barn_codegen_save_output_to_file(barn_codegen_t* codegen, const char* filename)
-{
-    // printf("nok\n");
-    // FILE* f = fopen(filename, "w+");
-    // printf("nok\n");
-
-    // fprintf(f, "%s\n%s\n", 
-    //     codegen->c_header, codegen->c_code);
-    // printf("nok\n");
-    // fclose(f);
 }
 
 const char* 

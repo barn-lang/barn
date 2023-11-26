@@ -27,6 +27,8 @@
 #include <barn_functions.h>
 #include <barn_func_call.h>
 
+#include <barn_enum.h>
+
 #include <barn_string.h>
 #include <barn_array.h>
 #include <barn_io.h>
@@ -59,7 +61,7 @@
 
 static const char* barn_const_keywords[BARN_KEYWORDS_LEN] = {
     [0 ] = "fun",
-    [1 ] = "extern", // to implement
+    [1 ] = "extern",
     [2 ] = "@import_c", // to implement
     [3 ] = "@import",
     [4 ] = "let",
@@ -92,8 +94,10 @@ bool
 barn_parser_is_next_token(barn_parser_t* parser, barn_token_kind_t kind)
 {
     if (parser->curr_token->kind == BARN_TOKEN_EOF)
+    {
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expeceted '%s' not EOF", 
-                        barn_token_kind_to_string(parser->curr_token->kind));
+                        barn_token_kind_to_string(kind));
+    }
 
     barn_parser_skip(parser, 1);
     if (parser->curr_token->kind == kind)
@@ -153,7 +157,6 @@ barn_parser_identifier(barn_parser_t* parser)
         else
         {
             barn_parser_skip(parser, 1);
-            printf("%s\n", parser->curr_token->value);
             BARN_UNIMPLEMENTED("statements like +=, -=, *= etc. are not implemented");
         }
 
@@ -184,6 +187,8 @@ barn_parser_identifier(barn_parser_t* parser)
         barn_parser_break_loop(parser);
     else if (BARN_TOKEN_CMP("continue"))
         barn_parser_continue_loop(parser);
+    else if (BARN_TOKEN_CMP("enum"))
+        barn_parser_enum(parser);
     else
     {
         barn_token_print(parser->curr_token);
@@ -210,8 +215,8 @@ barn_parser_check_usage_of_local_variables(barn_parser_t* parser)
     BARN_ARRAY_FOR(parser->local_variables)
     {
         barn_variable_t* local_var = barn_get_element_from_array(parser->local_variables, i);
-        if (local_var->is_used == false)
-            barn_warning_show("[disable with --w-disable-unused] variable named \"%s\" is not use", local_var->var_name);
+        if (local_var->is_used == false && strlen(local_var->var_name) != 0)
+            barn_warning_show("[disable with --w-disable-unused] variable named \"%s\" is not use", local_var->var_name);            
     }
 }
 
@@ -250,7 +255,6 @@ barn_parser_main_loop(barn_parser_t* parser)
     for (; parser->index < parser->lexer->tokens->length; parser->index++)
     {
         barn_parser_skip(parser, 0);
-        printf("curr_token = %s\n", parser->curr_token->value);
 
         if (parser->curr_token->kind == BARN_TOKEN_EOF)
             break;
@@ -288,7 +292,7 @@ barn_start_parser(barn_lexer_t* lexer)
     barn_debug_entry("barn_parser_main_loop", __FILE__, __LINE__);
     barn_initialize_builtin_functions(parser);
     barn_parser_main_loop(parser);
-    barn_parser_show_ast(parser);
+    // barn_parser_show_ast(parser);
     return parser;
 }
 

@@ -18,26 +18,19 @@
  *
 */
 
+#ifndef __BARN_ENUM__
+#define __BARN_ENUM__
+
 #include <barn_core.h>
+#include <barn_parser.h>
 
-#include <barn_colors.h>
-#include <barn_debug.h>
-#include <barn_warning.h>
-#include <barn_lexer.h>
+typedef struct __barn_enum_field_t {
+    const char*  enum_name;
+    barn_node_t* enum_expression;
+} barn_enum_field_t;
 
-void
-barn_warning_show(char* message, ...)
-{
-  va_list list;
-  va_start(list, message);
+void barn_parser_enum(barn_parser_t* parser);
 
-  char buf[512];
-  vsnprintf(buf, 512, message, list);
+barn_enum_field_t* barn_create_enum_field(const char* enum_name, barn_node_t* enum_expression);
 
-  printf("%sWarning%s: %s\n",
-  barn_get_bold_color_as_str_code(BARN_COLOR_YELLOW),
-  barn_get_color_as_str_code(BARN_COLOR_RESET),
-  buf);
-
-  va_end(list);
-}
+#endif /* __BARN_ENUM__ */

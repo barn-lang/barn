@@ -73,7 +73,7 @@ barn_initialize_builtin_functions(barn_parser_t* parser)
 
     barn_node_t* __use__function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
     barn_array_t* __use__args    = barn_create_array(sizeof(barn_func_argument_t));
-    barn_append_element_to_array(__use__args, barn_create_func_argument(barn_get_type_str_global(), "__use__str"));
+    barn_append_element_to_array(__use__args, barn_create_func_argument(barn_create_type(BARN_TYPE_ANY), "__use__str"));
 
     __use__function->function_declaration.function_name   = BARN_FUNCTION_USE_CODE;
     __use__function->function_declaration.function_args   = __use__args;
@@ -378,10 +378,10 @@ barn_parser_function_declaration(barn_parser_t* parser)
     if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
         barn_parser_skip(parser, 1);
 
-    for (int i = 0; i < function_args->length; i++)
-        printf("[%d]=argument_name:\"%s\", argument_type->size:\"%lu\"\n", 
-            i, ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_name,
-            ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_type->size);
+    // for (int i = 0; i < function_args->length; i++)
+    //     printf("[%d]=argument_name:\"%s\", argument_type->size:\"%lu\"\n", 
+    //         i, ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_name,
+    //         ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_type->size);
 
     if (parser->curr_token->kind == BARN_TOKEN_EOF)
     {
@@ -445,10 +445,10 @@ barn_parser_extern_function_declaration(barn_parser_t* parser)
     if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
         barn_parser_skip(parser, 1);
 
-    for (int i = 0; i < function_args->length; i++)
-        printf("[%d]=argument_name:\"%s\", argument_type->size:\"%lu\"\n", 
-            i, ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_name,
-            ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_type->size);
+    // for (int i = 0; i < function_args->length; i++)
+    //     printf("[%d]=argument_name:\"%s\", argument_type->size:\"%lu\"\n", 
+    //         i, ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_name,
+    //         ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_type->size);
 
     if (parser->curr_token->kind == BARN_TOKEN_EOF)
     {

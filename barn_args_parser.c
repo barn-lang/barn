@@ -42,9 +42,7 @@ barn_args_parser_start(int argc, char** argv)
         char* arg = args_parser->argv[i];
 
         if (arg[0] == '-')
-        {
             BARN_TRY(barn_append_element_to_array(args_parser->flags, arg));
-        }
         else 
         {
             if (args_parser->is_filename == false)
@@ -78,8 +76,8 @@ barn_get_flag_by_index(barn_args_parser_t* args_parser, int index)
 int 
 barn_get_flag_index(barn_args_parser_t* args_parser, char* flag)
 {
-    for (int i = 0; i < args_parser->flags->length; i++)
-        if (barn_get_element_from_array(args_parser->flags, i) == flag)
+    BARN_ARRAY_FOR(args_parser->flags) 
+        if (strcmp(barn_get_element_from_array(args_parser->flags, i), flag) == 0)
             return i;
 
     return -1;
@@ -88,9 +86,9 @@ barn_get_flag_index(barn_args_parser_t* args_parser, char* flag)
 bool 
 barn_is_flag(barn_args_parser_t* args_parser, char* flag)
 {
-    int index = barn_get_flag_index(args_parser, flag);
+    BARN_ARRAY_FOR(args_parser->flags) 
+        if (strcmp(barn_get_element_from_array(args_parser->flags, i), flag) == 0)
+            return true;
 
-    return index == -1 
-                ? true 
-                : false;
+    return false;
 }

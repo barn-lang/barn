@@ -69,8 +69,15 @@ barn_create_type(barn_type_kind_t type)
     new_type->is_float    = barn_is_type_float(type);
     new_type->is_bool     = barn_is_type_bool(type);
     new_type->is_ptr      = barn_is_type_ptr(type);
+    new_type->is_any      = barn_is_type_any(type);
 
     return new_type;
+}
+
+bool
+barn_is_type_any(barn_type_kind_t type)
+{
+    return (type == BARN_TYPE_ANY);
 }
 
 bool 
@@ -100,7 +107,8 @@ barn_is_type_string(barn_type_kind_t type)
 bool
 barn_is_type_number(barn_type_kind_t type)
 {
-    return ((barn_is_type_signed(type) || barn_is_type_unsigned(type) || barn_is_type_float(type))
+    return ((barn_is_type_signed(type) || barn_is_type_unsigned(type) || 
+             barn_is_type_float (type) || barn_is_type_bool    (type))
                 ? true
                 : false);
 }
@@ -133,6 +141,7 @@ barn_convert_type_to_size(barn_type_kind_t type)
         case BARN_TYPE_U8:
         case BARN_TYPE_I8:
         case BARN_TYPE_BOOL:
+        case BARN_TYPE_ANY:
         case BARN_TYPE_NONE:
         case BARN_TYPE_AUTO:
             return 1;
@@ -249,6 +258,9 @@ barn_convert_type_to_string(barn_type_t* type)
             break;
         case BARN_TYPE_FORMAT:
             return "format";
+            break;
+        case BARN_TYPE_ANY:
+            return "any";
             break;
         default:
             BARN_UNIMPLEMENTED("unhandled type size");

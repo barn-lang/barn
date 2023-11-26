@@ -1,17 +1,17 @@
 @import "std.ba"
 
-// enum {
-//     FAMILY = 1 // 1
-//     FRIEND     // 2
-//     GUEST      // 3
-// }
-// 
-// fun main() {
-//     printnum(FAMILY)
-//     printnum(FRIEND)
-//     printnum(GUEST)
-// }
+fun test() -> int {
+    return 0
+}
+
+enum {
+    FAMILY = 1      // 1
+    FRIEND = 2 + 4  // 6
+    GUEST  = test() // error! runtime value
+}
 
 fun main() {
-    // Enums don't work
+    fmt_printf("FAMILY=%d\n", FAMILY)
+    fmt_printf("FRIEND=%d\n", FRIEND)
+    fmt_printf("GUEST=%d\n", GUEST)
 }

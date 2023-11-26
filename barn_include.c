@@ -57,7 +57,6 @@ barn_include_tokenize_file_and_append_tokens(barn_include_t* include_struct)
         filename = filename_with_std;
     }
 
-    
     /* Create a custom args parser in which we would apply filename of imported file
      * and then after it start lexer work */
     barn_args_parser_t* custom_args_parser = (barn_args_parser_t*)calloc(1, sizeof(barn_args_parser_t));

@@ -17,6 +17,6 @@
  * If you don't want your code look pretty just comment line
  * below
  */
-#define BARN_CODEGEN_PRETTIER_CODE
+// #define BARN_CODEGEN_PRETTIER_CODE
 
 #endif /* __BARN_CONFIG__ */

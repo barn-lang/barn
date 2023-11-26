@@ -1,13 +1,6 @@
 @import "std.ba"
-@import "math.ba"
 
-extern fun okok() -> i32
-
-fun main() {
-    // i<T> (T = i32)
-    let i: auto = 0
-
-    let auto_str: string = "ok"
-    let auto_flt: f32 = 4.5 * 2
-    // let max_val: auto = max(1, 2)
+fun main() -> int {
+    fmt_print("Hello, world\n", 0)
+    return 0    
 }
