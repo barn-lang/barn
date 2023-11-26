@@ -81,7 +81,9 @@ barn_filename_action(barn_args_parser_t* args_parser)
     // Lexer
     barn_debug_entry("barn_start_lexer", __FILE__, __LINE__);
     barn_lexer_t* lexer = barn_start_lexer(file_content, args_parser);
-    BARN_USE(lexer);
+
+    if (barn_is_flag(args_parser, "--tokens", "-tok"))
+        barn_lexer_show_all_tokens(lexer);
 
     barn_debug_entry("barn_include_files", __FILE__, __LINE__);
     barn_include_files(lexer);
@@ -105,8 +107,23 @@ barn_filename_action(barn_args_parser_t* args_parser)
     barn_end_time_compilation(time_comp);
     barn_print_time_compilation(time_comp);
 
-    system("gcc -w barn.c");
-    system("rm barn.c");
+    if (barn_is_flag(args_parser, "--cflags", "\0"))
+    {
+        char* cflag = barn_get_flag_by_index(args_parser, 
+                                barn_get_flag_index(args_parser, "--cflags") + 1);
+    
+        if (cflag == NULL)
+            system("gcc -w barn.c");
+        else
+        {
+            char* buf = malloc(sizeof(char) * strlen("gcc -w barn.c") + strlen(cflag) + 10);
+            sprintf(buf, "gcc -w %s barn.c", cflag);
+            system(buf);
+        }
+    }
+
+    if (barn_is_flag(args_parser, "--no-delete-cout", "-no-cout") == false)
+        remove("barn.c");
 }
 
 int

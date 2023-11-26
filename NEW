@@ -14,3 +14,23 @@ fun main() -> i32  {
     return 0 // Success
 }
 ```
+- Enumerators. Example in ./examples/38-enums.ba
+```
+@import "std.ba"
+
+fun test() -> int {
+    return 0
+}
+
+enum {
+    FAMILY = 1      // 1
+    FRIEND = 2 + 4  // 6
+    GUEST  = test() // error! runtime value
+}
+
+fun main() {
+    fmt_printf("FAMILY=%d\n", FAMILY)
+    fmt_printf("FRIEND=%d\n", FRIEND)
+    fmt_printf("GUEST=%d\n", GUEST)
+}
+```

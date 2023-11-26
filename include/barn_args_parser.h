@@ -40,6 +40,6 @@ char* barn_get_flag_by_index(barn_args_parser_t* args_parser, int index);
 
 int barn_get_flag_index(barn_args_parser_t* args_parser, char* flag);
 
-bool barn_is_flag(barn_args_parser_t* args_parser, char* flag);
+bool barn_is_flag(barn_args_parser_t* args_parser, char* flag, char* alias_flag);
 
 #endif /* __BARN_ARGS_PARSER__ */

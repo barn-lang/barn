@@ -84,10 +84,11 @@ barn_get_flag_index(barn_args_parser_t* args_parser, char* flag)
 }
 
 bool 
-barn_is_flag(barn_args_parser_t* args_parser, char* flag)
+barn_is_flag(barn_args_parser_t* args_parser, char* flag, char* alias_flag)
 {
     BARN_ARRAY_FOR(args_parser->flags) 
-        if (strcmp(barn_get_element_from_array(args_parser->flags, i), flag) == 0)
+        if (strcmp(barn_get_element_from_array(args_parser->flags, i), flag)       == 0 ||
+            strcmp(barn_get_element_from_array(args_parser->flags, i), alias_flag) == 0)
             return true;
 
     return false;

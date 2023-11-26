@@ -27,8 +27,7 @@
 barn_time_compilation_t* 
 barn_start_time_compilation(barn_args_parser_t* args_parser)
 {
-    if (barn_is_flag(args_parser, "--time") == false || 
-        barn_is_flag(args_parser, "-t") == false)
+    if (!barn_is_flag(args_parser, "--time", "-t"))
         return NULL;
 
     barn_time_compilation_t* time_comp = (barn_time_compilation_t*)calloc(sizeof(barn_time_compilation_t), 1);
