@@ -36,6 +36,19 @@
 #include <barn_debug.h>
 #include <barn_error.h>
 
+/* When your compiler is fucked up */
+#ifndef __FILE_NAME__
+# define __FILE_NAME__ "unknown_filename"
+#endif /* __FILE_NAME__ */
+
+#ifndef __LINE__
+# define __LINE__ 0
+#endif /* __LINE__ */
+
+#ifndef __PRETTY_FUNCTION__
+# define __PRETTY_FUNCTION__ "unknown_function"
+#endif /* __PRETTY_FUNCTION__ */
+
 #ifndef __BARN_SHOW_DEBUG__
 // # define __BARN_SHOW_DEBUG__ (0x0001)
 #endif /* __BARN_SHOW_DEBUG__ */

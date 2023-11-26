@@ -58,7 +58,7 @@
 - [ ] Implement modulus (forgot about it)
 
 BUGS:
-    - [ ] Make args parser finally work...
+    - [X] Make args parser finally work...
     - [X] Make numbers act like booleans vice versa 
     - [ ] __use__
     - [ ] Variable use so warning doesnt come up
@@ -66,3 +66,4 @@ BUGS:
     - [ ] Seg fault with using int_to_string from std.ba
     - [ ] \\\" bug 
     - [ ] constant variables and enums can't use runtime values like functions
+    - [ ] implement --no-main and --no-stdlib
