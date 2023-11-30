@@ -1,3 +1,5 @@
+@import "std.ba"
+
 fun pow2(float x) -> float {
     return (x * x)
 }
@@ -7,5 +9,6 @@ fun main() -> int {
     pi = 3.14 // Whoops my bad
 
     let area: float = pi * pow2(pi)
+    fmt_print("area: %f", area)
     return 0 // Success
 }

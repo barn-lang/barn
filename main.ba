@@ -1,6 +1,10 @@
 @import "std.ba"
 
+let text: string = "okokok"
+
 fun main() -> int {
-    fmt_print(text, 0)
+    if 1 && 1 {
+        fmt_print(text)
+    }
     return 0
 }

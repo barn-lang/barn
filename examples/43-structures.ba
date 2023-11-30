@@ -1,11 +1,18 @@
-@import "std.ba"
+// This is just a concept for now but i will
+// go with this syntax
 
-struct Person {
-	name: string,
-	age: i16
-}
+// ------------------
+
+// @import "std.ba"
+
+// struct Person {
+// 	name: string,
+// 	age: i16
+// }
 
 fun main() {
-	let me: Person = new Person{ "My name", 60 }
-	fmt_print("name: %s, age: %d", me.name, me.age)
+// 	let me: Person = new Person{ "My name", 60 }
+// 	fmt_print("name: %s, age: %d", me.name, me.age)
 }
+
+// ------------------

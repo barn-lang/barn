@@ -99,7 +99,7 @@
 			}]
 		},
 		"reserved-words": {
-			"match": "\\b(println|println|println|printbool|println|putchar|input|string_length|string_compare|string_reverse|iota|string_malloc|printnum)\\b",
+			"match": "\\b(println|println|fmt_print|printbool|println|putchar|read_line_stdin|string_length|string_compare|string_reverse|string_malloc|printnum)\\b",
 			"name": "entity.name.function.member.tpl"
 		},
 		"comments": {

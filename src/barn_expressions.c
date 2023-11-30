@@ -167,19 +167,21 @@ barn_expression_is_curr_operator(barn_parser_t* parser)
         case BARN_TOKEN_PLUS: // normal operators
         case BARN_TOKEN_MINUS:
         case BARN_TOKEN_MUL:
+        case BARN_TOKEN_MOD:
         case BARN_TOKEN_OPENPARENT:
         case BARN_TOKEN_CLOSEPARENT:
         case BARN_TOKEN_DIV:
             return true;
             break;
-        case BARN_TOKEN_GT: // condiction operators
+        case BARN_TOKEN_GT: // condition operators
         case BARN_TOKEN_GTE:
         case BARN_TOKEN_LT:
         case BARN_TOKEN_LTE:
         case BARN_TOKEN_EQ:
         case BARN_TOKEN_NEQ:
+        case BARN_TOKEN_ANDAND:
+        case BARN_TOKEN_OROR:
             return true;
-            break;
         default:
             return false;
             break;

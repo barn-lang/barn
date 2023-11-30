@@ -42,8 +42,14 @@ def find_files_with_extension(directory, extension):
 def is_path_to_folder(path):
     return os.path.isdir(path)
 
+def is_path_to_file(path):
+    return os.path.isfile(path)
+
 def start_compilation_process(folder_path):
     files = find_files_with_extension(folder_path, BARN_EXTENSION)
+
+    if (is_path_to_file("./barn")):
+        print(f"barn: compile_all_files.py: expected barn compiler at \"./barn\"")
 
     if len(files) == 0:
         print(f"barn: compile_all_files.py: there isn't any barn files (with extension {BARN_EXTENSION}) inside {folder_path}")
@@ -51,14 +57,14 @@ def start_compilation_process(folder_path):
         success = 0
         for file in files:
             print(f"Compiling: {file}...")
-            completed_process = subprocess.run(f"barn {file}", shell=True, text=True, capture_output=True)
+            process = subprocess.run([f"./barn {file}"], timeout=2, shell=True)
 
-            if completed_process.returncode == 0:
-                print(f"Success: {completed_process.stdout}")
+            if process.returncode == 0:
                 success += 1
+                print(f"File {file} has been compiled successfully\n")
             else:
-                print(f"Error message: \n{completed_process.stdout}")
-        
+                exit(1)
+
         total_files = len(files)
         print(f"Successfully compiled {success}/{total_files}")
 

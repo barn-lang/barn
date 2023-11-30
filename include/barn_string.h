@@ -30,4 +30,6 @@ char* barn_create_string_from_char(char c);
 void barn_append_char_to_allocated_string(char** str, char c);
 void barn_append_string_to_allocated_string(char** str, char* sstr);
 
+bool barn_string_prefix(const char* string, const char* prefix);
+
 #endif /* __BARN_STRING__ */

@@ -1,7 +1,7 @@
 @import "std.ba"
 
 fun main() -> int {
-    let str: string = iota(20, 10)
+    let str: string = parse_string_to_int(20, 10)
     println(str)
     return 0
 }

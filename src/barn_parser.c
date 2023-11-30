@@ -132,7 +132,6 @@ barn_parser_is_id_correct_namespace(char* id_namespace)
     return true;
 }
    
-
 void
 barn_parser_identifier(barn_parser_t* parser)
 {
@@ -186,6 +185,8 @@ barn_parser_identifier(barn_parser_t* parser)
         barn_parser_continue_loop(parser);
     else if (BARN_TOKEN_CMP("enum"))
         barn_parser_enum(parser);
+    else if (BARN_TOKEN_CMP("@import_c"))
+        barn_parser_import_c(parser);
     else
     {
         barn_token_print(parser->curr_token);
@@ -213,7 +214,7 @@ barn_parser_check_usage_of_local_variables(barn_parser_t* parser)
     {
         barn_variable_t* local_var = barn_get_element_from_array(parser->local_variables, i);
         if (local_var->is_used == false && strlen(local_var->var_name) != 0)
-            barn_warning_show("[disable with --w-disable-unused] variable named \"%s\" is not use", local_var->var_name);            
+            barn_warning_show("[disable with --w-disable-unused] variable named \"%s\" is not used", local_var->var_name);            
     }
 }
 
@@ -246,6 +247,33 @@ barn_parser_close_brace(barn_parser_t* parser)
     parser->statement_open--;
 }
 
+void
+barn_parser_check_usage_of_global_variables(barn_parser_t* parser)
+{
+    if (barn_is_flag(parser->lexer->args_parser, "--w-disable-unused", "-wd-unused"))
+        return;
+
+    BARN_ARRAY_FOR(parser->global_variables)
+    {
+        barn_variable_t* global_var = barn_get_element_from_array(parser->global_variables, i);
+        if (global_var->is_used == false && strlen(global_var->var_name) != 0)
+            barn_warning_show("[disable with --w-disable-unused] variable named \"%s\" is not used", global_var->var_name);            
+    }
+}
+
+void
+barn_parser_check_is_main_function_defined(barn_parser_t* parser)
+{
+    if (barn_is_flag(parser->lexer->args_parser, "--no-main", "-nm"))
+        return;
+
+    if (barn_parser_function_get_by_name(parser, "main") == NULL)
+    {
+        barn_error_show(BARN_COMPILER_ERROR, "[disable with --no-main] \"main\" function is not defined");
+        exit(EXIT_FAILURE);
+    }
+}
+
 void 
 barn_parser_main_loop(barn_parser_t* parser)
 {
@@ -265,6 +293,9 @@ barn_parser_main_loop(barn_parser_t* parser)
             BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unknown use of '%s' token in this place", 
                             parser->curr_token->value);
     }
+
+    barn_parser_check_usage_of_global_variables(parser);
+    barn_parser_check_is_main_function_defined(parser);
 }
 
 barn_parser_t* 
@@ -374,4 +405,19 @@ barn_parser_append_node(barn_parser_t* parser, barn_node_t* node)
     }
 
     barn_append_element_to_array(parser->nodes, node);
+}
+
+void
+barn_parser_import_c(barn_parser_t* parser)
+{
+    if (!barn_parser_is_next_token(parser, BARN_TOKEN_STRING))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected string after @import_c", 0);
+
+    if (strlen(parser->curr_token->value) == 0)
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "c header is too short", 0);
+    barn_parser_skip(parser, 1);
+    
+    barn_node_t* node     = barn_create_empty_node(BARN_NODE_IMPORT_C);
+    node->import_c.header = parser->curr_token->value;
+    barn_parser_append_node(parser, node);
 }

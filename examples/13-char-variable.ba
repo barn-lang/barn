@@ -1,5 +1,5 @@
-let first_letter_name: char = 'B'
+let __first_letter_name: char = 'B'
 
 fun main() {
-    let second_letter_name: char = 'r'
+    let __second_letter_name: char = 'r'
 }

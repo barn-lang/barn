@@ -5,7 +5,7 @@ fun call_example_function() -> int {
 }
 
 fun main() {
-    let i1: string = "string"
-    let i2: int = call_example_function()
-    let i3: bool = false
+    let _i1: string = "string"
+    let _i2: int = call_example_function()
+    let _i3: bool = false
 }

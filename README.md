@@ -78,7 +78,7 @@ fun main() {
 
 fun main() {
 	println("What's your name: ")
-	let user_name: string = input()
+	let user_name: string = read_line_stdin()
 	println("Welcome ")
 	println(user_name)
 }

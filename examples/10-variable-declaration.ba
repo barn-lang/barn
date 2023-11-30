@@ -1,17 +1,15 @@
 fun main() {
-    let num: int = 0
+    let _num: int = 0
 
-    let num1: int = 1 + 1
-    let num2: int = 1 - 1
-    let num3: int = 1 * 1
-    let num4: int = 1 / 1
+    let _num1: int = 1 + 1
+    let _num2: int = 1 - 1
+    let _num3: int = 1 * 1
+    let _num4: int = 1 / 1
 
-    let num5: int = (1 + ((1 * 2)))
+    let _num5: int = (1 + ((1 * 2)))
     
-    let wow_number: float = ((10.0 * 20) + (328 + 1 - 2390 - 21 + 21)) / 2
+    let _wow_number: float = ((10.0 * 20) + (328 + 1 - 2390 - 21 + 21)) / 2
 
-    let str1: string = "String"
-    let yeah: bool = true
-
-    // println(str1)
+    let _str1: string = "String"
+    let _yeah: bool = true
 }

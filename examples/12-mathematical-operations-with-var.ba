@@ -1,5 +1,5 @@
 fun main() {
-    let first_var: int = 1
-    let next_var: int = first_var
-    let next_var_with_math: int = (first_var * 2) / next_var
+    let __first_var: int = 1
+    let __next_var: int = __first_var
+    let __next_var_with_math: int = (__first_var * 2) / __next_var
 }

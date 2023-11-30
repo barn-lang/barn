@@ -1,5 +1,9 @@
-@import "std.ba"
+// This test doesn't make any sense lol idk why it's still here
 
-fun foo() {
-    println("Hello, world but without main lol")
-}
+// @import "std.ba"
+
+// fun foo() {
+//     println("Hello, world but without main lol")
+// }
+
+fun main() {}

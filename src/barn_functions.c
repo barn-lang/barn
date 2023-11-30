@@ -71,9 +71,31 @@ barn_initialize_builtin_functions(barn_parser_t* parser)
 
     barn_append_element_to_array(parser->function_nodes, __code__function);
 
+    barn_node_t* putchar_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* putchar_args    = barn_create_array(sizeof(barn_func_argument_t));
+    barn_append_element_to_array(putchar_args, barn_create_func_argument(barn_get_type_i8_global(), "putchar_c"));
+
+    putchar_function->function_declaration.function_name   = "putchar";
+    putchar_function->function_declaration.function_args   = putchar_args;
+    putchar_function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    putchar_function->function_declaration.function_return = barn_create_type(BARN_TYPE_NONE);
+
+    barn_append_element_to_array(parser->function_nodes, putchar_function);
+
+    barn_node_t* exit_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
+    barn_array_t* exit_args    = barn_create_array(sizeof(barn_func_argument_t));
+    barn_append_element_to_array(exit_args, barn_create_func_argument(barn_get_type_i32_global(), "exit_code"));
+
+    exit_function->function_declaration.function_name   = "exit";
+    exit_function->function_declaration.function_args   = exit_args;
+    exit_function->function_declaration.function_nodes  = barn_create_array(sizeof(barn_node_t*));
+    exit_function->function_declaration.function_return = barn_create_type(BARN_TYPE_NONE);
+
+    barn_append_element_to_array(parser->function_nodes, exit_function);
+
     barn_node_t* __use__function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
     barn_array_t* __use__args    = barn_create_array(sizeof(barn_func_argument_t));
-    barn_append_element_to_array(__use__args, barn_create_func_argument(barn_create_type(BARN_TYPE_ANY), "__use__str"));
+    barn_append_element_to_array(__use__args, barn_create_func_argument(barn_create_type(BARN_TYPE_ANY), "__use__any"));
 
     __use__function->function_declaration.function_name   = BARN_FUNCTION_USE_CODE;
     __use__function->function_declaration.function_args   = __use__args;
@@ -291,7 +313,11 @@ barn_function_declaration_set_argument_as_variables(barn_parser_t* parser, barn_
             = barn_get_element_from_array(node->function_declaration.function_args, i);
         
         barn_variable_t* var = barn_create_variable(
-            func_argument->argument_name, func_argument->argument_type, true, false, false);
+            func_argument->argument_name, func_argument->argument_type, true, true, false);
+
+        if (func_argument->argument_name[0] == '-')
+            var->is_used = true;
+            
         barn_append_element_to_array(parser->local_variables, var);
     }
 }
@@ -450,14 +476,14 @@ barn_parser_extern_function_declaration(barn_parser_t* parser)
     //         i, ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_name,
     //         ((barn_func_argument_t*)barn_get_element_from_array(function_args, i))->argument_type->size);
 
-    if (parser->curr_token->kind == BARN_TOKEN_EOF)
-    {
-        barn_parser_skip(parser, -1);
-        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected '->' after externing a function not EOF", 0);
-    }
+    // if (parser->curr_token->kind == BARN_TOKEN_EOF)
+    // {
+    //     barn_parser_skip(parser, -1);
+    //     BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected '->' after externing a function not EOF", 0);
+    // }
 
-    if (parser->curr_token->kind != BARN_TOKEN_OPENBRACE && parser->curr_token->kind != BARN_TOKEN_ARROW)
-        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected '->' after externing a function", 0);
+    // if (parser->curr_token->kind != BARN_TOKEN_OPENBRACE && parser->curr_token->kind != BARN_TOKEN_ARROW)
+    //     BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected '->' after externing a function", 0);
 
     barn_type_t* function_return_type = barn_create_type(BARN_TYPE_NONE);
     if (parser->curr_token->kind == BARN_TOKEN_ARROW)

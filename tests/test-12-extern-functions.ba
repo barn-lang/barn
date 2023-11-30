@@ -1,7 +1,7 @@
 // This file is compiling with flag "--no-stdlib"
 
-extern fun puts(cstr msg)
+// extern fun puts(string msg)
 
 fun main() {
-    puts("Hello")
+    // puts("Hello")
 }

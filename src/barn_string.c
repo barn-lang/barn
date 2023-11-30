@@ -76,3 +76,9 @@ barn_create_string_from_char(char c)
     
     return str;
 }
+
+bool
+barn_string_prefix(const char* string, const char* prefix)
+{
+    return (strncmp(prefix, string, strlen(prefix)) == 0);
+}

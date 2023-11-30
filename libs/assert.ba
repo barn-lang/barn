@@ -27,8 +27,10 @@
  * ==========================
 */
 
+// TODO: implement __BARN_CURRENT_COMPILED_FILE__
 fun __barn_get_filename() -> string {
-    return __BARN_CURRENT_COMPILED_FILE__
+//     return __BARN_CURRENT_COMPILED_FILE__
+    return "__barn_get_filename is unimplemented"
 }
 
 /* 
@@ -37,7 +39,6 @@ fun __barn_get_filename() -> string {
  * ==========================
 */
 
-__code__("[[noreturn]]")
 fun __assert_failed___(string __filename, string __message) {
     __code__("printf(\"Assertion Failed: %s: %s\n\", __filename, __message);")
 
@@ -51,7 +52,6 @@ fun __assert_failed___(string __filename, string __message) {
  * ==========================
 */
 
-__code__("[[noreturn]]")
 fun assert(string __message) {
     let filename: string = __barn_get_filename()
     __assert_failed___(filename, __message)

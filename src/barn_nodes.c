@@ -65,6 +65,8 @@ barn_node_kind_show(barn_node_kind_t kind)
             return "ContinueLoop";
         case BARN_NODE_ENUM:
             return "Enum";
+        case BARN_NODE_IMPORT_C:
+            return "ImportC";
     }
 
     BARN_UNIMPLEMENTED("unhandled node type");

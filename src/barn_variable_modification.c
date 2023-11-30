@@ -41,6 +41,7 @@ barn_parser_variable_asn(barn_parser_t* parser)
                         parser->curr_token->value);
 
     barn_parser_skip(parser, 2);
+    variable->is_used = true;
 
     barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
 
@@ -66,6 +67,7 @@ barn_parser_variable_plusasn(barn_parser_t* parser)
                         parser->curr_token->value);
 
     barn_parser_skip(parser, 2);
+    variable->is_used = true;
 
     barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
 
@@ -91,6 +93,7 @@ barn_parser_variable_minusasn(barn_parser_t* parser)
                         parser->curr_token->value);
 
     barn_parser_skip(parser, 2);
+    variable->is_used = true;
 
     barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
 
@@ -116,6 +119,7 @@ barn_parser_variable_mulasn(barn_parser_t* parser)
                         parser->curr_token->value);
 
     barn_parser_skip(parser, 2);
+    variable->is_used = true;
 
     barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
 
@@ -141,6 +145,7 @@ barn_parser_variable_divasn(barn_parser_t* parser)
                         parser->curr_token->value);
 
     barn_parser_skip(parser, 2);
+    variable->is_used = true;
 
     barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
 
@@ -166,6 +171,7 @@ barn_parser_variable_incrementation(barn_parser_t* parser)
                         parser->curr_token->value);
 
     barn_parser_skip(parser, 1);
+    variable->is_used = true;
 
     barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_INCREMENTATION);
     node->variable_modification.variable_value = NULL;
@@ -190,6 +196,7 @@ barn_parser_variable_decrementation(barn_parser_t* parser)
                         parser->curr_token->value);
 
     barn_parser_skip(parser, 1);
+    variable->is_used = true;
 
     barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_DECREMENTATION);
     node->variable_modification.variable_value = NULL;

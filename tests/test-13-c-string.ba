@@ -8,3 +8,5 @@ fun main() {
     __code__("printf(\"%s\", _real_string);")
 }
 */
+
+fun main() { }

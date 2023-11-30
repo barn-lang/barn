@@ -56,6 +56,11 @@ fun parse_double(string s) -> f64 {
 	__use__(s)
 }
 
+fun parse_string_to_int(int n, int base) -> string {
+	__use__(n)
+	__use__(base)
+}
+
 // TODO: fix int_to_string function
 
 // Function for changing number to string

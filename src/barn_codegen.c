@@ -98,6 +98,15 @@ barn_codegen_operator_to_code(barn_token_kind_t op)
         case BARN_TOKEN_NEQ:
             return "!=";
             break;
+        case BARN_TOKEN_OROR:
+            return "||";
+            break;
+        case BARN_TOKEN_ANDAND:
+            return "&&";
+            break;
+        case BARN_TOKEN_MOD:
+            return "%";
+            break;
         default:
             BARN_UNIMPLEMENTED("unknown operator to code generate");
             break;
@@ -424,6 +433,12 @@ barn_codegen_generate_function_body(barn_codegen_t* codegen, barn_node_t* curr_n
                                                 ? "break" 
                                                 : "continue"));
             break;
+        case BARN_NODE_IMPORT_C:
+            if (barn_string_prefix(codegen->curr_node->import_c.header, "./"))
+                fprintf(codegen->c_file, "#include \"%s\"\n\n", codegen->curr_node->import_c.header);
+            else
+                fprintf(codegen->c_file, "#include <%s>\n\n", codegen->curr_node->import_c.header);
+            break;
         default:
             printf("unimplemented node kind -> %s\n", barn_node_kind_show(curr_node->node_kind));
             BARN_UNIMPLEMENTED("generating code for given node kind in function body is unimplemented feauter");
@@ -511,6 +526,18 @@ barn_codegen_start(barn_parser_t* parser)
             barn_codegen_enum(codegen, codegen->curr_node);
             fprintf(codegen->c_file, "\n\n");
         }
+        else if (codegen->curr_node->node_kind == BARN_NODE_IMPORT_C)
+        {
+            if (barn_string_prefix(codegen->curr_node->import_c.header, "./"))
+                fprintf(codegen->c_file, "#include \"%s\"\n\n", codegen->curr_node->import_c.header);
+            else
+                fprintf(codegen->c_file, "#include <%s>\n\n", codegen->curr_node->import_c.header);
+        }
+        else if (codegen->curr_node->node_kind == BARN_NODE_FUNCTION_CALL)
+        {
+            barn_node_t* first_argument = barn_get_element_from_array(codegen->curr_node->function_call.function_args, 0);
+            fprintf(codegen->c_file, "%s\n", barn_codegen_expression_generate(codegen, first_argument));
+        }
         else 
             BARN_UNIMPLEMENTED("unhandled node kind");
     }
@@ -549,7 +576,7 @@ barn_codegen_type_convert_to_c(barn_codegen_t* codegen, barn_type_t* type)
             return "float";
             break;
         case BARN_TYPE_U64:
-            return "unsgined long";
+            return "unsigned long";
             break;
         case BARN_TYPE_I64:
             return "long";

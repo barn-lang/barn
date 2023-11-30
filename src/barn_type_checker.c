@@ -382,7 +382,8 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
         else if (tc->curr_node->node_kind == BARN_NODE_EXPRESSION    ||
                  tc->curr_node->node_kind == BARN_NODE_END_STATEMENT ||
                  tc->curr_node->node_kind == BARN_NODE_BREAK_LOOP    ||
-                 tc->curr_node->node_kind == BARN_NODE_CONTINUE_LOOP)
+                 tc->curr_node->node_kind == BARN_NODE_CONTINUE_LOOP ||
+                 tc->curr_node->node_kind == BARN_NODE_IMPORT_C)
             continue;
         else if (tc->curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)
             barn_tc_variable_declaration(tc, NULL);

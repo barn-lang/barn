@@ -47,6 +47,7 @@ typedef enum __barn_node_kind_t {
     BARN_NODE_VARIABLE_DECREMENTATION,
 
     BARN_NODE_EXPRESSION,
+    BARN_NODE_IMPORT_C,
 
     BARN_NODE_CONDITION_STATEMENT,
     BARN_NODE_END_STATEMENT,
@@ -125,6 +126,10 @@ typedef struct __barn_node_t {
         const char*   function_name;
         barn_node_t*  function;
     } function_call;
+
+    struct {
+        char* header;
+    } import_c;
 
     struct {
         barn_array_t* enum_fields;
