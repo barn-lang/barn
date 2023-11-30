@@ -67,3 +67,4 @@ BUGS:
     - [ ] \\\" bug 
     - [ ] constant variables and enums can't use runtime values like functions
     - [ ] implement --no-main and --no-stdlib
+    - [ ] add some more info to unused variable warning

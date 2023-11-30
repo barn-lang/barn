@@ -1,17 +1,15 @@
 @import "std.ba"
 
-fun test() -> int {
-    return 0
-}
-
 enum {
-    FAMILY = 1      // 1
-    FRIEND = 2 + 4  // 6
-    GUEST  = test() // error! runtime value
+    FAMILY = 10, // 10
+    FRIEND,      // 11
+    GUEST,       // 12
+    OTHER = 40   // 40
 }
 
 fun main() {
-    fmt_printf("FAMILY=%d\n", FAMILY)
-    fmt_printf("FRIEND=%d\n", FRIEND)
-    fmt_printf("GUEST=%d\n", GUEST)
+    fmt_print("FAMILY=%d\n", FAMILY)
+    fmt_print("FRIEND=%d\n", FRIEND)
+    fmt_print("GUEST=%d\n",  GUEST)
+    fmt_print("OTHER=%d\n",  OTHER)
 }

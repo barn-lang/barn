@@ -22,6 +22,7 @@
 
 #include <barn_core.h>
 #include <barn_parser.h>
+#include <barn_functions.h>
 
 barn_enum_field_t* 
 barn_create_enum_field(const char* enum_name, barn_node_t* enum_expression) 
@@ -33,36 +34,85 @@ barn_create_enum_field(const char* enum_name, barn_node_t* enum_expression)
     return enum_field;
 }
 
+char*
+barn_parser_collect_enum_field_name(barn_parser_t* parser)
+{
+    if (parser->curr_token->kind != BARN_TOKEN_IDENTIFIER)
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected enum field name as an identifier", 0);
+    
+    char* field_name = barn_duplicate_string(parser->curr_token->value);
+    if (!barn_parser_is_id_correct_namespace((char*)field_name))
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "enum field can't be named \'%s\'", 
+                        parser->curr_token->value);
+
+    if (barn_parser_function_get_by_name(parser, (char*)field_name) != NULL)
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "this name is already took by a function", 0);
+
+    return field_name;
+}
+
+void
+barn_parser_enum_append_field(barn_parser_t* parser, barn_array_t* enum_fields,
+                              char* field_name, barn_node_t* field_val)
+{
+    // Create a global variable named by field_name
+    barn_append_element_to_array(enum_fields, barn_create_enum_field(field_name, field_val));
+    barn_parser_skip(parser, 1);
+
+    barn_variable_t* variable 
+        = barn_create_variable(field_name, barn_get_type_i32_global(), true, true, false);
+    barn_append_element_to_array(parser->global_variables, variable);
+}
+
 barn_array_t* 
 barn_parser_enum_fields(barn_parser_t* parser)
 {
-    barn_parser_skip(parser, 1);
-    barn_array_t* enum_fields;
+    barn_array_t* enum_fields = barn_create_array(sizeof(barn_enum_field_t));
+    
+    if (parser->curr_token->kind == BARN_TOKEN_NEWLINE)
+        barn_parser_skip(parser, 1);
 
     while (parser->curr_token->kind != BARN_TOKEN_CLOSEBRACE || parser->curr_token->kind != BARN_TOKEN_EOF)
     {
-        if (!barn_parser_is_next_token(parser, BARN_TOKEN_IDENTIFIER))
-            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected enum field name", 0);
+        while (parser->curr_token->kind == BARN_TOKEN_NEWLINE)
+            barn_parser_skip(parser, 1);
 
-        barn_parser_skip(parser, 1);    
-        barn_enum_field_t* field = barn_create_enum_field(parser->curr_token->value, NULL);
+        char* field_name = barn_parser_collect_enum_field_name(parser);
+        barn_parser_skip(parser, 1);
+
+        while (parser->curr_token->kind == BARN_TOKEN_NEWLINE)
+            barn_parser_skip(parser, 1);
 
         if (parser->curr_token->kind == BARN_TOKEN_COMMA)
         {
-            barn_parser_skip(parser, 1);
-            barn_append_element_to_array(enum_fields, field);
+            barn_parser_enum_append_field(parser, enum_fields, field_name, NULL);
             continue;
-        } 
-        else if (parser->curr_token->kind == BARN_TOKEN_EQ)
-            BARN_UNIMPLEMENTED("enum field values");
+        }
+        else if (parser->curr_token->kind == BARN_TOKEN_ASN)
+        {
+            // Create a global variable named by field_name and assign 
+            // a value from parsed expression
+            barn_parser_skip(parser, 1);
+            barn_node_t* field_expression = barn_parse_expression(parser, BARN_TOKEN_COMMA, BARN_TOKEN_CLOSEBRACE, false);
+            
+            if (field_expression->expression.is_compiler_time == false && !barn_parser_is_function_opened(parser))
+                BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "value is not a compile-time expression", 0);
+
+            barn_parser_enum_append_field(parser, enum_fields, field_name, field_expression);
+
+            if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
+                break;
+            
+            barn_parser_skip(parser, 1);
+            continue;
+        }
         else if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
         {
-            barn_append_element_to_array(enum_fields, field);
+            barn_parser_enum_append_field(parser, enum_fields, field_name, NULL);
             break;
         }
-        else 
-            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"=\", \",\" or \"{\" not \"%s\"", 
-                barn_token_kind_to_string(parser->curr_token->kind));
+        else
+            BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "expected \",\", \"=\" or \"}\" after enum field name", 0);
     }
     
     return enum_fields;
@@ -77,10 +127,17 @@ barn_parser_enum(barn_parser_t* parser)
     barn_parser_skip(parser, 1);
 
     if (parser->curr_token->kind != BARN_TOKEN_OPENBRACE)
-    {
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"{\" after \"enum\" instead of \"%s\"", 
             barn_token_kind_to_string(parser->curr_token->kind));
-    }
+        
+    barn_parser_skip(parser, 1);
 
-    barn_parser_enum_fields(parser);
+    // If it's something like this: `enum {}` just return..
+    // we don't need to do anything with it
+    if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
+        return;
+
+    barn_node_t* enum_node           = barn_create_empty_node(BARN_NODE_ENUM);
+    enum_node->enumerate.enum_fields = barn_parser_enum_fields(parser);
+    barn_parser_append_node(parser, enum_node);
 }

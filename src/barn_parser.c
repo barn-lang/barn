@@ -139,7 +139,7 @@ barn_parser_identifier(barn_parser_t* parser)
     if (!barn_parser_is_id_keyword(parser->curr_token->value))
     {
         if (barn_parser_is_next_token(parser, BARN_TOKEN_OPENPARENT))
-            barn_parser_func_call(parser);
+            barn_parser_func_call(parser, false);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_ASN))
             barn_parser_variable_asn(parser);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_PLUSASN))
@@ -155,10 +155,7 @@ barn_parser_identifier(barn_parser_t* parser)
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_DECREMENTATION))
             barn_parser_variable_decrementation(parser);
         else
-        {
-            barn_parser_skip(parser, 1);
-            BARN_UNIMPLEMENTED("statements like +=, -=, *= etc. are not implemented");
-        }
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unexpected use of \"%s\"", parser->curr_token->value);
 
         return;
     }

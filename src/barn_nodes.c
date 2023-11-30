@@ -63,6 +63,8 @@ barn_node_kind_show(barn_node_kind_t kind)
             return "BreakLoop";
         case BARN_NODE_CONTINUE_LOOP:
             return "ContinueLoop";
+        case BARN_NODE_ENUM:
+            return "Enum";
     }
 
     BARN_UNIMPLEMENTED("unhandled node type");

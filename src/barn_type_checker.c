@@ -344,6 +344,16 @@ barn_tc_value_modification(barn_type_checker_t* tc, barn_node_t* value_mod)
 }
 
 void
+barn_tc_enum(barn_type_checker_t* tc, barn_node_t* enum_node)
+{
+    barn_node_t* curr_node = enum_node == NULL ? tc->curr_node : enum_node;
+
+    // TODO: implement enum type checking
+
+    return;
+}
+
+void
 barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
 {
     for (tc->index = 0; tc->index < tc->nodes->length; tc->index++)
@@ -388,6 +398,8 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
             barn_tc_condition_statement(tc, NULL);
         else if (tc->curr_node->node_kind == BARN_NODE_WHILE_LOOP)
             barn_tc_while_loop(tc, NULL);
+        else if (tc->curr_node->node_kind == BARN_NODE_ENUM)
+            barn_tc_enum(tc, NULL);
         else
         {
             printf("%s\n", barn_node_kind_show(tc->curr_node->node_kind));

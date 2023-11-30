@@ -34,7 +34,7 @@ fun os_current_system() -> string {
 
 fun os_file_exists(string filename) -> bool {
 	__code__("#if defined (__APPLE__)")
-		__code__("printf(\"os_file_exists(string filename) is not implemented for ios\")")
+		__code__("printf(\"os_file_exists(string filename) is not implemented for ios\");")
 		__code__("return false;")
 	__code__("#elif defined (__unix__)")
 		__code__("struct stat __buf;")
@@ -42,7 +42,7 @@ fun os_file_exists(string filename) -> bool {
 	__code__("#elif defined (_WIN32)")
 		__code__("return (bool)(GetFileAttributesA(filename) == 0xFFFFFFFF);")
 	__code__("#else")
-		__code__("printf(\"os_file_exists(string filename) is not implemented for your system\")")
+		__code__("printf(\"os_file_exists(string filename) is not implemented for your system\");")
 		__code__("return false;")
 	__code__("#endif")
 

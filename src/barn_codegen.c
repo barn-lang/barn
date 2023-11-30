@@ -25,6 +25,7 @@
 #include <barn_string.h>
 #include <barn_functions.h>
 #include <barn_std.h>
+#include <barn_enum.h>
 
 #include <config/barn_config.h>
 
@@ -260,6 +261,29 @@ barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, bool
 }
 
 void
+barn_codegen_enum(barn_codegen_t* codegen, barn_node_t* curr_node)
+{
+    BARN_CODEGEN_GENERATE_TABS(codegen);
+
+    fprintf(codegen->c_file, "enum {\n");
+    BARN_ARRAY_FOR(curr_node->enumerate.enum_fields)
+    {
+        const barn_enum_field_t* field = barn_get_element_from_array(curr_node->enumerate.enum_fields, i);
+
+        fprintf(codegen->c_file, "%s", field->enum_name);
+
+        if (field->enum_expression != NULL)
+            fprintf(codegen->c_file, " = %s", 
+                barn_codegen_expression_generate(codegen, field->enum_expression));
+
+        if (!BARN_ARRAY_IS_LAST_ELEMENT(curr_node->enumerate.enum_fields, i))
+            fprintf(codegen->c_file, ",");
+        fprintf(codegen->c_file, "\n");
+    }
+    fprintf(codegen->c_file, "};");
+}
+
+void
 barn_codegen_variable_declaration(barn_codegen_t* codegen, barn_node_t* curr_node)
 {
     BARN_CODEGEN_GENERATE_TABS(codegen);
@@ -433,7 +457,7 @@ barn_codegen_function_declaration(barn_codegen_t* codegen)
         
         const char* ctype = barn_codegen_type_convert_to_c(codegen, argument->argument_type);
 
-        if (fn_decl->function_declaration.function_args->length == (i + 1))
+        if (BARN_ARRAY_IS_LAST_ELEMENT(fn_decl->function_declaration.function_args, i))
             fprintf(codegen->c_file, "%s %s",
                 ctype, argument->argument_name);
         else
@@ -482,6 +506,13 @@ barn_codegen_start(barn_parser_t* parser)
             barn_codegen_variable_declaration(codegen, codegen->curr_node);
             fprintf(codegen->c_file, "\n\n");
         }
+        else if (codegen->curr_node->node_kind == BARN_NODE_ENUM)
+        {
+            barn_codegen_enum(codegen, codegen->curr_node);
+            fprintf(codegen->c_file, "\n\n");
+        }
+        else 
+            BARN_UNIMPLEMENTED("unhandled node kind");
     }
 
     fclose(codegen->c_file);

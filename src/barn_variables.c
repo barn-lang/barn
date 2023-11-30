@@ -102,15 +102,15 @@ barn_parser_collect_variable_name(barn_parser_t* parser)
     if (parser->curr_token->kind == BARN_TOKEN_EOF)
         return NULL;
 
-    const char* function_name = barn_duplicate_string(parser->curr_token->value);
-    if (!barn_parser_is_id_correct_namespace((char*)function_name))
+    const char* variable_name = barn_duplicate_string(parser->curr_token->value);
+    if (!barn_parser_is_id_correct_namespace((char*)variable_name))
         BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "variable couldn't be named \'%s\'", 
                         parser->curr_token->value);
 
-    if (barn_parser_function_get_by_name(parser, (char*)function_name) != NULL)
+    if (barn_parser_function_get_by_name(parser, (char*)variable_name) != NULL)
         BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "this name is already took by a function", 0);
 
-    return function_name;
+    return variable_name;
 }
 
 void
@@ -157,6 +157,9 @@ barn_parser_variable_declaration(barn_parser_t* parser, bool is_constant, bool i
     barn_parser_skip(parser, 2);
  
     barn_node_t* variable_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
+
+    if (variable_value->expression.is_compiler_time == false && !barn_parser_is_function_opened(parser))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "value is not a compile-time expression", 0);
 
     barn_variable_t* variable = barn_create_variable(variable_name, variable_type, is_constant, false, is_static);
 

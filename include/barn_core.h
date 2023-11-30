@@ -45,10 +45,6 @@
 # define __LINE__ 0
 #endif /* __LINE__ */
 
-#ifndef __PRETTY_FUNCTION__
-# define __PRETTY_FUNCTION__ "unknown_function"
-#endif /* __PRETTY_FUNCTION__ */
-
 #ifndef __BARN_SHOW_DEBUG__
 // # define __BARN_SHOW_DEBUG__ (0x0001)
 #endif /* __BARN_SHOW_DEBUG__ */

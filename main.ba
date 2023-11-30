@@ -1,6 +1,6 @@
 @import "std.ba"
 
 fun main() -> int {
-    fmt_print("Hello, world\n", 0)
-    return 0    
+    fmt_print(text, 0)
+    return 0
 }

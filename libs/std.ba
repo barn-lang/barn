@@ -45,12 +45,15 @@ fun string_length(string s) -> int {
 
 // TODO: implement these functions
 fun parse_float(string s) -> f32 {
+	__use__(s)
 }
 
 fun parse_int(string s) -> i32 {
+	__use__(s)
 }
 
 fun parse_double(string s) -> f64 {
+	__use__(s)
 }
 
 // TODO: fix int_to_string function

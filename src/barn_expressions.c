@@ -114,7 +114,9 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
     {
         if (barn_parser_is_next_token(parser, BARN_TOKEN_OPENPARENT))
         {
-            barn_node_t* func_call = __barn_parser_func_call(parser);
+            barn_node_t* func_call = __barn_parser_func_call(parser, true);
+
+            expr_parser->main_expr_node->expression.is_compiler_time = false;
 
             expr_value->expr_val_type = func_call->function_call.function->function_declaration.function_return;
             expr_value->expr_val_token = func_call->function_call.function_token;
@@ -376,6 +378,7 @@ barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind,
                       barn_token_kind_t end_kind_2, bool function_argument_value)
 {
     barn_node_t* expr_node = barn_create_expression_ast_node();
+    expr_node->expression.is_compiler_time = true;
 
     if (parser->curr_token->kind == end_kind || parser->curr_token->kind == end_kind_2)
         return expr_node;

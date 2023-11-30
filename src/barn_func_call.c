@@ -103,14 +103,15 @@ barn_parser_func_call_arugments_length(barn_parser_t* parser, barn_node_t* menti
 }
 
 barn_node_t*
-__barn_parser_func_call(barn_parser_t* parser)
+__barn_parser_func_call(barn_parser_t* parser, bool is_expr)
 {
     const char* function_call_name = BARN_COLLECT_CURR_TOK_VAL(parser);
     barn_token_t* function_token   = parser->curr_token;
 
     if (!BARN_STR_CMP(function_call_name, BARN_FUNCTION_INJECTING_CODE))
-        if (!barn_parser_is_function_opened(parser))
-            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "function should be opened to call a function", 0);
+        if (!is_expr)
+            if (!barn_parser_is_function_opened(parser))
+                BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "function should be opened to call a function", 0);
 
     barn_node_t* mentioned_function = barn_parser_function_get_by_name(parser, function_call_name);
 
@@ -152,8 +153,8 @@ __barn_parser_func_call(barn_parser_t* parser)
 }
 
 void 
-barn_parser_func_call(barn_parser_t* parser)
+barn_parser_func_call(barn_parser_t* parser, bool is_expr)
 {
-    barn_node_t* function_call_node = __barn_parser_func_call(parser);
+    barn_node_t* function_call_node = __barn_parser_func_call(parser, is_expr);
     barn_parser_append_node(parser, function_call_node);
 }

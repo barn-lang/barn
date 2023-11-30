@@ -24,8 +24,8 @@
 #include <barn_core.h>
 #include <barn_parser.h>
 
-barn_node_t* __barn_parser_func_call(barn_parser_t* parser);
+barn_node_t* __barn_parser_func_call(barn_parser_t* parser, bool is_expr);
 
-void barn_parser_func_call(barn_parser_t* parser);
+void barn_parser_func_call(barn_parser_t* parser, bool is_expr);
 
 #endif /* __BARN_FUNC_CALL__ */

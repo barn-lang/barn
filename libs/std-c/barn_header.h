@@ -18,6 +18,8 @@
 #ifndef __BARN_HEADER_h__
 #define __BARN_HEADER_h__
 
+#define __BARN_ENUM__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,8 +36,11 @@
     #include <windows.h>
 #endif
 
-#define __BARN_FUNCTION__
-#define __BARN_GLOBAL_VARIABLE__
 #define __use__(x) ({(void)x;})
+
+#ifdef __BARN_ENUM__
+#else
+# error "Enums are not enabled"
+#endif
 
 #endif /* __BARN_HEADER_h__ */

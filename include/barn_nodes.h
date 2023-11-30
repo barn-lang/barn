@@ -54,6 +54,8 @@ typedef enum __barn_node_kind_t {
     BARN_NODE_FOR_LOOP,
     BARN_NODE_BREAK_LOOP,
     BARN_NODE_CONTINUE_LOOP,
+
+    BARN_NODE_ENUM
 } barn_node_kind_t;
 
 typedef struct __barn_expression_value_t barn_expression_value_t;
@@ -114,6 +116,7 @@ typedef struct __barn_node_t {
 
     struct {
         barn_array_t* expression_nodes;
+        bool is_compiler_time;
     } expression;
 
     struct {
@@ -122,6 +125,10 @@ typedef struct __barn_node_t {
         const char*   function_name;
         barn_node_t*  function;
     } function_call;
+
+    struct {
+        barn_array_t* enum_fields;
+    } enumerate;
 } barn_node_t;
 
 char* barn_node_kind_show(barn_node_kind_t kind);
