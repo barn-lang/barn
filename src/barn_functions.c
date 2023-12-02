@@ -506,4 +506,5 @@ barn_parser_extern_function_declaration(barn_parser_t* parser)
     barn_node_t* node = barn_function_declaration_create_node(function_name, function_args, 
                                                               function_return_type, true);
     barn_parser_append_node(parser, node);
+    barn_append_element_to_array(parser->function_nodes, node);
 }

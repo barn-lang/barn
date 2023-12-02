@@ -65,7 +65,8 @@ BUGS:
     - [ ] Conditions with string
     - [ ] \\\" bug 
     - [X] constant variables and enums can't use runtime values like functions
-    - [X] implement --no-main and --no-stdlib
+    - [X] implement --no-main
+    - [X] implement --no-stdlib
     - [ ] add some more info to unused variable warning
     - [X] format arguments are not required
     - [X] add || and &&

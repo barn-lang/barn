@@ -507,8 +507,11 @@ barn_codegen_start(barn_parser_t* parser)
     barn_codegen_t* codegen = barn_codegen_create(parser);
 
     // TODO: if flag --no-stdlib is on don't add barn_header.h
-    barn_codegen_add_header(codegen, "std-c/barn_format.h");
-    barn_codegen_add_header(codegen, "std-c/barn_header.h");
+    if (!barn_is_flag(parser->lexer->args_parser, "--no-stdlib", "-n-stdlib"))
+    {
+        barn_codegen_add_header(codegen, "std-c/barn_format.h");
+        barn_codegen_add_header(codegen, "std-c/barn_header.h");
+    }
 
     for (codegen->index = 0; codegen->index < parser->nodes->length; codegen->index++)
     {
