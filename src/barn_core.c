@@ -39,3 +39,39 @@ barn_generate_tabs_to_buf(int tabs)
 
     return ((const char*)buf);
 }
+
+char*
+barn_display_numbers_ordinal(int i)
+{
+    /* Some people say we can't show negative numbers ordinal 
+     * so i will stick with it at all */
+    if (i < 0) return "negative";
+
+    char* ordinal_number_buffer = malloc(sizeof(char) * 32);
+    snprintf(ordinal_number_buffer, 24, "%d", i);
+
+    int last_two_digits = i % 100;
+    int last_digit      = i % 10;
+
+    if (last_two_digits >= 11 && last_two_digits <= 13)
+        strcat(ordinal_number_buffer, "th");
+    else 
+    {
+        switch (last_digit) 
+        {
+            case 1:
+                strcat(ordinal_number_buffer, "st");
+                break;
+            case 2:
+                strcat(ordinal_number_buffer, "nd");
+                break;
+            case 3:
+                strcat(ordinal_number_buffer, "rd");
+                break;
+            default:
+                strcat(ordinal_number_buffer, "th");
+        }
+    }
+
+    return ordinal_number_buffer;
+}

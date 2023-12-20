@@ -22,7 +22,9 @@
 
 #include <barn_expressions.h>
 #include <barn_func_call.h>
+#include <barn_types.h>
 #include <barn_tokens.h>
+#include <barn_struct.h>
 #include <barn_parser.h>
 
 barn_expression_value_t* 
@@ -32,8 +34,9 @@ barn_create_expression_value(barn_token_t* expr_val_token,
     barn_expression_value_t* expr_value = (barn_expression_value_t*)calloc(1, sizeof(barn_expression_value_t));
     BARN_NO_NULL(expr_value);
     
-    expr_value->expr_val_token = expr_val_token;
-    expr_value->expr_val_type  = expr_val_type;
+    expr_value->expr_val_token   = expr_val_token;
+    expr_value->expr_val_type    = expr_val_type;
+    expr_value->fields_of_struct = barn_create_array(sizeof(barn_struct_field_t*));
 
     return expr_value;
 }
@@ -60,6 +63,61 @@ barn_create_expression_ast_node()
     node->expression.expression_nodes = barn_create_array(sizeof(barn_expression_node_t*));
 
     return node;
+}
+
+void
+barn_parser_expression_access_structure_fields(barn_parser_t* parser, barn_expr_parser_t* expr_parser, 
+                                               barn_expression_value_t* expr_value)
+{
+    barn_variable_t* parent_variable = barn_parser_get_variable_by_name(parser, parser->curr_token->value);
+    barn_parser_skip(parser, 1);
+
+    if (!barn_is_type_struct(parent_variable->var_type->type))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unexpected use of \".\" because \"%s\" is not a structure type", 
+                        parent_variable->var_name);
+    
+    expr_value->is_variable = true;
+    barn_append_element_to_array(expr_value->fields_of_struct, parent_variable->var_name);
+
+    barn_type_t* current_type = parent_variable->var_type;
+
+    while (parser->curr_token->kind == BARN_TOKEN_DOT)
+    {
+        if (parser->curr_token->kind == BARN_TOKEN_DOT)
+            barn_parser_skip(parser, 1);
+
+        const char* field_name = parser->curr_token->value;
+
+        if (!barn_is_type_struct(current_type->type))
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "couldn't find field named \"%s\" in \"%s\" type because it's not a structure", 
+                            field_name, barn_convert_type_to_string(current_type));
+
+        if (!barn_parser_is_structure_field_named(parser, current_type, field_name))
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "couldn't find field named \"%s\" in \"%s\" type", 
+                            field_name, current_type->structure.sturct_type_name);
+
+        barn_append_element_to_array(expr_value->fields_of_struct, parser->curr_token->value);
+        barn_struct_field_t* field = barn_parser_get_structure_field_named(parser, current_type, field_name);
+        current_type = field->field_type;
+
+        barn_parser_skip(parser, 1);
+    }
+
+    expr_value->accessing_struct = true;
+    expr_value->expr_val_token   = barn_get_element_from_array(parser->lexer->tokens, parser->index);
+    expr_value->expr_val_type    = current_type;
+    expr_value->is_variable      = true;
+
+    parent_variable->is_used = true;
+    barn_parser_skip(parser, -1);
+
+    // fuck this code, how could i write this whole 
+    // compiler but struggle with implementing structure fields
+    // brooo covid is eating my mind really 
+    //  ~ Solindek 08.12.23 13:19
+
+    // nvm it works i'm just dumb lol 
+    //  ~ Solindek 08.12.23 13:26
 }
 
 barn_expression_value_t* 
@@ -125,14 +183,19 @@ barn_get_expr_value(barn_parser_t* parser, barn_expr_parser_t* expr_parser)
         }
         else if (barn_parser_is_variable_defined_lg(parser, parser->curr_token->value))
         {
-            barn_variable_t* variable = barn_parser_get_variable_by_name(parser, parser->curr_token->value);
+            if (barn_parser_is_next_token(parser, BARN_TOKEN_DOT))
+                barn_parser_expression_access_structure_fields(parser, expr_parser, expr_value);
+            else
+            {
+                barn_variable_t* variable = barn_parser_get_variable_by_name(parser, parser->curr_token->value);
 
-            expr_value->expr_val_token   = parser->curr_token;
-            expr_value->expr_val_type    = variable->var_type;
-            expr_value->is_function_call = false;
-            expr_value->is_variable      = true;
+                expr_value->expr_val_token   = parser->curr_token;
+                expr_value->expr_val_type    = variable->var_type;
+                expr_value->is_function_call = false;
+                expr_value->is_variable      = true;
 
-            variable->is_used = true;
+                variable->is_used = true;
+            }
         }
         else if (BARN_STR_CMP(parser->curr_token->value, "true")  || 
                  BARN_STR_CMP(parser->curr_token->value, "false"))
@@ -375,6 +438,103 @@ barn_create_expr_parser(bool function_argument_value, barn_node_t* expr_node,
     return expr_parser;
 }
 
+barn_array_t* 
+barn_parse_expression_structure_values(barn_parser_t* parser, barn_node_t* expr_node,
+                                       barn_type_t* structure_type)
+{
+    barn_array_t* structure_values = barn_create_array(sizeof(barn_node_t*));
+
+    while (true)
+    {
+        if (parser->curr_token->kind == BARN_TOKEN_EOF)
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected value or \",\"", 0);
+        
+        if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
+            return structure_values;
+
+        barn_node_t* argument_value = barn_parse_expression(parser, BARN_TOKEN_COMMA, BARN_TOKEN_CLOSEBRACE, false);
+        barn_append_element_to_array(structure_values, argument_value);
+
+        if (parser->curr_token->kind == BARN_TOKEN_COMMA)
+        {
+            barn_parser_skip(parser, 1);
+            continue;
+        }
+        else if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
+            return structure_values;
+        else
+        {
+            if (parser->curr_token->kind == BARN_TOKEN_NEWLINE)
+            {
+                barn_parser_skip(parser, -1);
+                if (parser->curr_token->kind == BARN_TOKEN_COMMA)
+                {
+                    barn_parser_skip(parser, 1);
+                    continue;
+                }
+                else if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
+                    return structure_values;
+                else
+                    BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \",\" or \"}\" after structure value", 0);
+            }
+            else
+                BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \",\" or \"}\" after structure value", 0);
+        }
+    }
+
+    return structure_values;
+}
+
+void
+barn_parse_expression_new_structure(barn_parser_t* parser, barn_node_t* expr_node, barn_expr_parser_t* expr_parser)
+{
+    /* Compiler time set to false */
+    expr_node->expression.is_compiler_time = false;
+    barn_token_t* start_token = parser->curr_token;
+
+    barn_parser_skip(parser, 1);
+    if (parser->curr_token->kind != BARN_TOKEN_IDENTIFIER)
+        BARN_PARSER_ERR(parser, BARN_TYPE_ERROR, "expected identifier that represents a struct type", 0);
+
+    barn_type_t* structure_type = barn_parser_current_token_type_representation(parser);
+    if (!barn_is_type_struct(structure_type->type))
+        BARN_PARSER_ERR(parser, BARN_TYPE_ERROR, "type named \"%s\" is not an structure", parser->curr_token->value);
+    
+    if (!barn_parser_is_next_token(parser, BARN_TOKEN_OPENBRACE))
+        BARN_PARSER_ERR(parser, BARN_TYPE_ERROR, "expected \"{\" to create a new structure", 0);
+    barn_parser_skip(parser, 1);
+
+    barn_array_t* structure_values = barn_create_array(sizeof(barn_node_t*));
+    if (!barn_parser_is_next_token(parser, BARN_TOKEN_CLOSEBRACE))
+    {
+        barn_parser_skip(parser, 1);
+        structure_values = barn_parse_expression_structure_values(parser, expr_node, structure_type);
+
+        if (structure_values->length != structure_type->structure.struct_fields->length)
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "there is too much or too less structure values", 0);
+    }
+    else
+        barn_parser_skip(parser, 1);
+
+    for (int i = 0; i < structure_values->length; i++)
+    {
+        barn_node_t* curr_args_node = barn_get_element_from_array(structure_values, i);
+
+        printf("structure_values[%d]={ expression_nodes: %p, expression_nodes->length: %d }\n", i,
+            curr_args_node->expression.expression_nodes,
+            curr_args_node->expression.expression_nodes->length);
+    }
+
+    /* Pack up all of it into a expression node */
+    barn_expression_value_t* structure_value = barn_create_expression_value(start_token, structure_type);
+    structure_value->initalizing_struct      = true;
+    structure_value->struct_type             = structure_type;
+    structure_value->struct_values           = structure_values;
+
+    barn_expression_node_t* struct_expr_node = barn_create_expression_node(structure_value, NULL, BARN_TOKEN_NONE, 0);
+    barn_append_element_to_array(expr_parser->main_expr_node->expression.expression_nodes, struct_expr_node);
+}
+
 barn_node_t* 
 barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind, 
                       barn_token_kind_t end_kind_2, bool function_argument_value)
@@ -390,6 +550,14 @@ barn_parse_expression(barn_parser_t* parser, barn_token_kind_t end_kind,
 
     barn_expr_parser_t* expr_parser = barn_create_expr_parser(function_argument_value, expr_node,
                                                               end_kind, end_kind_2);
+
+    /* Handle creating structures */
+    if (parser->curr_token->kind == BARN_TOKEN_IDENTIFIER &&
+        BARN_STR_CMP(parser->curr_token->value, "new"))
+    {
+        barn_parse_expression_new_structure(parser, expr_node, expr_parser);
+        return expr_node;
+    }
 
     for (; ; expr_parser->index++)
     {

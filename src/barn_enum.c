@@ -23,6 +23,7 @@
 #include <barn_core.h>
 #include <barn_parser.h>
 #include <barn_functions.h>
+#include <barn_struct.h>
 
 barn_enum_field_t* 
 barn_create_enum_field(const char* enum_name, barn_node_t* enum_expression) 
@@ -45,8 +46,11 @@ barn_parser_collect_enum_field_name(barn_parser_t* parser)
         BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "enum field can't be named \'%s\'", 
                         parser->curr_token->value);
 
-    if (barn_parser_function_get_by_name(parser, (char*)field_name) != NULL)
+    if (barn_parser_function_get_by_name(parser, field_name) != NULL)
         BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "this name is already took by a function", 0);
+
+    if (barn_parser_is_structure_defined(parser, field_name))
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "this name is already took by a structure", 0);
 
     return field_name;
 }

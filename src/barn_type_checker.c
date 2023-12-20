@@ -29,6 +29,7 @@
 #include <barn_functions.h>
 #include <barn_expressions.h>
 #include <barn_array.h>
+#include <barn_struct.h>
 
 #ifndef BARN_TYPE_CHECKER_ERR
 # define BARN_TYPE_CHECKER_ERR(tc, token, error_type, msg, ...) ({   \
@@ -48,17 +49,53 @@ barn_tc_advance(barn_type_checker_t* tc, int count)
 }
 
 void
+barn_tc_expression_check_structure_init(barn_type_checker_t* tc, barn_node_t* expr_node, 
+                                        barn_array_t* expr_nodes)
+{
+    barn_expression_value_t* struct_expr_value = ((barn_expression_node_t*)
+                                                    barn_get_element_from_array(expr_nodes, 0))->lhs;
+
+    printf("ok\n");
+
+    /* There is nothin to check at all */
+    if (struct_expr_value->struct_values->length == 0)
+        return;
+
+    for (int i = 0; i < struct_expr_value->struct_values->length; i++)
+    {
+        barn_struct_field_t* field = barn_get_element_from_array(struct_expr_value->struct_type->structure.struct_fields, i);
+        barn_node_t*   struct_expr = barn_get_element_from_array(struct_expr_value->struct_values, i);
+
+        if (barn_tc_does_types_collides(barn_tc_expression_get_type(tc, struct_expr), field->field_type))
+        {
+            BARN_TYPE_CHECKER_ERR(tc, struct_expr_value->expr_val_token, BARN_TYPE_ERROR, 
+                                  "the %s structure value is not expected type which was %s, but got %s", 
+                                  barn_display_numbers_ordinal(i + 1), 
+                                  barn_convert_type_to_string(field->field_type),
+                                  barn_convert_type_to_string(barn_tc_expression_get_type(tc, struct_expr)));
+        }
+    }
+}
+
+void
 barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
 {
     barn_array_t* expr_nodes = expr_node->expression.expression_nodes;
+
+    if (expr_nodes->length == 0)
+        BARN_UNIMPLEMENTED("this shouldn't happend");
 
     /* If there is only one node there is not reason for 
      * getting through this whole function */
     if (expr_nodes->length == 1 && 
         ((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
-            ->lhs->is_function_call == false &&
-        ((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
-            ->rhs == NULL)
+            ->lhs->initalizing_struct == true)
+        barn_tc_expression_check_structure_init(tc, expr_node, expr_nodes);
+    else if (expr_nodes->length == 1 && 
+            ((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
+                ->lhs->is_function_call == false &&
+            ((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
+                ->rhs == NULL)
         return;
     else if (((barn_expression_node_t*)barn_get_element_from_array(expr_nodes, 0))
                 ->lhs->is_function_call == true)
@@ -190,7 +227,11 @@ barn_tc_does_types_collides(barn_type_t* lhs, barn_type_t* rhs)
     if (barn_is_type_number(lhs->type) &&
         barn_is_type_number(rhs->type))
         return false;
-    
+
+    if ((lhs->is_struct && rhs->is_struct) &&
+        BARN_STR_CMP(lhs->structure.sturct_type_name, rhs->structure.sturct_type_name))
+        return false;
+
     return true;
 }
 
@@ -383,6 +424,7 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
                  tc->curr_node->node_kind == BARN_NODE_END_STATEMENT ||
                  tc->curr_node->node_kind == BARN_NODE_BREAK_LOOP    ||
                  tc->curr_node->node_kind == BARN_NODE_CONTINUE_LOOP ||
+                 tc->curr_node->node_kind == BARN_NODE_STRUCT        ||
                  tc->curr_node->node_kind == BARN_NODE_IMPORT_C)
             continue;
         else if (tc->curr_node->node_kind == BARN_NODE_VARIABLE_DECLARATION)

@@ -52,7 +52,10 @@
 - [X] Implement Extern
 - [X] Implement enum
 - [X] Implement everything from barngo
-- [ ] Implement structs
+- [X] Implement structs
+    - [X] Structure type
+    - [ ] Structures array
+    - [ ] Parse structure
 - [ ] Implement pointers
 - [ ] Implement match
 - [ ] Implement modulus (forgot about it)
@@ -73,4 +76,5 @@ BUGS:
     - [ ] implement __BARN_CURRENT_COMPILED_FILE__
     - [ ] for loops...
     - [ ] typecheck for enums
-    - [ ] test-12-extern-functions.ba is buggy
+    - [X] test-12-extern-functions.ba is buggy
+    - [ ] variables inside loops, conditions should not exists after closing 

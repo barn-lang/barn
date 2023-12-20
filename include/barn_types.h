@@ -61,23 +61,28 @@ typedef struct __barn_type_t {
     bool is_unsigned;
     bool is_signed;
     bool is_string;
+    bool is_struct;
     bool is_float;
-    bool is_bool;
+    bool is_bool; 
     bool is_char;
     bool is_ptr;
     bool is_any;
 
-    // TODO: structure fields
+    union {
+        barn_array_t* struct_fields;
+        const char*   sturct_type_name;
+    } structure;
 } barn_type_t;
 
 barn_type_t* barn_create_type(barn_type_kind_t type);
 
 size_t barn_convert_type_to_size(barn_type_kind_t type);
-const char*barn_convert_type_to_string(barn_type_t* type);
+const char* barn_convert_type_to_string(barn_type_t* type);
 
 bool barn_is_type_unsigned(barn_type_kind_t type);
 bool barn_is_type_signed(barn_type_kind_t type);
 bool barn_is_type_string(barn_type_kind_t type);
+bool barn_is_type_struct(barn_type_kind_t type);
 bool barn_is_type_float(barn_type_kind_t type);
 bool barn_is_type_bool(barn_type_kind_t type);
 bool barn_is_type_ptr(barn_type_kind_t type);

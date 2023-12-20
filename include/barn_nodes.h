@@ -56,7 +56,8 @@ typedef enum __barn_node_kind_t {
     BARN_NODE_BREAK_LOOP,
     BARN_NODE_CONTINUE_LOOP,
 
-    BARN_NODE_ENUM
+    BARN_NODE_ENUM,
+    BARN_NODE_STRUCT
 } barn_node_kind_t;
 
 typedef struct __barn_expression_value_t barn_expression_value_t;
@@ -134,6 +135,10 @@ typedef struct __barn_node_t {
     struct {
         barn_array_t* enum_fields;
     } enumerate;
+
+    struct {
+        barn_type_t* type_struct;
+    } structure;
 } barn_node_t;
 
 char* barn_node_kind_show(barn_node_kind_t kind);

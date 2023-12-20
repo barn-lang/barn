@@ -37,6 +37,13 @@ typedef struct __barn_expression_value_t {
     barn_type_t*  expr_val_type;
 
     bool is_variable;
+
+    bool accessing_struct;
+    barn_array_t* fields_of_struct;
+
+    bool initalizing_struct;
+    barn_type_t* struct_type;
+    barn_array_t* struct_values;
     
     bool is_function_call;
     barn_node_t* function_call;

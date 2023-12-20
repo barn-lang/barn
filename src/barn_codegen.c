@@ -26,6 +26,8 @@
 #include <barn_functions.h>
 #include <barn_std.h>
 #include <barn_enum.h>
+#include <barn_struct.h>
+#include <barn_random.h>
 
 #include <config/barn_config.h>
 
@@ -115,6 +117,25 @@ barn_codegen_operator_to_code(barn_token_kind_t op)
     return "unknown";
 }
 
+void
+barn_codegen_access_struct(barn_codegen_t* codegen, barn_expression_node_t* curr_expr_node,
+                           char** expression_buf)
+{
+    BARN_ARRAY_FOR(curr_expr_node->lhs->fields_of_struct)
+    {
+        char* field_str = barn_get_element_from_array(
+                                        curr_expr_node->lhs->fields_of_struct, i);
+
+        if (BARN_ARRAY_IS_LAST_ELEMENT(curr_expr_node->lhs->fields_of_struct, i))
+            barn_append_string_to_allocated_string(expression_buf, field_str);
+        else
+        {
+            barn_append_string_to_allocated_string(expression_buf, field_str);
+            barn_append_char_to_allocated_string(  expression_buf, '.');
+        }
+    }
+}
+
 const char* 
 barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expression_node)
 {
@@ -148,6 +169,8 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
             if (curr_expr_node->lhs->is_function_call == true)
                 barn_append_string_to_allocated_string(&expression_buf, 
                     barn_codegen_function_call(codegen, curr_expr_node->lhs->function_call, false, false));
+            else if (curr_expr_node->lhs->accessing_struct == true)
+                barn_codegen_access_struct(codegen, curr_expr_node, &expression_buf);
             else if (curr_expr_node->lhs->is_variable == true)
                 barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
             else
@@ -189,6 +212,9 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
                     barn_codegen_function_call(codegen, curr_expr_node->rhs->function_call, false, false));
             else if (curr_expr_node->rhs->is_variable == true)
                 barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->rhs->expr_val_token->value);
+            else if (curr_expr_node->rhs->accessing_struct == true)
+            {
+            }
             else
             {
                 if (curr_expr_node->rhs->expr_val_type->is_string)
@@ -239,7 +265,7 @@ barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, bool
         barn_node_t* argument_expr = barn_get_element_from_array(curr_node->function_call.function_args, 0);
         char* expr_code = (char*)barn_codegen_expression_generate(codegen, argument_expr);
         
-        *expr_code++;
+        BARN_USE(*expr_code++);
         expr_code[strlen(expr_code) - 1] = '\0';
         
         barn_append_string_to_allocated_string(&buf, expr_code);
@@ -501,6 +527,26 @@ barn_codegen_function_declaration(barn_codegen_t* codegen)
 
 }
 
+void
+barn_codegen_struct(barn_codegen_t* codegen, barn_node_t* curr_node)
+{
+    fprintf(codegen->c_file, "typedef struct __barn_struct_%s_t {\n",   
+        curr_node->structure.type_struct->structure.sturct_type_name);
+
+    barn_array_t* structure_arr = curr_node->structure.type_struct->structure
+                                            .struct_fields;
+    BARN_ARRAY_FOR(structure_arr)
+    {
+        barn_struct_field_t* field = barn_get_element_from_array(structure_arr, i);
+        const char* field_type     = barn_codegen_type_convert_to_c(codegen, field->field_type);
+
+        fprintf(codegen->c_file, "\t%s %s;\n",
+            field_type, field->field_name);
+    }
+    fprintf(codegen->c_file, "} __barn_%s_t;",   
+        curr_node->structure.type_struct->structure.sturct_type_name);
+}
+
 barn_codegen_t* 
 barn_codegen_start(barn_parser_t* parser)
 {
@@ -529,6 +575,11 @@ barn_codegen_start(barn_parser_t* parser)
             barn_codegen_enum(codegen, codegen->curr_node);
             fprintf(codegen->c_file, "\n\n");
         }
+        else if (codegen->curr_node->node_kind == BARN_NODE_STRUCT)
+        {
+            barn_codegen_struct(codegen, codegen->curr_node);
+            fprintf(codegen->c_file, "\n\n");
+        }
         else if (codegen->curr_node->node_kind == BARN_NODE_IMPORT_C)
         {
             if (barn_string_prefix(codegen->curr_node->import_c.header, "./"))
@@ -542,7 +593,10 @@ barn_codegen_start(barn_parser_t* parser)
             fprintf(codegen->c_file, "%s\n", barn_codegen_expression_generate(codegen, first_argument));
         }
         else 
+        {
+            printf("%s\n", barn_node_kind_show(codegen->curr_node->node_kind));
             BARN_UNIMPLEMENTED("unhandled node kind");
+        }
     }
 
     fclose(codegen->c_file);
@@ -593,11 +647,20 @@ barn_codegen_type_convert_to_c(barn_codegen_t* codegen, barn_type_t* type)
         case BARN_TYPE_NONE:
             return "void";
             break;
+        case BARN_TYPE_STRUCT:
+        {
+            char* buf = barn_create_allocated_string();
+            barn_append_string_to_allocated_string(&buf, "__barn_");
+            barn_append_string_to_allocated_string(&buf, type->structure.sturct_type_name);
+            barn_append_string_to_allocated_string(&buf, "_t");
+            return buf;
+            break;
+        }
         case BARN_TYPE_FORMAT:
             return "...";
             break;
         default:
-            BARN_UNIMPLEMENTED("unhandled type size");
+            BARN_UNIMPLEMENTED("unhandled type");
             break;        
     }
 

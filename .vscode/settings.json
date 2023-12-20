@@ -38,6 +38,13 @@
         "stdlib.h": "c",
         "barn_func_return.h": "c",
         "barn_enum.h": "c",
-        "__node_handle": "c"
+        "__node_handle": "c",
+        "string_view": "c",
+        "barn_struct.h": "c",
+        "time.h": "c",
+        "cmath": "c",
+        "complex": "c",
+        "barn_random.h": "c",
+        "string.h": "c"
     }
 }

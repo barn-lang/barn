@@ -1,10 +1,25 @@
 @import "std.ba"
 
-let text: string = "okokok"
+struct Name {
+    name: string
+}
+
+struct Person {
+    name_struct: Name,
+    age: i16
+}
+
+fun print_person(Person me) {
+	fmt_print("name: %s, age: %d", me.name_struct.name, me.age)
+}
 
 fun main() -> int {
-    if 1 && 1 {
-        fmt_print(text)
-    }
-    return 0
+	let me: Person = new Person{ new Name{ "string" } , 60 }
+    // print_person(me)
+
+    // me.name = "New name"
+    // me.age  = 70
+    // print_person(me)
+
+    // return 0
 }

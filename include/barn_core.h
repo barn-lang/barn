@@ -30,6 +30,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <math.h>
 
 #include <sys/time.h>
 
@@ -90,9 +91,13 @@ typedef char barn_error_or_t;
     }                                                                              \
 })                                                                                 \
 
+#define BARN_BOOL_AS_STR(b) ((b ? "True" : "False"))
+
 #define BARN_USE(x) ({ (void*)(x); })
 
 const char* barn_generate_tabs_to_buf(int tabs);
 void barn_generate_tabs(int tabs);
+
+char* barn_display_numbers_ordinal(int i);
 
 #endif /* __BARN_CORE__ */

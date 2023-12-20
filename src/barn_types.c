@@ -22,6 +22,7 @@
 
 #include <barn_types.h>
 #include <barn_parser.h>
+#include <barn_struct.h>
 
 static barn_type_t* barn_type_u8_global;
 static barn_type_t* barn_type_u16_global;
@@ -66,10 +67,14 @@ barn_create_type(barn_type_kind_t type)
     new_type->is_unsigned = barn_is_type_unsigned(type);
     new_type->is_signed   = barn_is_type_signed(type);
     new_type->is_string   = barn_is_type_string(type);
+    new_type->is_struct   = barn_is_type_struct(type);
     new_type->is_float    = barn_is_type_float(type);
     new_type->is_bool     = barn_is_type_bool(type);
     new_type->is_ptr      = barn_is_type_ptr(type);
     new_type->is_any      = barn_is_type_any(type);
+
+    if (new_type->is_struct)
+        barn_error_show(BARN_COMPILER_ERROR, "to create an struct type use barn_struct_type_create function");
 
     return new_type;
 }
@@ -96,6 +101,12 @@ barn_is_type_signed(barn_type_kind_t type)
             (type == BARN_TYPE_I16) || 
             (type == BARN_TYPE_I32) || 
             (type == BARN_TYPE_I64));
+}
+
+bool 
+barn_is_type_struct(barn_type_kind_t type)
+{
+    return ((type == BARN_TYPE_STRUCT));
 }
 
 bool 
@@ -199,10 +210,10 @@ barn_parser_current_token_type_representation(barn_parser_t* parser)
         type = barn_type_str_global;
     else if (BARN_STR_CMP(parser->curr_token->value, "bool"))
         type = barn_type_bool_global;
+    else
+        type = barn_parser_struct_find_by_name(parser, parser->curr_token->value);
 
-    // TODO: implement structure types
     // TODO: implement pointers
-
     return type;
 }
 
@@ -261,6 +272,9 @@ barn_convert_type_to_string(barn_type_t* type)
             break;
         case BARN_TYPE_ANY:
             return "any";
+            break;
+        case BARN_TYPE_STRUCT:
+            return type->structure.sturct_type_name;
             break;
         default:
             BARN_UNIMPLEMENTED("unhandled type size");

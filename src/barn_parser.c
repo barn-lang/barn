@@ -27,6 +27,7 @@
 #include <barn_functions.h>
 #include <barn_func_call.h>
 
+#include <barn_struct.h>
 #include <barn_enum.h>
 
 #include <barn_string.h>
@@ -187,6 +188,8 @@ barn_parser_identifier(barn_parser_t* parser)
         barn_parser_enum(parser);
     else if (BARN_TOKEN_CMP("@import_c"))
         barn_parser_import_c(parser);
+    else if (BARN_TOKEN_CMP("struct"))
+        barn_parser_struct(parser);
     else
     {
         barn_token_print(parser->curr_token);

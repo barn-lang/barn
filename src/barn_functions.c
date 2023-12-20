@@ -23,6 +23,7 @@
 #include <barn_functions.h>
 #include <barn_parser.h>
 #include <barn_string.h>
+#include <barn_struct.h>
 #include <barn_lexer.h>
 #include <barn_nodes.h>
 #include <barn_array.h>
@@ -197,7 +198,7 @@ barn_parser_collect_function_name(barn_parser_t* parser)
 
     const char* function_name = barn_duplicate_string(parser->curr_token->value);
     if (!barn_parser_is_id_correct_namespace((char*)function_name))
-        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "function couldn't be named \'%s\'", 
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "function can't be named \'%s\'", 
                         parser->curr_token->value);
 
     if (barn_parser_function_get_by_name(parser, (char*)function_name) != NULL)
@@ -205,6 +206,9 @@ barn_parser_collect_function_name(barn_parser_t* parser)
 
     if (barn_parser_is_variable_defined_g(parser, function_name))
         BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "variable with this name already exists", 0);
+
+    if (barn_parser_is_structure_defined(parser, function_name))
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "structure with this name already exists", 0);
 
     return function_name;
 }

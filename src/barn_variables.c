@@ -22,6 +22,7 @@
 
 #include <barn_core.h>
 #include <barn_types.h>
+#include <barn_struct.h>
 
 #include <barn_parser.h>
 #include <barn_expressions.h>
@@ -110,6 +111,12 @@ barn_parser_collect_variable_name(barn_parser_t* parser)
     if (barn_parser_function_get_by_name(parser, (char*)variable_name) != NULL)
         BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "this name is already took by a function", 0);
 
+    if (barn_parser_is_variable_defined_lg(parser, variable_name))
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "variable with this name already exists", 0);
+
+    if (barn_parser_is_structure_defined(parser, variable_name))
+        BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "structure with this name already exists", 0);
+
     return variable_name;
 }
 
@@ -134,7 +141,7 @@ barn_parser_variable_declaration(barn_parser_t* parser, bool is_constant, bool i
     barn_parser_skip(parser, 1);
 
     // let/const example_var: type = <expression>
-    //                         ^
+    //                         ^ 
     if (!barn_parser_is_next_token(parser, BARN_TOKEN_IDENTIFIER))
         BARN_PARSER_ERR(parser, BARN_NAMESPACE_ERROR, "expected identifier after colon to specify type of variable", 0);
     barn_parser_skip(parser, 1);
