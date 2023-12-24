@@ -25,12 +25,13 @@
 #include <barn_parser.h>
 
 typedef struct __barn_enum_field_t {
-    const char*  enum_name;
-    barn_node_t* enum_expression;
+    const char*   enum_name;
+    barn_node_t*  enum_expression;
+    barn_token_t* enum_token;
 } barn_enum_field_t;
 
 void barn_parser_enum(barn_parser_t* parser);
 
-barn_enum_field_t* barn_create_enum_field(const char* enum_name, barn_node_t* enum_expression);
+barn_enum_field_t* barn_create_enum_field(const char* enum_name, barn_node_t* enum_expression, barn_token_t* enum_token);
 
 #endif /* __BARN_ENUM__ */

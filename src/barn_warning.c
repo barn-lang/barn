@@ -28,16 +28,16 @@
 void
 barn_warning_show(char* message, ...)
 {
-  va_list list;
-  va_start(list, message);
+    va_list list;
+    va_start(list, message);
 
-  char buf[512];
-  vsnprintf(buf, 512, message, list);
+    char buf[512];
+    vsnprintf(buf, 512, message, list);
 
-  printf("%sWarning%s: %s\n",
-  barn_get_bold_color_as_str_code(BARN_COLOR_YELLOW),
-  barn_get_color_as_str_code(BARN_COLOR_RESET),
-  buf);
+    printf("%sWarning%s: %s\n",
+    barn_get_bold_color_as_str_code(BARN_COLOR_YELLOW),
+    barn_get_color_as_str_code(BARN_COLOR_RESET),
+    buf);
 
-  va_end(list);
+    va_end(list);
 }

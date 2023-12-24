@@ -30,6 +30,7 @@
 #include <barn_expressions.h>
 #include <barn_array.h>
 #include <barn_struct.h>
+#include <barn_enum.h>
 
 #ifndef BARN_TYPE_CHECKER_ERR
 # define BARN_TYPE_CHECKER_ERR(tc, token, error_type, msg, ...) ({   \
@@ -389,7 +390,17 @@ barn_tc_enum(barn_type_checker_t* tc, barn_node_t* enum_node)
 {
     barn_node_t* curr_node = enum_node == NULL ? tc->curr_node : enum_node;
 
-    // TODO: implement enum type checking
+    BARN_ARRAY_FOR(curr_node->enumerate.enum_fields)
+    {
+        barn_enum_field_t* field = barn_get_element_from_array(curr_node->enumerate.enum_fields, i);
+        if (field->enum_expression == NULL)
+            continue;
+        barn_type_t* field_expr_type = barn_tc_expression_get_type(tc, field->enum_expression);
+        if (barn_tc_does_types_collides(field_expr_type, barn_get_type_i64_global()))
+            BARN_TYPE_CHECKER_ERR(tc, field->enum_token, BARN_TYPE_ERROR,
+                                  "expected an integer like type, got %s", 
+                                  barn_convert_type_to_string(field_expr_type));
+    }
 
     return;
 }

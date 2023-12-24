@@ -134,6 +134,7 @@ typedef struct __barn_node_t {
 
     struct {
         barn_array_t* enum_fields;
+        barn_token_t* enum_token;
     } enumerate;
 
     struct {
