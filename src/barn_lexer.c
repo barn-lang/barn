@@ -350,7 +350,7 @@ barn_lexer_create_char(barn_lexer_t* lexer)
 bool
 barn_lexer_is_char_identifier(barn_lexer_t* lexer)
 {
-    static const char* identifiers_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXYZ_@$";
+    static const char* identifiers_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@$";
 
     for (int i = 0; i < strlen(identifiers_characters); i++)
         if (identifiers_characters[i] == lexer->curr_char)

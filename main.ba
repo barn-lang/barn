@@ -4,22 +4,30 @@ struct Name {
     name: string
 }
 
+struct Name2 {
+    name: Name
+}
+
 struct Person {
-    name_struct: Name,
+    name_struct: Name2,
     age: i16
 }
 
 fun print_person(Person me) {
-	fmt_print("name: %s, age: %d", me.name_struct.name, me.age)
+	fmt_print("name: %s, age: %d\n", me.name_struct.name.name, me.age)
 }
 
 fun main() -> int {
-	let me: Person = new Person{ new Name{ "string" } , 60 }
-    // print_person(me)
+	let me: Person = new Person{ new Name2{ new Name{"opaa"} } , 60 }
+    print_person(me)
 
-    // me.name = "New name"
-    // me.age  = 70
-    // print_person(me)
+    me.age++
+    print_person(me)
 
-    // return 0
+    me.age = 30
+    print_person(me)
+
+    me.age = 33
+    me.name_struct.name.name = "Bruno"
+    print_person(me)
 }

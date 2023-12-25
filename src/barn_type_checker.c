@@ -56,8 +56,6 @@ barn_tc_expression_check_structure_init(barn_type_checker_t* tc, barn_node_t* ex
     barn_expression_value_t* struct_expr_value = ((barn_expression_node_t*)
                                                     barn_get_element_from_array(expr_nodes, 0))->lhs;
 
-    printf("ok\n");
-
     /* There is nothin to check at all */
     if (struct_expr_value->struct_values->length == 0)
         return;
@@ -351,6 +349,10 @@ void
 barn_tc_value_modification(barn_type_checker_t* tc, barn_node_t* value_mod)
 {
     barn_node_t* curr_node = value_mod == NULL ? tc->curr_node : value_mod;
+
+    barn_type_t* lhs_type = curr_node->variable_modification.access_element->is_access_struct 
+                                ? curr_node->variable_modification.access_element->access_struct.struct_field_type
+                                : curr_node->variable_modification.access_element->variable.variable->var_type;
         
     if (curr_node->node_kind == BARN_NODE_VARIABLE_ASNPLUS        ||
         curr_node->node_kind == BARN_NODE_VARIABLE_ASNMINUS       ||
@@ -359,10 +361,10 @@ barn_tc_value_modification(barn_type_checker_t* tc, barn_node_t* value_mod)
         curr_node->node_kind == BARN_NODE_VARIABLE_INCREMENTATION || 
         curr_node->node_kind == BARN_NODE_VARIABLE_DECREMENTATION)
     {
-        if (!barn_is_type_number(curr_node->variable_modification.variable->var_type->type))
+        if (!barn_is_type_number(lhs_type->type))
             BARN_TYPE_CHECKER_ERR(tc, curr_node->variable_modification.variable_token, BARN_TYPE_ERROR, 
                     "type mismatch, only number types or pointers can be modified like this not %s",
-                    barn_convert_type_to_string(curr_node->variable_modification.variable->var_type)); 
+                    barn_convert_type_to_string(lhs_type)); 
     }
 
     if (curr_node->node_kind == BARN_NODE_VARIABLE_INCREMENTATION || 
@@ -374,13 +376,12 @@ barn_tc_value_modification(barn_type_checker_t* tc, barn_node_t* value_mod)
 
     barn_type_t* new_value_type = barn_tc_expression_get_type(tc, curr_node->variable_modification.variable_value);
 
-    if (barn_tc_does_types_collides(curr_node->variable_modification.variable->var_type,
-                                    new_value_type))
+    if (barn_tc_does_types_collides(lhs_type, new_value_type))
     {
         barn_expression_node_t* first_expr_node = barn_get_element_from_array(curr_node->variable_modification.variable_value
                                                     ->expression.expression_nodes, 0);
         BARN_TYPE_CHECKER_ERR(tc, first_expr_node->lhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s as new variable value but instead got %s",
-                    barn_convert_type_to_string(curr_node->variable_modification.variable->var_type),
+                    barn_convert_type_to_string(lhs_type),
                     barn_convert_type_to_string(new_value_type)); 
     }
 }

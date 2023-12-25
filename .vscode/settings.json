@@ -45,6 +45,7 @@
         "cmath": "c",
         "complex": "c",
         "barn_random.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "sstream": "c"
     }
 }

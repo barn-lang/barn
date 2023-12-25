@@ -134,26 +134,111 @@ barn_parser_is_id_correct_namespace(char* id_namespace)
 }
    
 void
+barn_parse_access_element_structure(barn_parser_t* parser, barn_parser_access_element_t* access)
+{
+    if (!barn_is_type_struct(access->variable.variable->var_type->type))
+        BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unexpected use of \".\" because \"%s\" is not a structure type", 
+                        access->variable.variable->var_name);
+    barn_append_element_to_array(access->access_struct.fields_of_struct, 
+                                 access->variable.variable->var_name);
+    barn_type_t* current_type = access->variable.variable->var_type;
+    barn_parser_skip(parser, 1);
+
+    while (parser->curr_token->kind == BARN_TOKEN_DOT)
+    {
+        if (parser->curr_token->kind == BARN_TOKEN_DOT)
+            barn_parser_skip(parser, 1);
+
+        const char* field_name = parser->curr_token->value;
+
+        if (!barn_is_type_struct(current_type->type))
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "couldn't find field named \"%s\" in \"%s\" type because it's not a structure", 
+                            field_name, barn_convert_type_to_string(current_type));
+
+        if (!barn_parser_is_structure_field_named(parser, current_type, field_name))
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "couldn't find field named \"%s\" in \"%s\" type", 
+                            field_name, current_type->structure.sturct_type_name);
+
+        barn_append_element_to_array(access->access_struct.fields_of_struct, 
+                                     parser->curr_token->value);
+        barn_struct_field_t* field = barn_parser_get_structure_field_named(parser, current_type, field_name);
+        current_type = field->field_type;
+        barn_parser_skip(parser, 1);
+    }
+
+    access->access_struct.parent_variable_name = access->variable.variable->var_name;
+    access->access_struct.parent_variable      = access->variable.variable;
+    access->access_struct.struct_field_type    = current_type;
+
+    access->is_access_struct = true;
+    access->is_variable      = true;
+
+    access->access_struct.parent_variable->is_used = true;
+    barn_parser_skip(parser, -1);
+}
+
+barn_parser_access_element_t*
+barn_parse_access_element(barn_parser_t* parser)
+{
+    barn_parser_access_element_t* access   = (barn_parser_access_element_t*)calloc(1, sizeof(barn_parser_access_element_t));
+    access->access_struct.fields_of_struct = barn_create_array(sizeof(char*));
+
+    // If a variable named curr_token exists and next token isn't a DOT "." then it's just 
+    // a simple variable access
+    if (((access->variable.variable = barn_parser_get_variable_by_name(parser, parser->curr_token->value)) != NULL) &&
+        barn_parser_is_next_token(parser, BARN_TOKEN_DOT) == false)
+    {
+        printf("accessing a simple variable\n");
+        access->variable.variable_name = parser->curr_token->value;
+        access->is_variable = true;
+        return access;
+    }
+
+    // If a variable named curr_token exists and next token is a DOT "." then program
+    // is trying to access a structure of a variable 
+    if (((access->variable.variable = barn_parser_get_variable_by_name(parser, parser->curr_token->value)) != NULL) &&
+        barn_parser_is_next_token(parser, BARN_TOKEN_DOT) == true)
+    {
+        printf("accessing a struct variable\n");
+        barn_parse_access_element_structure(parser, access);
+        return access;
+    }
+
+    if ((barn_parser_function_get_by_name(parser, parser->curr_token->value) != NULL) &&
+        barn_parser_is_next_token(parser, BARN_TOKEN_OPENPARENT) == true)
+    {
+        printf("accessing function\n");
+        access->function.function_name = parser->curr_token->value;
+        access->is_function = true;
+        return access;
+    }
+
+    BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "\"%s\" is undefined", parser->curr_token->value);
+}
+
+void
 barn_parser_identifier(barn_parser_t* parser)
 {
     if (!barn_parser_is_id_keyword(parser->curr_token->value))
     {
+        barn_parser_access_element_t* element = barn_parse_access_element(parser);
+
         if (barn_parser_is_next_token(parser, BARN_TOKEN_OPENPARENT))
-            barn_parser_func_call(parser, false);
+            barn_parser_func_call(parser, false, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_ASN))
-            barn_parser_variable_asn(parser);
+            barn_parser_variable_asn(parser, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_PLUSASN))
-            barn_parser_variable_plusasn(parser);
+            barn_parser_variable_plusasn(parser, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_MINUSASN))
-            barn_parser_variable_minusasn(parser);
+            barn_parser_variable_minusasn(parser, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_MULASN))
-            barn_parser_variable_mulasn(parser);
+            barn_parser_variable_mulasn(parser, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_DIVASN))
-            barn_parser_variable_divasn(parser);
+            barn_parser_variable_divasn(parser, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_INCREMENTATION))
-            barn_parser_variable_incrementation(parser);
+            barn_parser_variable_incrementation(parser, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_DECREMENTATION))
-            barn_parser_variable_decrementation(parser);
+            barn_parser_variable_decrementation(parser, element);
         else
             BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "unexpected use of \"%s\"", parser->curr_token->value);
 

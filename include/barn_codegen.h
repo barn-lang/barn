@@ -41,4 +41,6 @@ const char* barn_codegen_save_output_to_file(barn_codegen_t* codegen, const char
 const char* barn_codegen_function_call(barn_codegen_t* codegen, barn_node_t* curr_node, 
                                        bool colon, bool tabs);
 
+const char* barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expression_node);
+
 #endif /* __BARN_CODEGEN__ */

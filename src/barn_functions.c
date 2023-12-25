@@ -169,7 +169,7 @@ barn_initialize_builtin_functions(barn_parser_t* parser)
 barn_node_t*
 barn_parser_function_get_by_name(barn_parser_t* parser, char* function_name)
 {
-    for (int i = 0; i < parser->function_nodes->length; i++)
+    BARN_ARRAY_FOR(parser->function_nodes)
     {
         barn_node_t* node = barn_get_element_from_array(parser->function_nodes, i);
         

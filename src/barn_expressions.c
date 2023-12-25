@@ -26,6 +26,7 @@
 #include <barn_tokens.h>
 #include <barn_struct.h>
 #include <barn_parser.h>
+#include <barn_type_checker.h>
 
 barn_expression_value_t* 
 barn_create_expression_value(barn_token_t* expr_val_token,
@@ -448,12 +449,14 @@ barn_parse_expression_structure_values(barn_parser_t* parser, barn_node_t* expr_
     {
         if (parser->curr_token->kind == BARN_TOKEN_EOF)
             BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected value or \",\"", 0);
-        
         if (parser->curr_token->kind == BARN_TOKEN_CLOSEPARENT)
             return structure_values;
 
         barn_node_t* argument_value = barn_parse_expression(parser, BARN_TOKEN_COMMA, BARN_TOKEN_CLOSEBRACE, false);
         barn_append_element_to_array(structure_values, argument_value);
+
+        if (barn_tc_expression_get_type(NULL, argument_value)->is_struct)
+            barn_parser_skip(parser, 1);
 
         if (parser->curr_token->kind == BARN_TOKEN_COMMA)
         {
@@ -511,19 +514,19 @@ barn_parse_expression_new_structure(barn_parser_t* parser, barn_node_t* expr_nod
         structure_values = barn_parse_expression_structure_values(parser, expr_node, structure_type);
 
         if (structure_values->length != structure_type->structure.struct_fields->length)
-            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "there is too much or too less structure values", 0);
+            BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "there is too much or too less structure value %s", structure_type->structure.sturct_type_name);
     }
     else
         barn_parser_skip(parser, 1);
 
-    for (int i = 0; i < structure_values->length; i++)
-    {
-        barn_node_t* curr_args_node = barn_get_element_from_array(structure_values, i);
-
-        printf("structure_values[%d]={ expression_nodes: %p, expression_nodes->length: %d }\n", i,
-            curr_args_node->expression.expression_nodes,
-            curr_args_node->expression.expression_nodes->length);
-    }
+    // for (int i = 0; i < structure_values->length; i++)
+    // {
+    //     barn_node_t* curr_args_node = barn_get_element_from_array(structure_values, i);
+    //
+    //     printf("structure_values[%d]={ expression_nodes: %p, expression_nodes->length: %d }\n", i,
+    //         curr_args_node->expression.expression_nodes,
+    //         curr_args_node->expression.expression_nodes->length);
+    // }
 
     /* Pack up all of it into a expression node */
     barn_expression_value_t* structure_value = barn_create_expression_value(start_token, structure_type);

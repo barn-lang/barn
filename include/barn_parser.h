@@ -52,6 +52,27 @@ typedef struct __barn_parser_t {
     barn_node_t* actual_function;
 } barn_parser_t;
 
+typedef struct __barn_parser_access_element_t {
+    bool is_function;
+    struct {
+        const char* function_name;
+    } function;
+
+    bool is_variable;
+    struct {
+        const char* variable_name;
+        barn_variable_t* variable;
+    } variable;
+
+    bool is_access_struct;
+    struct {
+        const char* parent_variable_name;
+        barn_variable_t* parent_variable;
+        barn_type_t* struct_field_type;
+        barn_array_t* fields_of_struct; /* arr<char*> */
+    } access_struct;
+} barn_parser_access_element_t;
+
 #include <barn_types.h>
 
 #define BARN_COLLECT_CURR_TOK_VAL(parser) (parser->curr_token->value)

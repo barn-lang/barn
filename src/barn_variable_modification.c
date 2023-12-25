@@ -27,180 +27,149 @@
 #include <barn_nodes.h>
 
 void
-barn_parser_variable_asn(barn_parser_t* parser)
+barn_parser_variable_asn(barn_parser_t* parser, barn_parser_access_element_t* element)
 {
-    const char* variable_name = BARN_COLLECT_CURR_TOK_VAL(parser);
+    barn_token_t* start_token = parser->curr_token;
+    barn_parser_skip(parser, 1);
     
-    if (!barn_parser_is_variable_defined_lg(parser, variable_name))
-        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "'%s' is undefined", 
-                        parser->curr_token->value);
-
-    barn_variable_t* variable = barn_parser_get_variable_by_name(parser, variable_name);
-    if (variable->is_const == true)
+    if (element->variable.variable->is_const == true)
         BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be modified", 
                         parser->curr_token->value);
-
-    barn_parser_skip(parser, 2);
-    variable->is_used = true;
+    barn_parser_skip(parser, 1);
+    element->variable.variable->is_used = true;
 
     barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
-
     barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASN);
     node->variable_modification.variable_value = new_var_value;
-    node->variable_modification.variable       = variable;
+    node->variable_modification.access_element = element;
+    node->variable_modification.variable_token = start_token;
 
     barn_parser_append_node(parser, node);
 }
 
 void 
-barn_parser_variable_plusasn(barn_parser_t* parser)
+barn_parser_variable_plusasn(barn_parser_t* parser, barn_parser_access_element_t* element)
 {
-    const char* variable_name = BARN_COLLECT_CURR_TOK_VAL(parser);
+    barn_token_t* start_token = parser->curr_token;
+    barn_parser_skip(parser, 1);
     
-    if (!barn_parser_is_variable_defined_lg(parser, variable_name))
-        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "'%s' is undefined", 
-                        parser->curr_token->value);
-
-    barn_variable_t* variable = barn_parser_get_variable_by_name(parser, variable_name);
-    if (variable->is_const == true)
+    if (element->variable.variable->is_const == true)
         BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be modified", 
-                        parser->curr_token->value);
-
-    barn_parser_skip(parser, 2);
-    variable->is_used = true;
-
-    barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
-
-    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASNPLUS);
-    node->variable_modification.variable_value = new_var_value;
-    node->variable_modification.variable       = variable;
-
-    barn_parser_append_node(parser, node);
-}
-
-void 
-barn_parser_variable_minusasn(barn_parser_t* parser)
-{
-    const char* variable_name = BARN_COLLECT_CURR_TOK_VAL(parser);
-    
-    if (!barn_parser_is_variable_defined_lg(parser, variable_name))
-        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "'%s' is undefined", 
-                        parser->curr_token->value);
-
-    barn_variable_t* variable = barn_parser_get_variable_by_name(parser, variable_name);
-    if (variable->is_const == true)
-        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be modified", 
-                        parser->curr_token->value);
-
-    barn_parser_skip(parser, 2);
-    variable->is_used = true;
-
-    barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
-
-    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASNMINUS);
-    node->variable_modification.variable_value = new_var_value;
-    node->variable_modification.variable       = variable;
-
-    barn_parser_append_node(parser, node);
-}
-
-void 
-barn_parser_variable_mulasn(barn_parser_t* parser)
-{
-    const char* variable_name = BARN_COLLECT_CURR_TOK_VAL(parser);
-    
-    if (!barn_parser_is_variable_defined_lg(parser, variable_name))
-        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "'%s' is undefined", 
-                        parser->curr_token->value);
-
-    barn_variable_t* variable = barn_parser_get_variable_by_name(parser, variable_name);
-    if (variable->is_const == true)
-        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be modified", 
-                        parser->curr_token->value);
-
-    barn_parser_skip(parser, 2);
-    variable->is_used = true;
-
-    barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
-
-    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASNMUL);
-    node->variable_modification.variable_value = new_var_value;
-    node->variable_modification.variable       = variable;
-
-    barn_parser_append_node(parser, node);
-}
-
-void 
-barn_parser_variable_divasn(barn_parser_t* parser)
-{
-    const char* variable_name = BARN_COLLECT_CURR_TOK_VAL(parser);
-    
-    if (!barn_parser_is_variable_defined_lg(parser, variable_name))
-        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "'%s' is undefined", 
-                        parser->curr_token->value);
-
-    barn_variable_t* variable = barn_parser_get_variable_by_name(parser, variable_name);
-    if (variable->is_const == true)
-        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be modified", 
-                        parser->curr_token->value);
-
-    barn_parser_skip(parser, 2);
-    variable->is_used = true;
-
-    barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
-
-    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASNDIV);
-    node->variable_modification.variable_value = new_var_value;
-    node->variable_modification.variable       = variable;
-
-    barn_parser_append_node(parser, node);
-}
-
-void 
-barn_parser_variable_incrementation(barn_parser_t* parser)
-{
-    const char* variable_name = BARN_COLLECT_CURR_TOK_VAL(parser);
-    
-    if (!barn_parser_is_variable_defined_lg(parser, variable_name))
-        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "'%s' is undefined", 
-                        parser->curr_token->value);
-
-    barn_variable_t* variable = barn_parser_get_variable_by_name(parser, variable_name);
-    if (variable->is_const == true)
-        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be incremented", 
                         parser->curr_token->value);
 
     barn_parser_skip(parser, 1);
-    variable->is_used = true;
+    element->variable.variable->is_used = true;
+
+    barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
+    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASNPLUS);
+    node->variable_modification.variable_value = new_var_value;
+    node->variable_modification.access_element = element;
+    node->variable_modification.variable_token = start_token;
+
+    barn_parser_append_node(parser, node);
+}
+
+void 
+barn_parser_variable_minusasn(barn_parser_t* parser, barn_parser_access_element_t* element)
+{
+    barn_token_t* start_token = parser->curr_token;
+    barn_parser_skip(parser, 1);
+    
+    if (element->variable.variable->is_const == true)
+        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be modified", 
+                        parser->curr_token->value);
+
+    barn_parser_skip(parser, 1);
+    element->variable.variable->is_used = true;
+
+    barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
+    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASNMINUS);
+    node->variable_modification.variable_value = new_var_value;
+    node->variable_modification.access_element = element;
+    node->variable_modification.variable_token = start_token;
+
+    barn_parser_append_node(parser, node);
+}
+
+void 
+barn_parser_variable_mulasn(barn_parser_t* parser, barn_parser_access_element_t* element)
+{
+    barn_token_t* start_token = parser->curr_token;
+    barn_parser_skip(parser, 1);
+    
+    if (element->variable.variable->is_const == true)
+        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be modified", 
+                        parser->curr_token->value);
+
+    barn_parser_skip(parser, 1);
+    element->variable.variable->is_used = true;
+
+    barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
+    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASNMUL);
+    node->variable_modification.variable_value = new_var_value;
+    node->variable_modification.access_element = element;
+    node->variable_modification.variable_token = start_token;
+
+    barn_parser_append_node(parser, node);
+}
+
+void 
+barn_parser_variable_divasn(barn_parser_t* parser, barn_parser_access_element_t* element)
+{
+    barn_token_t* start_token = parser->curr_token;
+    barn_parser_skip(parser, 1);
+    
+    if (element->variable.variable->is_const == true)
+        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be modified", 
+                        parser->curr_token->value);
+
+    barn_parser_skip(parser, 1);
+    element->variable.variable->is_used = true;
+
+    barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
+    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASNDIV);
+    node->variable_modification.variable_value = new_var_value;
+    node->variable_modification.access_element = element;
+    node->variable_modification.variable_token = start_token;
+
+    barn_parser_append_node(parser, node);
+}
+
+void 
+barn_parser_variable_incrementation(barn_parser_t* parser, barn_parser_access_element_t* element)
+{
+    barn_parser_skip(parser, 1);
+    
+    if (element->variable.variable->is_const == true)
+        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be incremeneted", 
+                        parser->curr_token->value);
+
+    barn_parser_skip(parser, 1);
+    element->variable.variable->is_used = true;
 
     barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_INCREMENTATION);
     node->variable_modification.variable_value = NULL;
-    node->variable_modification.variable       = variable;
+    node->variable_modification.access_element = element;
     node->variable_modification.variable_token = parser->curr_token;
 
     barn_parser_append_node(parser, node);
 } 
 
 void 
-barn_parser_variable_decrementation(barn_parser_t* parser)
+barn_parser_variable_decrementation(barn_parser_t* parser, barn_parser_access_element_t* element)
 {
-    const char* variable_name = BARN_COLLECT_CURR_TOK_VAL(parser);
+    barn_parser_skip(parser, 1);
     
-    if (!barn_parser_is_variable_defined_lg(parser, variable_name))
-        BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "'%s' is undefined", 
-                        parser->curr_token->value);
-
-    barn_variable_t* variable = barn_parser_get_variable_by_name(parser, variable_name);
-    if (variable->is_const == true)
+    if (element->variable.variable->is_const == true)
         BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be decremented", 
                         parser->curr_token->value);
 
     barn_parser_skip(parser, 1);
-    variable->is_used = true;
+    element->variable.variable->is_used = true;
 
     barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_DECREMENTATION);
     node->variable_modification.variable_value = NULL;
-    node->variable_modification.variable       = variable;
+    node->variable_modification.access_element = element;
     node->variable_modification.variable_token = parser->curr_token;
 
     barn_parser_append_node(parser, node);

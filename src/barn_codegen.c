@@ -131,9 +131,32 @@ barn_codegen_access_struct(barn_codegen_t* codegen, barn_expression_node_t* curr
         else
         {
             barn_append_string_to_allocated_string(expression_buf, field_str);
-            barn_append_char_to_allocated_string(  expression_buf, '.');
+            barn_append_string_to_allocated_string(expression_buf, "->");
         }
     }
+}
+
+void
+barn_codegen_initalize_structure(barn_codegen_t* codegen, barn_expression_node_t* curr_expr_node, char** expression_buf)
+{
+    barn_array_t* struct_values = curr_expr_node->lhs->struct_values;
+    barn_type_t*  struct_type   = curr_expr_node->lhs->struct_type;
+
+    barn_array_t* struct_expr = curr_expr_node->lhs->struct_values;
+
+    barn_append_string_to_allocated_string(expression_buf, "__barn_new_struct_");
+    barn_append_string_to_allocated_string(expression_buf, struct_type->structure.sturct_type_name);
+    barn_append_string_to_allocated_string(expression_buf, "_t__(");
+
+    BARN_ARRAY_FOR(struct_expr)
+    {
+        barn_node_t* expr = barn_get_element_from_array(struct_expr, i);
+        const char* gen_expr = barn_codegen_expression_generate(codegen, expr);
+        barn_append_string_to_allocated_string(expression_buf, gen_expr);
+        if (!BARN_ARRAY_IS_LAST_ELEMENT(struct_expr, i))
+            barn_append_string_to_allocated_string(expression_buf, ",");
+    }
+    barn_append_char_to_allocated_string(expression_buf, ')');
 }
 
 const char* 
@@ -173,6 +196,11 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
                 barn_codegen_access_struct(codegen, curr_expr_node, &expression_buf);
             else if (curr_expr_node->lhs->is_variable == true)
                 barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
+            else if (curr_expr_node->lhs->initalizing_struct)
+            {
+                barn_codegen_initalize_structure(codegen, curr_expr_node, &expression_buf);
+                break;
+            }
             else
             {
                 if (curr_expr_node->lhs->expr_val_type->is_string)
@@ -373,9 +401,22 @@ void
 barn_codegen_variable_modification(barn_codegen_t* codegen, barn_node_t* curr_node)
 {
     BARN_CODEGEN_GENERATE_TABS(codegen);
-    
-    const char* variable_name = curr_node->variable_modification.variable->var_name;
-    fprintf(codegen->c_file, "%s ", variable_name);
+
+    if (curr_node->variable_modification.access_element->is_access_struct)
+    {
+        barn_array_t* fields_of_struct = curr_node->variable_modification.access_element->access_struct.fields_of_struct;
+        printf("%p\n", fields_of_struct);
+        BARN_ARRAY_FOR(fields_of_struct)
+        {
+            fprintf(codegen->c_file, "%s", barn_get_element_from_array(fields_of_struct, i));
+            if (!BARN_ARRAY_IS_LAST_ELEMENT(fields_of_struct, i))
+                fprintf(codegen->c_file, "->");
+        }
+    }
+    else if (curr_node->variable_modification.access_element->is_variable)
+        fprintf(codegen->c_file, "%s", curr_node->variable_modification.access_element->variable.variable_name);
+    else 
+        BARN_UNIMPLEMENTED("this shouldn't happend");
 
     switch (curr_node->node_kind)
     {
@@ -543,8 +584,42 @@ barn_codegen_struct(barn_codegen_t* codegen, barn_node_t* curr_node)
         fprintf(codegen->c_file, "\t%s %s;\n",
             field_type, field->field_name);
     }
-    fprintf(codegen->c_file, "} __barn_%s_t;",   
+    fprintf(codegen->c_file, "} __barn_struct_%s_t;\n\n",   
         curr_node->structure.type_struct->structure.sturct_type_name);
+    
+    fprintf(codegen->c_file, "__barn_struct_%s_t* __barn_new_struct_%s_t__(", 
+        curr_node->structure.type_struct->structure.sturct_type_name,
+        curr_node->structure.type_struct->structure.sturct_type_name);
+
+    BARN_ARRAY_FOR(structure_arr)
+    {
+        barn_struct_field_t* field = barn_get_element_from_array(structure_arr, i);
+        const char* field_type     = barn_codegen_type_convert_to_c(codegen, field->field_type);
+
+        if (BARN_ARRAY_IS_LAST_ELEMENT(structure_arr, i))
+            fprintf(codegen->c_file, "%s __barn_struct_name_%s__",
+                field_type, field->field_name);
+        else
+            fprintf(codegen->c_file, "%s __barn_struct_name_%s__,",
+                field_type, field->field_name);        
+    }
+
+    fprintf(codegen->c_file, ")\n\
+{\n\
+\t__barn_struct_%s_t* value = (__barn_struct_%s_t*)malloc(sizeof(__barn_struct_%s_t) * 1);\n",
+    curr_node->structure.type_struct->structure.sturct_type_name,
+    curr_node->structure.type_struct->structure.sturct_type_name,
+    curr_node->structure.type_struct->structure.sturct_type_name);  
+    
+    BARN_ARRAY_FOR(structure_arr)
+    {
+        barn_struct_field_t* field = barn_get_element_from_array(structure_arr, i);
+        const char* field_type     = barn_codegen_type_convert_to_c(codegen, field->field_type);
+
+        fprintf(codegen->c_file, "\tvalue->%s = __barn_struct_name_%s__;\n",
+            field->field_name, field->field_name);
+    }
+    fprintf(codegen->c_file, "\treturn value;\n}");
 }
 
 barn_codegen_t* 
@@ -650,9 +725,9 @@ barn_codegen_type_convert_to_c(barn_codegen_t* codegen, barn_type_t* type)
         case BARN_TYPE_STRUCT:
         {
             char* buf = barn_create_allocated_string();
-            barn_append_string_to_allocated_string(&buf, "__barn_");
+            barn_append_string_to_allocated_string(&buf, "__barn_struct_");
             barn_append_string_to_allocated_string(&buf, type->structure.sturct_type_name);
-            barn_append_string_to_allocated_string(&buf, "_t");
+            barn_append_string_to_allocated_string(&buf, "_t*");
             return buf;
             break;
         }

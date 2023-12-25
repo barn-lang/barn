@@ -28,13 +28,13 @@
 #include <barn_types.h>
 #include <barn_nodes.h>
 
-void barn_parser_variable_asn     (barn_parser_t* parser); // =
-void barn_parser_variable_plusasn (barn_parser_t* parser); // +=
-void barn_parser_variable_minusasn(barn_parser_t* parser); // -= 
-void barn_parser_variable_mulasn  (barn_parser_t* parser); // *=
-void barn_parser_variable_divasn  (barn_parser_t* parser); // /=
+void barn_parser_variable_asn     (barn_parser_t* parser, barn_parser_access_element_t* element); // =
+void barn_parser_variable_plusasn (barn_parser_t* parser, barn_parser_access_element_t* element); // +=
+void barn_parser_variable_minusasn(barn_parser_t* parser, barn_parser_access_element_t* element); // -= 
+void barn_parser_variable_mulasn  (barn_parser_t* parser, barn_parser_access_element_t* element); // *=
+void barn_parser_variable_divasn  (barn_parser_t* parser, barn_parser_access_element_t* element); // /=
 
-void barn_parser_variable_incrementation(barn_parser_t* parser); // ++
-void barn_parser_variable_decrementation(barn_parser_t* parser); // --
+void barn_parser_variable_incrementation(barn_parser_t* parser, barn_parser_access_element_t* element); // ++
+void barn_parser_variable_decrementation(barn_parser_t* parser, barn_parser_access_element_t* element); // --
 
 #endif /* __BARN_VARIABLE_MODIFICATION__ */

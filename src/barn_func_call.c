@@ -157,8 +157,11 @@ __barn_parser_func_call(barn_parser_t* parser, bool is_expr)
 }
 
 void 
-barn_parser_func_call(barn_parser_t* parser, bool is_expr)
+barn_parser_func_call(barn_parser_t* parser, bool is_expr, barn_parser_access_element_t* element)
 {
+    // TODO: Use element
+    BARN_USE(element);
+
     barn_node_t* function_call_node = __barn_parser_func_call(parser, is_expr);
     barn_parser_append_node(parser, function_call_node);
 }

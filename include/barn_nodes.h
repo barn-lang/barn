@@ -21,12 +21,14 @@
 #ifndef __BARN_NODES__
 #define __BARN_NODES__
 
-typedef struct __barn_node_t barn_node_t;
-typedef struct __barn_type_t barn_type_t;
+typedef struct __barn_parser_access_element_t barn_parser_access_element_t;
 typedef struct __barn_variable_t barn_variable_t;
+typedef struct __barn_type_t barn_type_t;
+typedef struct __barn_node_t barn_node_t;
 
 #include <barn_core.h>
 #include <barn_array.h>
+#include <barn_parser.h>
 #include <barn_types.h>
 #include <barn_expressions.h>
 #include <barn_variables.h>
@@ -111,7 +113,7 @@ typedef struct __barn_node_t {
     } variable_declaration;
 
     struct {
-        barn_variable_t* variable;
+        barn_parser_access_element_t* access_element;
         barn_node_t* variable_value;
         barn_token_t* variable_token;
     } variable_modification;
