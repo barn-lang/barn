@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://cdn.discordapp.com/icons/1028291656862142466/45ac54896f82c18ddf408e5c35739789.png?size=256" />
+  <img src="https://cdn.discordapp.com/icons/1028291656862142466/45ac54896f82c18ddf408e5c35739789.png?size=512" />
 </p>
 
 # REWRITE OF BARN!!!
