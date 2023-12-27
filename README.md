@@ -2,95 +2,40 @@
   <img src="https://cdn.discordapp.com/icons/1028291656862142466/45ac54896f82c18ddf408e5c35739789.png?size=512" />
 </p>
 
-# REWRITE OF BARN!!!
-[READ MORE HERE](https://barn-lang.github.io/barn-docs/news/news-rewriting-whole-compiler-and-reactivaiton-of-barn-project.html)
-Old Go compiler is in barngo repository
+# Barn Programming Language
+## About
 
-# Barn
-# About
-#### Barn is in experimental version (BETA)
-**Barn** is a simple programming language written in C and compiled to C.
-Syntax is very simple, and Barn can call C/C++ functions natively so creating new bindings should be easy. Barn was written with the goal of being as fast and easy to use as possible. Barn is just a little project with which I can chill and just code.
-# Documentation
-You can find barn documentation at [/documentation](https://barn-lang.github.io/barn-docs/documentation.html)
-# Syntax
-## Hello World
-[01-hello-world.ba](./examples/01-hello-world.ba)
-```kotlin
-fun main() {
-   println("Hello World\n")
-}
-```
-## Variables
-[14-function-arguments-variable.ba](./examples/14-function-arguments-variable.ba)
-```kotlin
-fun example_function(int i1, string str1, bool b1, char c1, float f1) {
-    println(str1)
-    println("\n")
-}
+Barn is a simple and efficient programming language designed for beginners and experienced programmers alike. It is compiled to C, making it fast and portable. Barn has a clean and easy-to-read syntax, making it a great choice for learning programming. It also has a growing community of users and contributors.
 
-fun main() {
-    let i1: int = 1
-    let str1: string = "str"
-    let b1: bool = true
-    let c1: char = 'A'
-    let f1: float = 1.0
-    example_function(i1, str1, b1, c1, f1)
-}
+This repository includes the whole **BarnC** which is basically barn compiler written in C, lot's of example programs in Barn also extensions for well known editors like `Vim, Visual Studio Code, Emacs`
+ 
+<img src="https://cdn.discordapp.com/attachments/858992887706157056/1189564357114339430/image.png?ex=659e9f23&is=658c2a23&hm=a92a458d0f9d4ffeff77693817353905863f84c831b1827ef8bfcc55c8db9e78&">
+
+## Get started with Barn
+Welcome to the exciting world of Barn programming! For a seamless introduction to the language, we highly recommend exploring our documentation, that is available online. Dive into the details and unleash your creativity by visiting [our documentation page](https://barn-lang.github.io/barn-docs/documentation.html).
+
+But if you don't have time to read our documentation check out everything underneath. To get started with barn you should install our compiler to do it correctly put these commands into your (Linux/MacOS) terminal (Windows is not supported right now):
+
+`terminal`
 ```
-## Fizz Buzz in Barn
-[31-fizz-buzz-in-barn.ba](./examples/31-fizz-buzz-in-barn.ba)
+git clone https://github.com/barn-lang/barn && cd barn
+make CC=gcc # Set the compiler you will use
+make install
+barn --version
+```
+After that let's dive into some programming. We would start with the most basic program we can write in any programming language yeah i mean a Hello World.
+
+`main.ba`
 ```kotlin
 @import "std.ba"
 
-fun main() {
-    for let i: int = 0; i != 1000; i++ {
-        if (i % 15) == 0 {
-            println("FizzBuzz\t")
-        } elif (i % 3) == 0 {
-            println("Fizz\t")
-        } elif (i % 5) == 0 {
-            println("Buzz\t")
-        } else {
-            printnum(i)
-            println("\t")
-        }
-    }
+fun main() -> i32 {
+    println("Hello, World!")
+    return 0
 }
 ```
-## If statements
-[19-if-condition.ba](./examples/19-if-condition.ba)
-```kotlin
-fun main() {
-    let age: int = 13
-    if (age == 13) {
-        println("Age is 13\n")
-    } elif (age == 14) {
-        println("Age is 14\n")    
-    } else {
-        println("Age isn't 13\n")
-    }
-}
-```
-## User input
-```kotlin
-@import "std.ba"
-
-fun main() {
-	println("What's your name: ")
-	let user_name: string = read_line_stdin()
-	println("Welcome ")
-	println(user_name)
-}
-```
-# Extensions
-## Visual Studio Code
-[Here!](./extensions/vscode/), copy **barn-lang** folder to where you installed visual studio code (usually $HOME/.vscode/extensions/)
-## Vim
-[Here!](./extensions/vim/) move barn.vim into .vim/syntax/ and add the following line  to ~/.vimrc `autocmd BufRead,BufNewFile *.barn set filetype=barn`
-# Documentation
-[HERE!!](https://barn-lang.github.io/barn-docs/)
-# Bugs
-If you found a bug immediately call me about it, you can create [Github Issue](), write to me on Discord Solindek#9808 or on my [website contact page](https://solindedk.ct8.pl/)
+That's all after compiling this program by using this command `barn ./main.ba` and running it with `./a.out` you should see a beautiful `Hello, World!` pop up on your terminal window! That the most basic thing in barn we would recommend to check out some example programs in Barn [right here](./examples/)
+## Finding & reporting bugs
+Barn is a dynamic and evolving programming language, and your feedback is crucial in ensuring its stability and performance. If you encounter any bugs or unexpected behavior, we encourage you to report them as fast as possible. If you find a bug please create a new github issue on this [repository](https://github.com/barn-lang/barn/issues), please include code and terminal output. 
 
 
