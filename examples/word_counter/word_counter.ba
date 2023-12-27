@@ -1,0 +1,89 @@
+/*
+ * This is an example program written for tests the barn compiler 
+ * performance and work. This program is a very simple word counter
+ * that will count words and letters from a file or direct console 
+ * input. Have fun compiling it and trying it for yourself! 
+ */
+
+/*
+ *
+ *  Barn Programming Language Organization
+ *  All rights reserved. Copyright (C) 2022-2024
+ *   
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *   
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *   
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+*/
+
+/* Import some useful libraries */
+@import "std.ba"
+@import "os.ba"
+
+fun get_file_console_decision() -> i32 {
+    while true {
+        let decision: string = read_line_stdin()
+
+        if string_compare(decision, "file") { 
+            return 0 
+        } elif string_compare(decision, "console") { 
+            return 1 
+        } elif string_compare(decision, "exit") {
+            println("Exiting..")
+            process_exit(0)
+        } else {
+            println("Unknown decision try again.")
+            continue
+        }
+    }
+}
+
+fun calculate_words(string buffer) -> i32 {
+    let token: string = c_strtok(buffer, " ")
+    let words: i64    = 0
+
+    while token != C_NULL() {
+        words++;
+        token = c_strtok(C_NULL(), " ");
+    }
+
+    return words
+}
+
+fun main() -> i32 {
+    print("Simple word counter written in Barn (https://github.com/barn-lang/barn)\n")
+    print("Would you like to count the words from a file or console input? (file/console/exit): ")
+    
+    let decision: i32 = get_file_console_decision()
+    let buffer: string = ""
+
+    if decision == 0 {
+        print("Filename: ")
+        let filename: string = read_line_stdin()
+
+        if os_file_exists(filename) == false {
+            fmt_print("Error: File named %s doesn't exists\n", filename)
+            return 0
+        }
+
+        buffer = os_read_file(filename)
+    } elif decision == 1 {
+        print("Console input: ")
+        buffer = read_line_stdin()
+    }
+
+    let letters: i64 = string_length(buffer)
+    let words: i64 = calculate_words(buffer)
+    fmt_print("Letters: %d\nWords: %d\n", letters, words)
+
+    return 0
+}

@@ -27,7 +27,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     #include <sys/types.h>
     #include <sys/stat.h>
     #include <unistd.h>

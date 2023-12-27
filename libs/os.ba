@@ -34,8 +34,8 @@ fun os_current_system() -> string {
 
 fun os_file_exists(string filename) -> bool {
 	__code__("#if defined (__APPLE__)")
-		__code__("printf(\"os_file_exists(string filename) is not implemented for ios\");")
-		__code__("return false;")
+		// @import_c "unistd.h"
+		__code__("return (access(filename, F_OK) != -1);")
 	__code__("#elif defined (__unix__)")
 		__code__("struct stat __buf;")
 		__code__("return (bool)(stat (filename, &__buf) == 0);")
@@ -54,21 +54,14 @@ fun os_read_file(string filename) -> string {
 	__code__("FILE* f = fopen(filename, \"r\");")
 	__code__("if (f == NULL)")
 	__code__("	return strdup(\"\");")
-    __code__("long size;")
-    __code__("int flen = 0;")
-    __code__("char* buf = \"\";")
-    __code__("fseek(f, 0, SEEK_END);")
-    __code__("flen = ftell(f) + 1;")
-    __code__("buf = malloc(flen * sizeof(char));")
+	__code__("fseek(f, 0, SEEK_END);")
+    __code__("long file_size = ftell(f);")
     __code__("fseek(f, 0, SEEK_SET);")
-    __code__("size = fread(buf, 1, flen, f);")
-	__code__("if (size != flen - 1) {")
-	__code__("	fclose(f);")
-    __code__("    return buf;")
-	__code__("}")
-	__code__("fclose(f);")
-    __code__("return buf;")
-
+    __code__("char* buffer = calloc(sizeof(char), file_size + 1);")
+	__code__("fread(buffer, 1, file_size, f);")
+	__code__("buffer[file_size] = '\\0';")
+    __code__("fclose(f);")
+    __code__("return buffer;")
 	// Give it __use__ so there wouldn't be any warnings from os.ba
 	__use__(filename)
 }
@@ -85,4 +78,8 @@ fun os_write_file(string filename, string value) -> bool {
 	// Give it __use__ so there wouldn't be any warnings from os.ba
 	__use__(filename)
 	__use__(value)
+}
+
+fun process_exit(i8 status) {
+	__code__("exit(status);")
 }

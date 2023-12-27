@@ -1,0 +1,36 @@
+/*
+ * Hi, I guess it's your first time seeing barn.. It's okay
+ * I don't blame you barn is a little not popular programming 
+ * language, underneath there is a simple hello world program
+ * with which everyone starts at a beginning of programming in 
+ * every language. At the start i will recommend to check out
+ * our documentation:
+ *  https://barn-lang.github.io/barn-docs/documentation.html
+ */
+
+/*
+ *
+ *  Barn Programming Language Organization
+ *  All rights reserved. Copyright (C) 2022-2024
+ *   
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *   
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *   
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+*/
+
+@import "std.ba"
+
+fun main() -> i32 {
+    println("Hello, World!")
+    return 0
+}

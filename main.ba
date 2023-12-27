@@ -1,33 +1,16 @@
 @import "std.ba"
+@import "math.ba"
 
-struct Name {
-    name: string
-}
+fun main() -> i32 {
+    print("Enter the radius of the circle: ")
+    let circle_radius: f32 = parse_float(read_line_stdin())
 
-struct Name2 {
-    name: Name
-}
+    if circle_radius <= 0 {
+        println("Incorrect circle radius")
+    } else {
+        let circle_area: f32 = _MATH_PI * pow2(circle_radius)
+        fmt_print("Circle area = πr² = %f\n", circle_area)
+    }
 
-struct Person {
-    name_struct: Name2,
-    age: i16
-}
-
-fun print_person(Person me) {
-	fmt_print("name: %s, age: %d\n", me.name_struct.name.name, me.age)
-}
-
-fun main() -> int {
-	let me: Person = new Person{ new Name2{ new Name{"opaa"} } , 60 }
-    print_person(me)
-
-    me.age++
-    print_person(me)
-
-    me.age = 30
-    print_person(me)
-
-    me.age = 33
-    me.name_struct.name.name = "Bruno"
-    print_person(me)
+    return 0
 }

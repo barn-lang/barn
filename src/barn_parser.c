@@ -188,7 +188,6 @@ barn_parse_access_element(barn_parser_t* parser)
     if (((access->variable.variable = barn_parser_get_variable_by_name(parser, parser->curr_token->value)) != NULL) &&
         barn_parser_is_next_token(parser, BARN_TOKEN_DOT) == false)
     {
-        printf("accessing a simple variable\n");
         access->variable.variable_name = parser->curr_token->value;
         access->is_variable = true;
         return access;
@@ -199,7 +198,6 @@ barn_parse_access_element(barn_parser_t* parser)
     if (((access->variable.variable = barn_parser_get_variable_by_name(parser, parser->curr_token->value)) != NULL) &&
         barn_parser_is_next_token(parser, BARN_TOKEN_DOT) == true)
     {
-        printf("accessing a struct variable\n");
         barn_parse_access_element_structure(parser, access);
         return access;
     }
@@ -207,7 +205,6 @@ barn_parse_access_element(barn_parser_t* parser)
     if ((barn_parser_function_get_by_name(parser, parser->curr_token->value) != NULL) &&
         barn_parser_is_next_token(parser, BARN_TOKEN_OPENPARENT) == true)
     {
-        printf("accessing function\n");
         access->function.function_name = parser->curr_token->value;
         access->is_function = true;
         return access;

@@ -1,6 +1,6 @@
 /*
  *  This file is part of Barn standard library which is globally
- *  available in barn-lang github repository
+ *  available in barn-lang github repository.
 */
 
 /*
@@ -19,6 +19,8 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+@import_c "math.h"
 
 /* 
  * ==========================
@@ -43,6 +45,23 @@ const _MATH_PI_4 : f64       = 0.78539816339744830961566084581987572  // PI / 4
  *    Essential functions
  * ==========================
 */
+
+/* ---   Power   --- */
+fun pow2(f64 __pow_num) -> f64 {
+    return (__pow_num * __pow_num)
+}
+
+fun power(f64 __pow_num, i64 __pow_n_times) -> f64 {
+    let res: f64 = 0
+    let i:   i32 = 0
+
+    while i != __pow_n_times {
+        res = res * __pow_num
+        i++
+    }
+
+    return res
+}
 
 /* ---   Floor   --- */
 

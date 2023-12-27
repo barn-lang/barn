@@ -20,18 +20,14 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+// TODO: Change it to constant value and pointer some time 
+fun C_NULL() -> string {
+	__code__("return ((char*)0x0000);")
+}
+
 // Function for comparing string
 fun string_compare(string s1, string s2) -> bool {
 	__code__("return ((bool)((strcmp(s1, s2) == 0) == 1 ? 1 : 0));")
-
-	__use__(s1)
-	__use__(s2)
-}
-
-// Function for comparing string used in if
-fun __barn_string_compare(string s1, string s2) -> bool {
-	__code__("return ((bool)(string_compare(s1, s2)));")
-
 	__use__(s1)
 	__use__(s2)
 }
@@ -39,21 +35,22 @@ fun __barn_string_compare(string s1, string s2) -> bool {
 // Function for getting string length
 fun string_length(string s) -> int {	
 	__code__("return ((int)(strlen(s)));")
-
 	__use__(s)
 }
 
 // TODO: implement these functions
-fun parse_float(string s) -> f32 {
-	__use__(s)
-}
-
-fun parse_int(string s) -> i32 {
+fun parse_int(string s) -> i64 {
+	__code__("return (long)(atoll(s));")
 	__use__(s)
 }
 
 fun parse_double(string s) -> f64 {
+	__code__("return (double)(atof(s));")
 	__use__(s)
+}
+
+fun parse_float(string s) -> f32 {
+	return parse_double(s) 
 }
 
 fun parse_string_to_int(int n, int base) -> string {
@@ -151,4 +148,11 @@ fun fmt_print(string __format_start__, ...) {
 
 		i++
 	}
+}
+
+// Make a predefinition
+fun c_strtok(string restrict_str, string restrict_sep) -> string {
+	__code__("return strtok(restrict_str, restrict_sep);")
+	__use__(restrict_str)
+	__use__(restrict_sep)
 }

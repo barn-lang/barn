@@ -42,7 +42,7 @@ barn_parser_func_return(barn_parser_t* parser)
      * assign return value into it and append to node
      * array
      * */
-    barn_node_t* return_value     = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_NONE, false);
+    barn_node_t* return_value     = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_CLOSEBRACE, false);
     barn_node_t* func_return_node = barn_create_empty_node(BARN_NODE_FUNCTION_RETURN);
 
     func_return_node->function_return.return_value = return_value;
