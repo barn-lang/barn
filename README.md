@@ -14,7 +14,7 @@ This repository includes the whole **BarnC** which is basically Barn compiler wr
 ## Get started with Barn
 Welcome to the exciting world of Barn programming! For a seamless introduction to the language, we highly recommend exploring our documentation, which is available online. Dive into the details and unleash your creativity by visiting [our documentation page](https://barn-lang.github.io/barn-docs/documentation.html).
 
-If you don't have time to read our documentation check out everything underneath. To get started with Barn have to install our compiler, to do it correctly put these commands into your (Linux/MacOS) terminal (Windows is not supported right now):
+If you don't have time to read our documentation check out everything underneath. To get started with Barn you have to install our compiler, to do it correctly put these commands into your (Linux/MacOS) terminal (Windows is not supported right now):
 
 `terminal`
 ```
