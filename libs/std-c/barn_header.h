@@ -38,9 +38,13 @@
 
 #define __use__(x) ({(void)x;})
 
-#ifdef __BARN_ENUM__
-#else
-# error "Enums are not enabled"
+#ifndef __BARN_ENUM__
+/* Maybe change this to error idk.. */
+# warning "Enums are not enabled"
 #endif
+
+#ifndef __compiler_BARN_STRING_COMPARATION__
+#define __compiler_BARN_STRING_COMPARATION__(s1, s2) (strcmp(s1, s2) == 0 ? true : false) 
+#endif /* __compiler_BARN_STRING_COMPARATION__ */
 
 #endif /* __BARN_HEADER_h__ */

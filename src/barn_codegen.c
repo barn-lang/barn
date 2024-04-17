@@ -187,6 +187,51 @@ barn_codegen_expression_generate(barn_codegen_t* codegen, barn_node_t* expressio
             last_parent = curr_expr_node->parents;
         }
 
+        /* This code does generate string comparation */
+        if ((curr_expr_node->lhs != NULL && curr_expr_node->rhs != NULL) &&
+            (curr_expr_node->lhs->expr_val_token != NULL && 
+             curr_expr_node->rhs->expr_val_token != NULL))
+        {
+            if (curr_expr_node->lhs->expr_val_type->is_string &&
+                curr_expr_node->rhs->expr_val_type->is_string)
+            {
+                barn_append_string_to_allocated_string(  &expression_buf, "__compiler_BARN_STRING_COMPARATION__(");
+                
+                if (curr_expr_node->lhs->is_function_call == true)
+                    barn_append_string_to_allocated_string(&expression_buf, 
+                        barn_codegen_function_call(codegen, curr_expr_node->lhs->function_call, false, false));
+                else if (curr_expr_node->lhs->accessing_struct == true)
+                    barn_codegen_access_struct(codegen, curr_expr_node, &expression_buf);
+                else if (curr_expr_node->lhs->is_variable == true)
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
+                else
+                {
+                    barn_append_char_to_allocated_string(  &expression_buf, '\"');
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->lhs->expr_val_token->value);
+                    barn_append_char_to_allocated_string(  &expression_buf, '\"');
+                }
+
+                barn_append_char_to_allocated_string  (  &expression_buf, ',');
+
+                if (curr_expr_node->rhs->is_function_call == true)
+                    barn_append_string_to_allocated_string(&expression_buf, 
+                        barn_codegen_function_call(codegen, curr_expr_node->rhs->function_call, false, false));
+                else if (curr_expr_node->rhs->accessing_struct == true)
+                    barn_codegen_access_struct(codegen, curr_expr_node, &expression_buf);
+                else if (curr_expr_node->rhs->is_variable == true)
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->rhs->expr_val_token->value);
+                else
+                {
+                    barn_append_char_to_allocated_string(  &expression_buf, '\"');
+                    barn_append_string_to_allocated_string(&expression_buf, curr_expr_node->rhs->expr_val_token->value);
+                    barn_append_char_to_allocated_string(  &expression_buf, '\"');
+                }
+
+                barn_append_string_to_allocated_string(  &expression_buf, ")");
+                continue;
+            }
+        }
+
         if (curr_expr_node->lhs != NULL && curr_expr_node->lhs->expr_val_token != NULL)
         {
             if (curr_expr_node->lhs->is_function_call == true)

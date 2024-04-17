@@ -66,7 +66,7 @@ BUGS:
     - [X] Make numbers act like booleans vice versa 
     - [X] __use__
     - [X] Variable use so warning doesnt come up
-    - [ ] Conditions with string
+    - [X] Conditions with string
     - [ ] \\\" bug 
     - [X] constant variables and enums can't use runtime values like functions
     - [X] implement --no-main

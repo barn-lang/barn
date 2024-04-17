@@ -1,9 +1,21 @@
 @import "std.ba"
 
+fun ok2() -> string {
+    return "ok2"
+}
+
 fun main() -> i32 {
-    let xdd: i32 = 10
-
-    xdd %= 2
-
-    return 2 % 2
+    let ok: string = "Spoko"
+    
+    if "ok" == ok {
+        println("ok is equal to ok")
+    }
+    elif "ok" == ok2() {
+        println("ok is equal to ok")
+    }
+    elif ok2() < ok2() {
+        println("ok is equal to ok")
+    }
+    
+    return 0
 }

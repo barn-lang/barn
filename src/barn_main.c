@@ -123,7 +123,7 @@ barn_filename_action(barn_args_parser_t* args_parser)
     } else 
         system("gcc -w barn.c");
 
-    if (barn_is_flag(args_parser, "--no-delete-cout", "-no-cout") == false)
+    if (barn_is_flag(args_parser, "--no-delete-cout", "-nc") == false)
         remove("barn.c");
 }
 
