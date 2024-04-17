@@ -25,14 +25,14 @@ fun C_NULL() -> string {
 	__code__("return ((char*)0x0000);")
 }
 
-// Function for comparing string
+// Function to comparing strings
 fun string_compare(string s1, string s2) -> bool {
 	__code__("return ((bool)((strcmp(s1, s2) == 0) == 1 ? 1 : 0));")
 	__use__(s1)
 	__use__(s2)
 }
 
-// Function for getting string length
+// Function to get string length
 fun string_length(string s) -> int {	
 	__code__("return ((int)(strlen(s)));")
 	__use__(s)
@@ -60,7 +60,7 @@ fun parse_string_to_int(int n, int base) -> string {
 
 // TODO: fix int_to_string function
 
-// Function for changing number to string
+// Function to change number to string
 fun int_to_string(int num, int base) -> string {
 	// __code__("return itoa(num, base);")
 
@@ -68,7 +68,7 @@ fun int_to_string(int num, int base) -> string {
 	__use__(base)
 }
 
-// Function for getting user input from console
+// Function to get user input from console
 fun read_line_stdin() -> string {
 	__code__("char c;")
 	__code__("char* str = (char*)malloc(2048);")
@@ -78,28 +78,28 @@ fun read_line_stdin() -> string {
 	__code__("return str;")
 }
 
-// Function just for printing
+// Function to print into console
 fun print(string s) {
 	__code__("printf(\"%s\", s);")
 
 	__use__(s)
 }
 
-// Function just for printing with newline after it
+// Function to print with newline
 fun println(string s) {
 	__code__("printf(\"%s\n\", s);")
 
 	__use__(s)
 }
 
-// Function for printing numbers
+// Function to print numbers
 fun printnum(int num) {
 	__code__("printf(\"%d\", num);")
 
 	__use__(num)
 }
 
-// Function for printing numbers
+// Function to print bools
 fun printbool(bool to_print_bool) {
 	if to_print_bool == true {
 		print("true")
