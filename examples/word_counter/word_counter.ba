@@ -1,7 +1,7 @@
 /*
- * This is an example program written for tests the barn compiler 
+ * This is an example program written to test the Barn compiler 
  * performance and work. This program is a very simple word counter
- * that will count words and letters from a file or direct console 
+ * which counts words and letters from a file or direct console 
  * input. Have fun compiling it and trying it for yourself! 
  */
 
