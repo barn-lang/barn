@@ -358,6 +358,7 @@ barn_tc_value_modification(barn_type_checker_t* tc, barn_node_t* value_mod)
         curr_node->node_kind == BARN_NODE_VARIABLE_ASNMINUS       ||
         curr_node->node_kind == BARN_NODE_VARIABLE_ASNDIV         ||
         curr_node->node_kind == BARN_NODE_VARIABLE_ASNMUL         || 
+        curr_node->node_kind == BARN_NODE_VARIABLE_ASNMOD         || 
         curr_node->node_kind == BARN_NODE_VARIABLE_INCREMENTATION || 
         curr_node->node_kind == BARN_NODE_VARIABLE_DECREMENTATION)
     {
@@ -446,6 +447,7 @@ barn_type_checker_main_loop(barn_type_checker_t* tc, barn_parser_t* parser)
                  tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNMINUS       ||
                  tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNDIV         ||
                  tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNMUL         || 
+                 tc->curr_node->node_kind == BARN_NODE_VARIABLE_ASNMOD         || 
                  tc->curr_node->node_kind == BARN_NODE_VARIABLE_INCREMENTATION || 
                  tc->curr_node->node_kind == BARN_NODE_VARIABLE_DECREMENTATION)
             barn_tc_value_modification(tc, NULL);

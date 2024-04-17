@@ -63,6 +63,8 @@ barn_token_kind_to_string(barn_token_kind_t kind)
             return "MULASN";
         case BARN_TOKEN_DIVASN:
             return "DIVASN";
+        case BARN_TOKEN_MODASN:
+            return "MODASN";
         case BARN_TOKEN_BANG:
             return "BANG";
         case BARN_TOKEN_GT:

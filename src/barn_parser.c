@@ -226,6 +226,8 @@ barn_parser_identifier(barn_parser_t* parser)
             barn_parser_variable_asn(parser, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_PLUSASN))
             barn_parser_variable_plusasn(parser, element);
+        else if (barn_parser_is_next_token(parser, BARN_TOKEN_MODASN))
+            barn_parser_variable_modasn(parser, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_MINUSASN))
             barn_parser_variable_minusasn(parser, element);
         else if (barn_parser_is_next_token(parser, BARN_TOKEN_MULASN))

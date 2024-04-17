@@ -59,7 +59,7 @@
 - [ ] Implement array
 - [ ] Implement pointers
 - [ ] Implement match
-- [ ] Implement modulus (forgot about it)
+- [X] Implement modulus (forgot about it)
 
 BUGS:
     - [X] Make args parser finally work...

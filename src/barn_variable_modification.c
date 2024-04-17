@@ -70,6 +70,28 @@ barn_parser_variable_plusasn(barn_parser_t* parser, barn_parser_access_element_t
 }
 
 void 
+barn_parser_variable_modasn(barn_parser_t* parser, barn_parser_access_element_t* element)
+{
+    barn_token_t* start_token = parser->curr_token;
+    barn_parser_skip(parser, 1);
+    
+    if (element->variable.variable->is_const == true)
+        BARN_PARSER_ERR(parser, BARN_PARSER_ERROR, "'%s' is a constant variable that can't be modified", 
+                        parser->curr_token->value);
+
+    barn_parser_skip(parser, 1);
+    element->variable.variable->is_used = true;
+
+    barn_node_t* new_var_value = barn_parse_expression(parser, BARN_TOKEN_NEWLINE, BARN_TOKEN_SEMICOL, true);
+    barn_node_t* node = barn_create_empty_node(BARN_NODE_VARIABLE_ASNMOD);
+    node->variable_modification.variable_value = new_var_value;
+    node->variable_modification.access_element = element;
+    node->variable_modification.variable_token = start_token;
+
+    barn_parser_append_node(parser, node);
+}
+
+void 
 barn_parser_variable_minusasn(barn_parser_t* parser, barn_parser_access_element_t* element)
 {
     barn_token_t* start_token = parser->curr_token;

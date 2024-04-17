@@ -429,6 +429,9 @@ barn_codegen_variable_modification(barn_codegen_t* codegen, barn_node_t* curr_no
         case BARN_NODE_VARIABLE_ASNPLUS:
             fprintf(codegen->c_file, "+= ");
             break;
+        case BARN_NODE_VARIABLE_ASNMOD:
+            fprintf(codegen->c_file, "%= ");
+            break;
         case BARN_NODE_VARIABLE_ASNMUL:
             fprintf(codegen->c_file, "*= ");
             break;
@@ -477,6 +480,7 @@ barn_codegen_generate_function_body(barn_codegen_t* codegen, barn_node_t* curr_n
         case BARN_NODE_VARIABLE_ASNDIV:
         case BARN_NODE_VARIABLE_ASNMINUS:
         case BARN_NODE_VARIABLE_ASNPLUS:
+        case BARN_NODE_VARIABLE_ASNMOD:
         case BARN_NODE_VARIABLE_ASNMUL:
         case BARN_NODE_VARIABLE_INCREMENTATION:
         case BARN_NODE_VARIABLE_DECREMENTATION:

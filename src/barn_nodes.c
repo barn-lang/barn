@@ -43,6 +43,8 @@ barn_node_kind_show(barn_node_kind_t kind)
             return "VariableAssignmentDivide";
         case BARN_NODE_VARIABLE_ASNPLUS:
             return "VariableAssignmentPlus";
+        case BARN_NODE_VARIABLE_ASNMOD:
+            return "VariableAssignmentMod";
         case BARN_NODE_VARIABLE_ASNMINUS:
             return "VariableAssignmentMinus";
         case BARN_NODE_VARIABLE_ASNMUL:

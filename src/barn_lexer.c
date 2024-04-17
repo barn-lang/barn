@@ -665,6 +665,14 @@ barn_lexer_create_symbol(barn_lexer_t* lexer)
         }
         case '%':
         {
+            if (lexer->next_char == '=')
+            {
+                barn_lexer_advance(lexer, 1);
+                symbol.symbol_value = "%=";
+                symbol.symbol_kind  = BARN_TOKEN_MODASN;
+                return symbol;
+            } 
+
             symbol.symbol_value = "%";
             symbol.symbol_kind  = BARN_TOKEN_MOD;
             return symbol;

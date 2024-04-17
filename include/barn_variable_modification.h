@@ -33,6 +33,7 @@ void barn_parser_variable_plusasn (barn_parser_t* parser, barn_parser_access_ele
 void barn_parser_variable_minusasn(barn_parser_t* parser, barn_parser_access_element_t* element); // -= 
 void barn_parser_variable_mulasn  (barn_parser_t* parser, barn_parser_access_element_t* element); // *=
 void barn_parser_variable_divasn  (barn_parser_t* parser, barn_parser_access_element_t* element); // /=
+void barn_parser_variable_modasn  (barn_parser_t* parser, barn_parser_access_element_t* element); // /=
 
 void barn_parser_variable_incrementation(barn_parser_t* parser, barn_parser_access_element_t* element); // ++
 void barn_parser_variable_decrementation(barn_parser_t* parser, barn_parser_access_element_t* element); // --

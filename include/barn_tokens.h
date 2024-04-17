@@ -47,6 +47,7 @@ typedef enum __barn_token_kind_t {
 	BARN_TOKEN_MINUSASN,       // "-="
 	BARN_TOKEN_MULASN,         // "*="
 	BARN_TOKEN_DIVASN,         // "/="
+	BARN_TOKEN_MODASN,         // "%="
 	BARN_TOKEN_INCREMENTATION, // "++"
 	BARN_TOKEN_DECREMENTATION, // "--"
 
