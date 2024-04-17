@@ -140,7 +140,7 @@ barn_parser_enum(barn_parser_t* parser)
         
     barn_parser_skip(parser, 1);
 
-    // If it's something like this: `enum {}` just return..
+    // If it's something like: `enum {}` just return..
     // we don't need to do anything with it
     if (parser->curr_token->kind == BARN_TOKEN_CLOSEBRACE)
         return;
