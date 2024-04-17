@@ -27,7 +27,7 @@
 void
 barn_version_message()
 {
-    printf("barnc compiler %s0.3v%s (%s%s%s)\n",
+    printf("barnc compiler %s"BARN_VERSION_FULL"%s (%s%s%s)\n",
         barn_get_bold_color_as_str_code(BARN_COLOR_GREEN),
         barn_get_bold_color_as_str_code(BARN_COLOR_RESET),
         barn_get_bold_color_as_str_code(BARN_COLOR_GREEN),
@@ -51,17 +51,42 @@ barn_no_flags_message(char** argv)
 void 
 barn_help_message()
 {
-    printf("%sBarn Help:%s\n", barn_get_bold_color_as_str_code(BARN_COLOR_GREEN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("  - %sFlags%s\n", barn_get_bold_color_as_str_code(BARN_COLOR_YELLOW), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("    > %s--help%s show this message\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("    > %s--version%s show version of barn compiler\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("    > %s--c%s compile and write output of program in C (default)\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("    > %s--tokens%s show all tokens from lexer (for debug purposes)\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("    > %s--time%s show lexer, parser and codegen process time\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("    > %s--cflags%s argument that can add c flags to compilation\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("    > %s--no-main%s don't show error about no main function\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("    > %s--no-stdlib%s don't include barn_header.h\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
-	printf("    > %s--no-delete-cout%s don't delete generated source code\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+    // printf("%sBarn Help:%s\n", barn_get_bold_color_as_str_code(BARN_COLOR_GREEN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("  - %sFlags%s\n", barn_get_bold_color_as_str_code(BARN_COLOR_YELLOW), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("    > %s--help%s show this message\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("    > %s--version%s show version of barn compiler\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("    > %s--c%s compile and write output of program in C (default)\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("    > %s--tokens%s show all tokens from lexer (for debug purposes)\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("    > %s--time%s show lexer, parser and codegen process time\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("    > %s--cflags%s argument that can add c flags to compilation\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("    > %s--no-main%s don't show error about no main function\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("    > %s--no-stdlib%s don't include barn_header.h\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+	// printf("    > %s--no-delete-cout%s don't delete generated source code\n", barn_get_bold_color_as_str_code(BARN_COLOR_CYAN), barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
+
+    printf("barnc compiler %s"BARN_VERSION_FULL"%s (%s%s%s)\n\
+%susage%s: barn <options> <filename>\n\n\
+%soptions%s:\n\
+  - --no-stdlib, -ns               Standard libraries are not included\n\
+  - --tokens, -t                   Show all tokens generated in lexer\n\
+  - --cflags                       Add flags to C compiler\n\
+  - --version, -v                  Show Current version of barn compiler\n\
+  - --no-delete-cout, -nc          Don't delete generated source code\n\
+  - --w-disable-unused, -wd-unused Warning about unused variables are not showed\n\
+  - --no-main, -nm                 Compiled file is allowed to not have a main function in it\n\
+  - --time, -t                     Prints compilation time\n\
+  - --help, -h                     Prints this message\n\
+  - --ast, -a                      Shows Abstract Syntax Tree generated in Parser\n\
+",
+
+        barn_get_bold_color_as_str_code(BARN_COLOR_GREEN),
+        barn_get_bold_color_as_str_code(BARN_COLOR_RESET),
+        barn_get_bold_color_as_str_code(BARN_COLOR_GREEN),
+        barn_get_current_architecture(),
+        barn_get_bold_color_as_str_code(BARN_COLOR_RESET),
+        barn_get_bold_color_as_str_code(BARN_COLOR_GREEN),
+        barn_get_bold_color_as_str_code(BARN_COLOR_RESET),
+        barn_get_bold_color_as_str_code(BARN_COLOR_GREEN),
+        barn_get_bold_color_as_str_code(BARN_COLOR_RESET));
 
     exit(0);
 }

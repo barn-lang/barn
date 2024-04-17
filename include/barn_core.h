@@ -37,6 +37,10 @@
 #include <barn_debug.h>
 #include <barn_error.h>
 
+#define BARN_VERSION_FULL  "0.3v"
+#define BARN_VERSION_MAJOR 0
+#define BARN_VERSION_MINOR 3
+
 /* When your compiler is fucked up */
 #ifndef __FILE_NAME__
 # define __FILE_NAME__ "unknown_filename"

@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.ejs": "html",
         "*.asm": "barn",
         "__config": "cpp",
         "__locale": "cpp",
@@ -46,6 +47,7 @@
         "complex": "c",
         "barn_random.h": "c",
         "string.h": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "ios": "c"
     }
 }
