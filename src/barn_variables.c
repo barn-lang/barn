@@ -45,8 +45,8 @@ barn_create_variable(const char* var_name, barn_type_t* var_type,
     return var;
 }
 
-// barn_parser_is_variable_defined_lg function is checking does
-// a variable named variable_name already exists
+// barn_parser_is_variable_defined_lg function checks if
+// variable named variable_name already exists
 //
 // lg stands for "local and global"
 bool
@@ -61,8 +61,8 @@ barn_parser_is_variable_defined_lg(barn_parser_t* parser, const char* variable_n
     return false;
 }
 
-// barn_parser_is_variable_defined_lg function is checking does
-// a variable named variable_name already exists
+// barn_parser_is_variable_defined_lg function checks if
+// variable named variable_name already exists
 //
 // l stands for "local"
 bool
@@ -79,8 +79,8 @@ barn_parser_is_variable_defined_l(barn_parser_t* parser, const char* variable_na
     return false;
 }
 
-// barn_parser_is_variable_defined_lg function is checking does
-// a variable named variable_name already exists
+// barn_parser_is_variable_defined_lg function checks if
+// variable named variable_name already exists
 //
 // g stands for "global"
 bool
