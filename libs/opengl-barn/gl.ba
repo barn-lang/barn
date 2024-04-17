@@ -20,8 +20,8 @@ fun main_loop_gl() {
     __code__("glutMainLoop();")
 }
 
-// To use this function you need to have function display_func()
-// defined in main file
+// To use this function you need to define function display_func()
+// in main file
 fun register_display_func() {
 }
 

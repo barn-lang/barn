@@ -132,7 +132,7 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
         {
             barn_expression_node_t* last_node = barn_get_element_from_array(expr_nodes, i - 1);
 
-            // Situation where lhs and rhs is NULL this can happend in expressions
+            // Situation where lhs and rhs is NULL can happend in expressions
             // like this underneath:
             //              y
             // (1 + 2) * (3 + 4)
@@ -197,9 +197,9 @@ barn_tc_expression_get_type(barn_type_checker_t* tc, barn_node_t* expr_node)
 bool
 barn_tc_does_types_collides(barn_type_t* lhs, barn_type_t* rhs)
 {
-    // A very simple function that checks does two given types don't collide
+    // A very simple function that checks if two given types don't collide
     // with each other, for example if lhs=T<string> and rhs=T<i32>
-    // these two types will gonna collide because we can't make any action
+    // these two types are gonna collide because we can't make any action
     // with them.
     //
     // TODO: Add custom structure comparasion (structures first)
@@ -278,7 +278,7 @@ barn_tc_variable_declaration(barn_type_checker_t* tc, barn_node_t* var_node)
     barn_type_t* var_expected_value_type = curr_node->variable_declaration.variable->var_type;
     barn_type_t* var_value_expr_type     = barn_tc_expression_get_type(tc, curr_node->variable_declaration.variable_value);
     
-    /* This code make auto variables work, how? Uhh we just take 
+    /* This code makes auto variables work, how? Uhh we just take 
      * expression type and swap it into the variable. */
     if (var_expected_value_type->type == BARN_TYPE_AUTO)
     {

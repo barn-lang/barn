@@ -38,11 +38,11 @@ typedef struct __barn_parse_function_args_t {
 } barn_parse_function_args_t;
 
 /* 
- * This function named `barn_parser_collect_function_name`
- * is a very interesting one because it first of all checks
- * is the current token EOF kind next we duplicate this string
- * and checks is it a correct namespace and does a function
- * like this doesn't exists already 
+ * The function named `barn_parser_collect_function_name`
+ * is a very interesting one because it first checks
+ * the current token EOF kind, next we duplicate this string
+ * and checks if it is a correct namespace and runs a function
+ * (like this doesn't exists already)
  */
 const char* barn_parser_collect_function_name(barn_parser_t* parser);
 

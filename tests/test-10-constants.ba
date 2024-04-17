@@ -1,6 +1,6 @@
 @import "std.ba"
 
-const CONSTANT: string = "HI A CONSTANT"
+const CONSTANT: string = "HI IM A CONSTANT"
 
 fun main() {
     println(CONSTANT)
