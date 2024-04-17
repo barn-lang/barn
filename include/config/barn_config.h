@@ -3,7 +3,7 @@
 
 /* 
  * This will generate prettier code but it will be 
- * more massive and will take more memory. For example
+ * bigger and take more memory. For example
  * without BARN_CODEGEN_PRETTIER_CODE defined generated
  * expression will look like this
  * 
