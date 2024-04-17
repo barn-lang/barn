@@ -28,3 +28,9 @@
  *
 */
 
+@import "std.ba"
+
+fun main() -> i32 {
+    println("Hello, World!")
+    return 0
+}
