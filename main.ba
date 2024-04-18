@@ -1,21 +1,11 @@
 @import "std.ba"
 
-fun ok2() -> string {
-    return "ok2"
-}
-
 fun main() -> i32 {
-    let ok: string = "Spoko"
-    
-    if "ok" == ok {
-        println("ok is equal to ok")
+    if "string" == "string" {
+        
     }
-    elif "ok" == ok2() {
-        println("ok is equal to ok")
+    if "third string" > "error!!" {
+
     }
-    elif ok2() < ok2() {
-        println("ok is equal to ok")
-    }
-    
     return 0
 }

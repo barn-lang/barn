@@ -77,6 +77,19 @@ barn_tc_expression_check_structure_init(barn_type_checker_t* tc, barn_node_t* ex
 }
 
 void
+barn_tc_check_string_comparation_expression(barn_type_checker_t* tc, barn_expression_value_t* lhs, 
+                                            barn_expression_value_t* rhs, barn_expression_node_t* curr_expr_node)
+{
+    if (!(lhs->expr_val_type->is_string || rhs->expr_val_type->is_string))
+        return;
+
+    if (curr_expr_node->operator != BARN_TOKEN_EQ)
+        BARN_TYPE_CHECKER_ERR(tc, lhs->expr_val_token, BARN_TYPE_ERROR, "wrong operator, strings can only be compared", 0);
+
+    return;
+}
+
+void
 barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
 {
     barn_array_t* expr_nodes = expr_node->expression.expression_nodes;
@@ -127,6 +140,8 @@ barn_tc_expression_check(barn_type_checker_t* tc, barn_node_t* expr_node)
                 BARN_TYPE_CHECKER_ERR(tc, curr_expr_node->lhs->expr_val_token, BARN_TYPE_ERROR, "type mismatch, expected %s but got %s",
                     barn_convert_type_to_string(curr_expr_node->lhs->expr_val_type), 
                     barn_convert_type_to_string(curr_expr_node->rhs->expr_val_type));
+                
+            barn_tc_check_string_comparation_expression(tc, curr_expr_node->lhs, curr_expr_node->rhs, curr_expr_node);
         }
         else
         {
