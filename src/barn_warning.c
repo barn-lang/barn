@@ -41,3 +41,36 @@ barn_warning_show(char* message, ...)
 
     va_end(list);
 }
+
+void
+barn_warning_show_line(char* message, barn_token_t* token, ...)
+{
+    va_list list;
+    va_start(list, message);
+
+    char buf[512];
+    vsnprintf(buf, 512, message, list);
+
+    printf("%sWarning%s: %s\n",
+    barn_get_bold_color_as_str_code(BARN_COLOR_YELLOW),
+    barn_get_color_as_str_code(BARN_COLOR_RESET),
+    buf);
+
+    if (token->row != 0) 
+        printf("%s%d %s| %s...%s\n", 
+            barn_get_color_as_str_code(BARN_COLOR_GREEN), token->row, barn_get_color_as_str_code(BARN_COLOR_RESET), 
+            barn_get_color_as_str_code(BARN_COLOR_GRAY), barn_get_color_as_str_code(BARN_COLOR_RESET));
+
+    printf("%s%d %s| %s%s\n", 
+        barn_get_color_as_str_code(BARN_COLOR_GREEN), token->row + 1, 
+        barn_get_color_as_str_code(BARN_COLOR_RESET), barn_get_color_as_str_code(BARN_COLOR_GRAY), token->line);
+    
+    printf("%s%d %s| %s", 
+        barn_get_color_as_str_code(BARN_COLOR_GREEN), token->row, barn_get_color_as_str_code(BARN_COLOR_RESET), 
+        barn_get_color_as_str_code(BARN_COLOR_GRAY));
+    for (int i = 0; i < token->col - 1; i++)
+        printf(" ");
+    printf("^---- declared here.%s\n", barn_get_color_as_str_code(BARN_COLOR_RESET));
+
+    va_end(list);
+}

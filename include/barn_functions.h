@@ -28,8 +28,9 @@
 #define BARN_FUNCTION_USE_CODE       "__use__"
 
 typedef struct __barn_func_argument_t {
-    barn_type_t* argument_type;
-    const char*  argument_name;
+    barn_type_t*  argument_type;
+    const char*   argument_name;
+    barn_token_t* argument_token; 
 } barn_func_argument_t;
 
 typedef struct __barn_parse_function_args_t {
@@ -51,7 +52,7 @@ void barn_parser_function_declaration(barn_parser_t* parser);
 
 barn_node_t* barn_parser_function_get_by_name(barn_parser_t* parser, char* function_name);
 
-barn_func_argument_t* barn_create_func_argument(barn_type_t* argument_type, const char* argument_name);
+barn_func_argument_t* barn_create_func_argument(barn_type_t* argument_type, const char* argument_name, barn_token_t* argument_token);
 
 void barn_initialize_builtin_functions();
 

@@ -301,7 +301,7 @@ barn_parser_check_usage_of_local_variables(barn_parser_t* parser)
     {
         barn_variable_t* local_var = barn_get_element_from_array(parser->local_variables, i);
         if (local_var->is_used == false && strlen(local_var->var_name) != 0)
-            barn_warning_show("[disable with --w-disable-unused] variable named \"%s\" is not used", local_var->var_name);            
+            barn_warning_show_line("[disable with --w-disable-unused] variable named \"%s\" is not used", local_var->var_token, local_var->var_name);            
     }
 }
 
@@ -344,7 +344,7 @@ barn_parser_check_usage_of_global_variables(barn_parser_t* parser)
     {
         barn_variable_t* global_var = barn_get_element_from_array(parser->global_variables, i);
         if (global_var->is_used == false && strlen(global_var->var_name) != 0)
-            barn_warning_show("[disable with --w-disable-unused] variable named \"%s\" is not used", global_var->var_name);            
+            barn_warning_show("[disable with --w-disable-unused] variable named \"%s\" is not used", global_var->var_token, global_var->var_name);            
     }
 }
 

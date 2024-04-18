@@ -25,15 +25,17 @@
 #include <barn_types.h>
 
 typedef struct __barn_variable_t {
-    bool         is_const;
-    bool         is_static;
-    bool         is_used;
-    barn_type_t* var_type;
-    const char*  var_name;
+    bool          is_const;
+    bool          is_static;
+    bool          is_used;
+    barn_type_t*  var_type;
+    const char*   var_name;
+    barn_token_t* var_token;
 } barn_variable_t;
- 
+
 barn_variable_t* barn_create_variable(const char* var_name, barn_type_t* var_type, 
-                                      bool is_const, bool is_used, bool is_static);
+                                      bool is_const, bool is_used, bool is_static,
+                                      barn_token_t* token);
 
 void barn_parser_variable_declaration(barn_parser_t* parser, bool is_constant, bool is_static);
 void barn_parser_static_variable_declaration(barn_parser_t* parser);

@@ -65,7 +65,7 @@ barn_parser_enum_append_field(barn_parser_t* parser, barn_array_t* enum_fields,
     barn_parser_skip(parser, 1);
 
     barn_variable_t* variable 
-        = barn_create_variable(field_name, barn_get_type_i64_global(), true, true, false);
+        = barn_create_variable(field_name, barn_get_type_i64_global(), true, true, false, field_token);
     barn_append_element_to_array(parser->global_variables, variable);
 }
 

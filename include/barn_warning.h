@@ -22,7 +22,9 @@
 #define __BARN_WARNING__
 
 #include <barn_core.h>
+#include <barn_tokens.h>
 
 void barn_warning_show(char* message, ...);
+void barn_warning_show_line(char* message, barn_token_t* token, ...);
 
 #endif /* __BARN_WARNING__ */

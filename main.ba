@@ -1,11 +1,6 @@
 @import "std.ba"
 
-fun main() -> i32 {
-    if "string" == "string" {
-        
-    }
-    if "lol s" > "error!!" {
-
-    }
+fun main(i32 ok) -> i32 {
+    let i: i32 = 1
     return 0
 }

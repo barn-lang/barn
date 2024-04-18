@@ -63,7 +63,7 @@ barn_initialize_builtin_functions(barn_parser_t* parser)
 {
     barn_node_t* __code__function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
     barn_array_t* __code__args    = barn_create_array(sizeof(barn_func_argument_t));
-    barn_append_element_to_array(__code__args, barn_create_func_argument(barn_get_type_str_global(), "__code__str"));
+    barn_append_element_to_array(__code__args, barn_create_func_argument(barn_get_type_str_global(), "__code__str", NULL));
 
     __code__function->function_declaration.function_name   = BARN_FUNCTION_INJECTING_CODE;
     __code__function->function_declaration.function_args   = __code__args;
@@ -74,7 +74,7 @@ barn_initialize_builtin_functions(barn_parser_t* parser)
 
     barn_node_t* putchar_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
     barn_array_t* putchar_args    = barn_create_array(sizeof(barn_func_argument_t));
-    barn_append_element_to_array(putchar_args, barn_create_func_argument(barn_get_type_i8_global(), "putchar_c"));
+    barn_append_element_to_array(putchar_args, barn_create_func_argument(barn_get_type_i8_global(), "putchar_c", NULL));
 
     putchar_function->function_declaration.function_name   = "putchar";
     putchar_function->function_declaration.function_args   = putchar_args;
@@ -85,7 +85,7 @@ barn_initialize_builtin_functions(barn_parser_t* parser)
 
     barn_node_t* exit_function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
     barn_array_t* exit_args    = barn_create_array(sizeof(barn_func_argument_t));
-    barn_append_element_to_array(exit_args, barn_create_func_argument(barn_get_type_i32_global(), "exit_code"));
+    barn_append_element_to_array(exit_args, barn_create_func_argument(barn_get_type_i32_global(), "exit_code", NULL));
 
     exit_function->function_declaration.function_name   = "exit";
     exit_function->function_declaration.function_args   = exit_args;
@@ -96,7 +96,7 @@ barn_initialize_builtin_functions(barn_parser_t* parser)
 
     barn_node_t* __use__function = barn_create_empty_node(BARN_NODE_FUNCTION_DECLARATION);
     barn_array_t* __use__args    = barn_create_array(sizeof(barn_func_argument_t));
-    barn_append_element_to_array(__use__args, barn_create_func_argument(barn_create_type(BARN_TYPE_ANY), "__use__any"));
+    barn_append_element_to_array(__use__args, barn_create_func_argument(barn_create_type(BARN_TYPE_ANY), "__use__any", NULL));
 
     __use__function->function_declaration.function_name   = BARN_FUNCTION_USE_CODE;
     __use__function->function_declaration.function_args   = __use__args;
@@ -237,7 +237,7 @@ barn_parser_function_args_parse_type(barn_parser_t* parser, barn_parse_function_
             BARN_PARSER_ERR(parser, BARN_UNDEFINED_ERROR, "undefined and unknown type name '%s'", 
                             parser->curr_token->value);
 
-        barn_append_element_to_array(args, barn_create_func_argument(argument_type, parser->curr_token->value));
+        barn_append_element_to_array(args, barn_create_func_argument(argument_type, parser->curr_token->value, parser->curr_token));
         
         func_args_parser->expect_type  = false;
         func_args_parser->expect_name  = true;
@@ -249,7 +249,7 @@ barn_parser_function_args_parse_type(barn_parser_t* parser, barn_parse_function_
     else if (parser->curr_token->kind == BARN_TOKEN_TRIPLEDOT)
     {  
         barn_type_t* format_type = barn_create_type(BARN_TYPE_FORMAT);
-        barn_append_element_to_array(args, barn_create_func_argument(format_type, ""));
+        barn_append_element_to_array(args, barn_create_func_argument(format_type, "", parser->curr_token));
 
         func_args_parser->expect_type  = false;
         func_args_parser->expect_name  = false;
@@ -299,11 +299,12 @@ barn_parser_function_args_parse_comma(barn_parser_t* parser, barn_parse_function
 }
 
 barn_func_argument_t* 
-barn_create_func_argument(barn_type_t* argument_type, const char* argument_name)
+barn_create_func_argument(barn_type_t* argument_type, const char* argument_name, barn_token_t* argument_token)
 {
     barn_func_argument_t* argument = (barn_func_argument_t*)calloc(1, sizeof(barn_func_argument_t));
-    argument->argument_name = argument_name;
-    argument->argument_type = argument_type;
+    argument->argument_name  = argument_name;
+    argument->argument_type  = argument_type;
+    argument->argument_token = argument_token;
 
     return argument;
 }
@@ -317,7 +318,8 @@ barn_function_declaration_set_argument_as_variables(barn_parser_t* parser, barn_
             = barn_get_element_from_array(node->function_declaration.function_args, i);
         
         barn_variable_t* var = barn_create_variable(
-            func_argument->argument_name, func_argument->argument_type, true, true, false);
+            func_argument->argument_name, func_argument->argument_type, 
+            true, false, false, func_argument->argument_token);
 
         if (func_argument->argument_name[0] == '-')
             var->is_used = true;
