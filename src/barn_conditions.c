@@ -44,6 +44,8 @@ barn_parser_if_statement(barn_parser_t* parser)
     {
         parser->statement_open += 1;
         parser->statement_node =  if_node;
+
+        parser->layer++;
     }
     else
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"{\" after if condition", 0);
@@ -83,6 +85,8 @@ barn_parser_elif_statement(barn_parser_t* parser)
         {
             parser->statement_open += 1;
             parser->statement_node =  elif_node;
+
+            parser->layer++;
         }
         else
             BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"{\" after elif condition", 0);
@@ -126,6 +130,8 @@ barn_parser_else_statement(barn_parser_t* parser)
         {
             parser->statement_open += 1;
             parser->statement_node =  else_node;
+
+            parser->layer++;
         }
         else
             BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"{\" after else condition", 0);

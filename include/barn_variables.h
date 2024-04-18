@@ -31,11 +31,12 @@ typedef struct __barn_variable_t {
     barn_type_t*  var_type;
     const char*   var_name;
     barn_token_t* var_token;
+    int           var_layer;
 } barn_variable_t;
 
 barn_variable_t* barn_create_variable(const char* var_name, barn_type_t* var_type, 
                                       bool is_const, bool is_used, bool is_static,
-                                      barn_token_t* token);
+                                      barn_token_t* token, int var_layer);
 
 void barn_parser_variable_declaration(barn_parser_t* parser, bool is_constant, bool is_static);
 void barn_parser_static_variable_declaration(barn_parser_t* parser);

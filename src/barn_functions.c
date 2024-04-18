@@ -319,7 +319,7 @@ barn_function_declaration_set_argument_as_variables(barn_parser_t* parser, barn_
         
         barn_variable_t* var = barn_create_variable(
             func_argument->argument_name, func_argument->argument_type, 
-            true, false, false, func_argument->argument_token);
+            true, false, false, func_argument->argument_token, 0);
 
         if (func_argument->argument_name[0] == '-')
             var->is_used = true;
@@ -447,6 +447,8 @@ barn_parser_function_declaration(barn_parser_t* parser)
     barn_parser_append_node(parser, node);
     barn_function_declaration_set_values(parser, node);
     barn_function_declaration_set_argument_as_variables(parser, node);
+
+    parser->layer = 0;
 }
 
 void

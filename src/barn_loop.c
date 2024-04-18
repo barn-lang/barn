@@ -43,6 +43,7 @@ barn_parser_while_loop(barn_parser_t* parser)
         parser->loop_open     += 1;
         parser->statement_open += 1;
         parser->statement_node =  while_node;
+        parser->layer++;
     }
     else
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "expected \"{\" after while condition", 0);

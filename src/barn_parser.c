@@ -316,6 +316,7 @@ barn_parser_close_brace(barn_parser_t* parser)
         parser->actual_function = NULL;
         barn_parser_check_usage_of_local_variables(parser);
         barn_parser_reset_local_variables(parser);
+        parser->layer = -1;
         return;
     }
 
@@ -332,6 +333,7 @@ barn_parser_close_brace(barn_parser_t* parser)
     barn_parser_append_node(parser, end_node);
     
     parser->statement_open--;
+    parser->layer--;
 }
 
 void

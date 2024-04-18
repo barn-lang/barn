@@ -33,7 +33,7 @@
 barn_variable_t* 
 barn_create_variable(const char* var_name, barn_type_t* var_type, 
                      bool is_const, bool is_used, bool is_static,
-                     barn_token_t* var_token)
+                     barn_token_t* var_token, int var_layer)
 {
     barn_variable_t* var = (barn_variable_t*)calloc(1, sizeof(barn_variable_t));
 
@@ -43,6 +43,7 @@ barn_create_variable(const char* var_name, barn_type_t* var_type,
     var->var_name   =  var_name ;
     var->var_type   =  var_type ;
     var->var_token  =  var_token;
+    var->var_layer  =  var_layer;
 
     if (var->var_token == NULL)
         var->is_used = true;
@@ -75,10 +76,12 @@ barn_parser_is_variable_defined_l(barn_parser_t* parser, const char* variable_na
 {  
     BARN_ARRAY_FOR(parser->local_variables)
     {
-        if (BARN_STR_CMP(
-                ((barn_variable_t*)barn_get_element_from_array(parser->local_variables, i))
-                ->var_name, variable_name))
-            return true;
+        barn_variable_t* current_var = barn_get_element_from_array(parser->local_variables, i);
+
+        if (BARN_STR_CMP(current_var->var_name, variable_name))
+            if (parser->layer >= current_var->var_layer)
+                return true;
+
     }
 
     return false;
@@ -175,7 +178,8 @@ barn_parser_variable_declaration(barn_parser_t* parser, bool is_constant, bool i
     if (variable_value->expression.is_compiler_time == false && !barn_parser_is_function_opened(parser))
         BARN_PARSER_ERR(parser, BARN_SYNTAX_ERROR, "value is not a compile-time expression", 0);
 
-    barn_variable_t* variable = barn_create_variable(variable_name, variable_type, is_constant, false, is_static, variable_token);
+    barn_variable_t* variable = barn_create_variable(variable_name, variable_type, is_constant, 
+                                                     false, is_static, variable_token, parser->layer);
 
     if (variable->var_name[0] == '_')
         variable->is_used = true;
@@ -204,10 +208,11 @@ barn_parser_get_variable_by_name(barn_parser_t* parser, const char* variable_nam
 
     BARN_ARRAY_FOR(parser->local_variables)
     {
-        if (BARN_STR_CMP(
-                ((barn_variable_t*)barn_get_element_from_array(parser->local_variables, i))
-                ->var_name, variable_name))
-            return ((barn_variable_t*)barn_get_element_from_array(parser->local_variables, i));
+        barn_variable_t* current_var = barn_get_element_from_array(parser->local_variables, i);
+
+        if (BARN_STR_CMP(current_var->var_name, variable_name))
+            if (parser->layer >= current_var->var_layer)
+                return current_var;
     }
 
     return NULL;

@@ -41,6 +41,7 @@ typedef struct __barn_parser_t {
     
     int statement_open;
     int loop_open;
+    int layer;
     int index;
 
     barn_array_t* function_nodes;
