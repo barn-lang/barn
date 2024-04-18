@@ -4,7 +4,7 @@ fun main() -> i32 {
     if "string" == "string" {
         
     }
-    if "third string" > "error!!" {
+    if "lol s" > "error!!" {
 
     }
     return 0

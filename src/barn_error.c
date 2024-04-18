@@ -77,6 +77,7 @@ barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, ch
             barn_get_color_as_str_code(BARN_COLOR_RESET), barn_get_color_as_str_code(BARN_COLOR_GRAY));
 
     bool was_char_printed = false;
+    bool string_opened    = false;
     int  space_skipped    = 0;
 
     for (int i = 0; i < strlen(line); i++)
@@ -93,10 +94,14 @@ barn_error_show_with_line(barn_lexer_t* lexer, barn_error_types_t error_type, ch
         if (i == col)
             printf("%s", barn_get_color_as_str_code(BARN_COLOR_GREEN));
 
+        if (line[i] == '"')
+            string_opened = !string_opened;
+
         if (line[i] == ' ' || line[i] == '(' || line[i] == '|' || line[i] == ')' || line[i] == '{' || 
             line[i] == '}' || line[i] == '[' || line[i] == ']' || line[i] == ']' || line[i] == ':' ||
             line[i] == ',')
-            printf("%s", barn_get_color_as_str_code(BARN_COLOR_GRAY));
+            if (string_opened == false)
+                printf("%s", barn_get_color_as_str_code(BARN_COLOR_GRAY));
 
         printf("%c", line[i]);
     }
