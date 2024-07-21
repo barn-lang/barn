@@ -10,8 +10,8 @@ BUILD_DIR := build
 SRC_DIR := ./src
 TARGET := barn
 
-SRCS := $(wildcard $(SRC_DIR)/*.c)
-OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRCS))
+SRCS := $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/**/*.c $(SRC_DIR)/**/**/*.c)
+OBJS := $(SRCS:.c=.o)
 
 .PHONY: all clean
 
