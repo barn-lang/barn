@@ -27,7 +27,7 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 clean:
-	rm ./**/*.o ./**/**/*.o ./**/**/**/*.o
+	find . -type f -name '*.o' -delete
 
 install:
 	mkdir -p $(HOME)/.barn/
