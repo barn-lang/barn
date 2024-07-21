@@ -84,4 +84,4 @@ BUGS:
 EXAMPLE_PROGRAMS:
     - [ ] Temperature converter
     - [X] Word Counter
-    - [ ] Voltage Divider Calculator
+    - [X] Voltage Divider Calculator

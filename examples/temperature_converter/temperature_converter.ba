@@ -1,0 +1,87 @@
+/*
+ * This is an example program written to test the Barn compiler 
+ * performance and work. This program just converts tempreature 
+ * units like Fahrenheits, Kelvins and Celcius
+ */
+
+/*
+ *
+ *  Barn Programming Language Organization
+ *  All rights reserved. Copyright (C) 2022-2024
+ *   
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *   
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *   
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+*/
+
+/* Import some useful libraries */
+@import "std.ba"
+@import "os.ba"
+
+enum {
+    FAHRENHEIT_UNIT = 0,
+    KELVIN_UNIT,
+    CELCIUS_UNIT
+}
+
+fun recognize_temperature(string temperature_str) -> i32 {
+    if temperature_str == "Fahrenheit" || temperature_str == "F" {
+        return FAHRENHEIT_UNIT
+    }
+
+    if temperature_str == "Kelvin" || temperature_str == "K" {
+        return KELVIN_UNIT
+    }
+
+    if temperature_str == "Celcius" || temperature_str == "C" {
+        return CELCIUS_UNIT
+    } 
+
+    return -1
+}
+
+fun main() {
+    let temperature_unit: i32 = -1
+    let temperature_number: f32 = 0
+
+    while true {
+        print("Input temperature unit (Fahrenheit/Kelvin/Celcius) (F/K/C): ")
+        let temperature_str: string = read_line_stdin()
+
+        temperature_unit = recognize_temperature(temperature_str)
+
+        if temperature_unit == -1 {
+            print("Wrong temperature unit (Remember about uppercase)\n")
+        } else {
+            break
+        }
+    }
+
+    print("Input the temperature: ")
+    let temperature_str_num = read_line_stdin()
+    temperature_number = parse_double(temperature_str_num)
+
+    if temperature_unit == FAHRENHEIT_UNIT {
+        fmt_print("Fahrenheits: %fF\n", temperature_number)
+        fmt_print("Kelvins: %fF\n",     (temperature_number - 32) * 5 / 9 + 273.15)
+        fmt_print("Celcius: %fF\n",     (temperature_number - 32) * 5 / 9)
+    } elif temperature_unit == KELVIN_UNIT {
+        fmt_print("Kelvins: %fF\n",     (temperature_number - 32) * 5 / 9 + 273.15)
+        fmt_print("Fahrenheits: %fF\n", temperature_number)
+        fmt_print("Celcius: %fF\n",     (temperature_number - 32) * 5 / 9)
+
+    } elif temperature_unit == CELCIUS_UNIT {
+        fmt_print("Fahrenheits: %fF\n", temperature_number)
+
+    }
+}
